@@ -1,0 +1,27 @@
+Circuit: * C:\Users\Mike Klopfer\Downloads\3phasemeter_current.asc
+
+.OP point found by inspection.
+.step r=10
+.step r=50
+.step r=100
+.step r=1000
+.step r=5000
+
+Date: Mon Nov 26 09:24:25 2018
+Total elapsed time: 0.180 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 444
+traniter = 444
+tranpoints = 223
+accept = 172
+rejected = 51
+matrix size = 10
+fillins = 0
+solver = Normal
+Matrix Compiler1: 534 bytes object code size  0.3/0.3/[0.2]
+Matrix Compiler2: off  [0.1]/0.3/0.2
+
+
