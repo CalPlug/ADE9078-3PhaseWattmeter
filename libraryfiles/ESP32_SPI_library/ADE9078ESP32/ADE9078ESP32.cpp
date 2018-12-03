@@ -1,21 +1,33 @@
 /*
- ADE7953.cpp - Simple library for operating the ADE7953 Single-Phase AC Line measurement IC over SPI for Arduino Uno 
-  Created by Umar Kazmi, Crystal Lai, and Michael Klopfer, Ph.D.
+ ADE7953.cpp - Simple library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno 
+  Created by Umar Kazmi, Crystal Lai, and Michael Klopfer, Ph.D. for the ADE7953
   January 23, 2017 - v6.2 (pre-release)
+  Forked to ADE9078 by XXXX on XXXXXX
+  
   University of California, Irvine - California Plug Load Research Center (CalPlug)
   Released into the public domain.
+  Copyright 2018
 */
 
+//for ESP32, use the following includes:
 #include "Arduino.h"
 #include "ADE7953ESP32.h"
 #include "esp32-hal-spi.h"
+
+//for Arduino Uno only use the following includes:
+//#include "Arduino.h"
+//#include <SPI.h>
+//#include "ADE7953.h"
+
 //#define ADE7953_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program!  Turning this on can take a lot of memory!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
-#define NEWBRANDY
-//#define BRANDY
+
+//Debug and Configuration settings:
+#define SETTINGMODE1
+//#define SETTINGMODE0
 //#define DEVKIT
 
+//Set SPIInstance:
 spi_t * spy;
-
 
 //******************************************************************************************
 
@@ -346,7 +358,7 @@ void ADE7953::initialize(){
   #endif
 // Slave select is 15
 
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -368,7 +380,7 @@ void ADE7953::initialize(){
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -485,7 +497,7 @@ uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorith
   byte one;
   byte two; //This may be a dummy read, it looks like the ADE7953 is outputting an extra byte as a 16 bit response even for a 1 byte return
   
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -499,7 +511,7 @@ uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorith
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -576,7 +588,7 @@ uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
   byte one;
   byte two;
   
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -590,7 +602,7 @@ uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -669,7 +681,7 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
   byte two;
   byte three;
   
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -684,7 +696,7 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -769,7 +781,7 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   byte two;
   byte three;
   byte four;
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -785,7 +797,7 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -873,7 +885,7 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm32_write function started "); 
   #endif 
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -889,7 +901,7 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -959,7 +971,7 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm24_write function started "); 
   #endif
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -974,7 +986,7 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -1038,7 +1050,7 @@ void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm16_write function started "); 
   #endif
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -1052,7 +1064,7 @@ void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -1111,7 +1123,7 @@ void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is t
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm8_write function started "); 
   #endif
-  #ifdef NEWBRANDY
+  #ifdef SETTINGMODE1
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -1124,7 +1136,7 @@ void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is t
   digitalWrite(_SS, HIGH);
   spiStopBus(spy);
   #endif
-  #ifdef BRANDY
+  #ifdef SETTINGMODE0
   spy = spiStartBus(FSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
