@@ -205,7 +205,7 @@
 #define LAST_RWDATA_32 0x3FF //LAST_RWDATA, (R) Default: 0x000000, Unsigned, Contains the data from the last successful 24-bit/32-bit register communication(32 bit)
 
 
-//********************
+//*********************
 /*
 ADE7953 REGISTER DESCRIPTIONS
 
