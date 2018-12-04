@@ -1,5 +1,5 @@
 /*
- ADE7953.cpp - Example library for operating the ADE7953 Single-Phase AC Line measurement IC over SPI for Arduino Uno 
+ ADE7953.cpp - Example library for operating the ADE7953 Single-Phase AC Line measurement IC over SPI for Arduino Uno
   Created by Umar Kazmi, Crystal Lai, and Michael J. Klopfer, Ph.D.
   January 23, 2017 - 0.1 (pre-release)
   May 3, 2018 - v6.2 (current version) - by MJK
@@ -8,7 +8,7 @@
   Copyright: The Regents of the University of California
   Released into the public domain with Share-alike licensing.
   Be decent: if our work helped you, then please reference/acknowledge this project and its authors in your work!
-  
+
   Note: Please refer to the Analog Devices ADE7953 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
 */
 
@@ -25,17 +25,17 @@
 //The #define used to save space where functions are not invoked - list of full general commands for ADE7953, not all implemented in current code - put in place as prep for potential extended development.
 
 //8-bit Registers
-#define SAGCYC_8 0x000 //SAGCYC, (R/W) Default: 0x00, Unsigned, Sag lines Cycle 
-#define DISNOLOAD_8 0x001 //DISNOLOAD, (R/W) Default: 0x00, Unsigned, No-load detection disable* 
+#define SAGCYC_8 0x000 //SAGCYC, (R/W) Default: 0x00, Unsigned, Sag lines Cycle
+#define DISNOLOAD_8 0x001 //DISNOLOAD, (R/W) Default: 0x00, Unsigned, No-load detection disable*
 #define LCYCMODE_8 0x004 //LCYCMODE, (R/W) Default: 0x40, Unsigned, Line cycle accumulation mode configuration **
-#define PGA_V_8 0x007 //PGA_V, (R/W) Default: 0x00, Unsigned, Voltage channel gain configuration (Bits[2:0])  
-#define PGA_IA_8 0x008 //PGA_IA, (R/W) Default: 0x00, Unsigned, Current Channel A gain configuration (Bits[2:0])  
-#define PGA_IB_8 0x009 //PGA_IB, (R/W) Default: 0x00, Unsigned, Current Channel B gain configuration (Bits[2:0]) 
-#define WRITE_PROTECT_8 0x040 //WRITE_PROTECT, (R/W) Default: 0x00, Unsigned, Write protection bits (Bits[2:0]) 
-#define LAST_OP_8 0x0FD //LAST_OP, (R/W) Default: 0x00, Unsigned, Contains the type (read or write) of the last successful communication (0x35 read 0xCA = write) 
-#define LAST_RWDATA_8 0x0FF //LAST_RWDATA_8, (R/W) Default: 0x00, Unsigned, Contains the data from the last successful 8-bit register communication  
-#define Version_8 0x702 //Version, (R/W) Default: N/A, Unsigned, Contains the silicon version number 
-#define EX_REF_8 0x800 //EX_REF, (R/W) Default: 0x00, Unsigned, Reference input configuration:0 = internal 1 = external 
+#define PGA_V_8 0x007 //PGA_V, (R/W) Default: 0x00, Unsigned, Voltage channel gain configuration (Bits[2:0])
+#define PGA_IA_8 0x008 //PGA_IA, (R/W) Default: 0x00, Unsigned, Current Channel A gain configuration (Bits[2:0])
+#define PGA_IB_8 0x009 //PGA_IB, (R/W) Default: 0x00, Unsigned, Current Channel B gain configuration (Bits[2:0])
+#define WRITE_PROTECT_8 0x040 //WRITE_PROTECT, (R/W) Default: 0x00, Unsigned, Write protection bits (Bits[2:0])
+#define LAST_OP_8 0x0FD //LAST_OP, (R/W) Default: 0x00, Unsigned, Contains the type (read or write) of the last successful communication (0x35 read 0xCA = write)
+#define LAST_RWDATA_8 0x0FF //LAST_RWDATA_8, (R/W) Default: 0x00, Unsigned, Contains the data from the last successful 8-bit register communication
+#define Version_8 0x702 //Version, (R/W) Default: N/A, Unsigned, Contains the silicon version number
+#define EX_REF_8 0x800 //EX_REF, (R/W) Default: 0x00, Unsigned, Reference input configuration:0 = internal 1 = external
 
 //*DISNOLOAD register
 //**LCYCMODE register
@@ -45,19 +45,19 @@
 #define ZXTOUT_16 0x100 //ZXTOUT, (R/W) Default:0xFFFF, Unsigned,Zero-crossing timeout
 #define LINECYC_16 0x101 //LINCYC, (R/W) Default:0x0000, Unsigned,Number of half line cycles for line cycle energy accumulation mode
 #define CONFIG_16 0x102 //CONFIG, (R/W) Default:0x8004, Unsigned,Configuration register***
-#define CF1DEN_16 0x103 //CF1DEN, (R/W) Default:0x003F, Unsigned,CF1 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful. 
-#define CF2DEN_16 0x104 //CF2DEN, (R/W) Default:0x003F, Unsigned,CF2 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful. 
+#define CF1DEN_16 0x103 //CF1DEN, (R/W) Default:0x003F, Unsigned,CF1 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful.
+#define CF2DEN_16 0x104 //CF2DEN, (R/W) Default:0x003F, Unsigned,CF2 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful.
 #define CFMODE_16 0x107 //CFMODE, (R/W) Default:0x0300, Unsigned, CF output selection */
-#define PHCALA_16 0x108 //PHCALA, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel A). This register is in sign magnitude format. 
-#define PHCALB_16 0x109 //PHCALB, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel B). This register is in sign magnitude format. 
-#define PFA_16 0x10A //PFA, (R) Default:0x0000, Signed,Power factor (Current Channel A) 
-#define PFB_16 0x10B //PFB, (R) Default:0x0000, Signed,Power factor (Current Channel B) 
-#define ANGLE_A_16 0x10C //ANGLE_A, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel A input 
-#define ANGLE_B_16 0x10D //ANGLE_B, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel B input 
-#define Period_16 0x11E //Period, (R) Default:0x0000, Unsigned, Period register 
+#define PHCALA_16 0x108 //PHCALA, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel A). This register is in sign magnitude format.
+#define PHCALB_16 0x109 //PHCALB, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel B). This register is in sign magnitude format.
+#define PFA_16 0x10A //PFA, (R) Default:0x0000, Signed,Power factor (Current Channel A)
+#define PFB_16 0x10B //PFB, (R) Default:0x0000, Signed,Power factor (Current Channel B)
+#define ANGLE_A_16 0x10C //ANGLE_A, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel A input
+#define ANGLE_B_16 0x10D //ANGLE_B, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel B input
+#define Period_16 0x11E //Period, (R) Default:0x0000, Unsigned, Period register
 #define ALT_OUTPUT_16 0x110 //ALT_OUTPUT, (R/W) Default:0x0000, Unsigned,Alternative output functions**/
-#define LAST_ADD_16 0x1FE //LAST_ADD, (R) Default:0x0000, Unsigned, Contains the address of the last successful communication 
-#define LAST_RWDATA_16 0x1FF //LAST_RWDATA_16, (R) Default:0x0000, Unsigned,Contains the data from the last successful 16-bit register communication 
+#define LAST_ADD_16 0x1FE //LAST_ADD, (R) Default:0x0000, Unsigned, Contains the address of the last successful communication
+#define LAST_RWDATA_16 0x1FF //LAST_RWDATA_16, (R) Default:0x0000, Unsigned,Contains the data from the last successful 16-bit register communication
 #define Reserved_16 0x120 //Reserved, (R/W) Default:0x0000, Unsigned,This register should be set to 30h to meet the performance specified in Table 1. To modify this register, it must be unlocked by setting Register Address 0xFE to 0xAD immediately prior. (16 bit)
 
 
@@ -206,6 +206,208 @@
 
 //*******************************************************************************************
 
+//****************ADE 9078 REGISTERS *****************************************************
+#define 0X000 AIGAIN_32 // Phase A current gain adjust
+
+// The following registers: // Phase A multipoint gain correction factor
+#define 0x001 AIGAIN0_32
+#define 0x003 AIGAIN1_32
+#define 0x004 AIGAIN2_32
+#define 0x005 AIGAIN3_32
+
+#define 0x006 APHCAL0_32
+#define 0x007 APHCAL1_32
+#define 0x008 APHCAL2_32
+#define 0x009 APHCAL3_32
+#define 0x00A APHCAL4_32
+
+#define 0x00B AVGAIN_32 // Phase A voltage gain adjust
+#define 0X00C AIRMSOS_32 // Phase A voltage rms offset for filter based AIRMS calculation
+#define 0X00D AVRMSOS_32 // Phase A current RMS offset for filter based AIRMS calucation
+#define 0X00E APGAIN_32 // Phase A power gain adjust for AWATT, AVA, avar, and AFVAR calculation
+#define 0X00F AWATTOS_32 // Phase A total active power offset correction for AWATT calculation.
+#define 0X010 AVAROS_32 // Phase A total active power offset correction for AVAR calculation.
+#define 0x012 AFVAROS_32 // Phase A fundamental reactive power offset correction for AFVAR calculation
+
+#define 0x020 BIGAIN_32 // Phrase B current gain adjust
+#define 0x021 BIGAIN0_32 // Phase B multipoint gain correction factors
+#define 0x022 BIGAIN1_32 // ...
+#define 0x023 BIGAIN2_32 // ...
+#define 0x024 BIGAIN3_32 // ...
+#define 0x025 BIGAIN4_32 // ...
+
+// Phase B multipoint phase correction factor
+#define 0x026 BPHCAL0_32
+#define 0x027 BPHCAL1_32
+#define 0x028 BPHCAL2_32
+#define 0x029 BPHCAL3_32
+#define 0x02A BPHCAL4_32
+
+#define 0x02B BVGAIN_32 // Phase B voltage gai nadjust
+#define 0x02C BIRMSOS_32 // Phase B current RMS offset for BIRMS calculation
+#define 0x02D BVRMSOS_32 // Phase B voltage RMS offset for BVRMS calculation
+#define 0X02E BPGAIN_32 // Phase B power gain adjust for BWATT, BVA, BVAR, and BFVAR calculations
+#define 0X02F BWATTOS_32 // Phase B total active power offset correction for BWATT calculation
+#define 0x030 BVAROS_32 // Phase B total active offset correction for BVAR calculation
+#define 0x032 BFVAROS_32 // Phase B fundamental reactive power offset correction for BFVAR calculation
+
+#define 0x040 CIGAIN_32 // Phase C current gain nadjust
+
+// Phase C multipoint gain correction factor
+#define 0x041 CIGAIN0_32
+#define 0x042 CIGAIN1_32
+#define 0x043 CIGAIN2_32
+#define 0x044 CIGAIN3_32
+#define 0x045 CIGAIN4_32
+
+#define 0X046 CPHCAL0_32
+#define 0X047 CPHCAL1_32
+#define 0X048 CPHCAL2_32
+#define 0X049 CPHCAL3_32
+#define 0X04A CPHCAL4_32
+
+#define 0x04B CVGAIN_32 // Phase C voltage gain adjust
+#define 0x04C CIRMSOS_32 // Phase C current RMS offset for CIRMS calculation
+#define 0x04D CVRMSOS_32 // Phase C voltage RMS offset for CVRMS calcuation
+#define 0x04E CPGAIN_32 // Phase C power gain adjust for CWATT, CVA, CVAR, and CFVAR calculations
+#define 0x04F CWATTOS_32 // Phase C total active power offset correction for CWATT calculations
+#define 0x050 CVAROS_32 // Phase C total reactive power offset correction for CVAR calculation
+#define 0x052 CFVAROS_32 // Phase C total reactive power offset correction for CVAR calculations
+
+#define 0x060 CONFIG0_32 // Configuration register 0
+
+// Multipoint phase/gain threshold.
+#define 0x061 MTTHR_L0_32
+#define 0x062 MTTHR_L1_32
+#define 0x063 MTTHR_L2_32
+#define 0x064 MTTHR_L3_32
+#define 0x065 MTTHR_L4_32
+
+#define 0x066 MTTHR_H0_32
+#define 0x067 MTTHR_H1_32
+#define 0x068 MTTHR_H2_32
+#define 0x069 MTTHR_H3_32
+#define 0x06A MTTHR_H4_32
+
+#define 0x06B NIRMSOS_32 // Neutral current RMS offset for NIRMS calculations
+#define 0x06C ISUMRMSOS_32 // Offset correction for ISUMRMS calculation based on the sume of IA + IB + IC +- IN.
+#define 0X06D NIGAIN_32 // Neutral current again adjust
+#define 0x06E NPHCAL_32 // Neutral current-phase compensation
+#define 0x071 VNOM_32 // Nominal phase voltage RMS used in the computation of apparent power, xVA, when VNOMx_EN bit is set in the CONFIG0 register
+#define 0x072 DICOEFF_32 // Value used in the digital integrator algorithm
+#define 0x073 ISUMLVL_32 // Threshold to compare ISUMRMS against
+
+#define 0x20A AI_PCF_32 // Instantaneous Phase A current channel waveform processed by the DSP, at 4 kSPS.
+#define 0x20B AV_PCF_32 // Instantaneous Phase A voltage channel waveform processed by the DSP, at 4 kSPS.
+#define 0x20C AIRMS_32 // Phase A filter based current RMS value, updates at 4kSPS
+#define 0x20D AVRMS_32 // Phase A filter based voltage RMS value, updates at 4kSPS
+
+#define 0x210 AWATT_32 // Phase A low-pass filtere total active power, updated at 4 4kSPS
+#define 0x211 AVAR_32 // Phase A low pass filtered total reactive power, updated at 4kSPS
+#define 0x212 AVA_32 // Phase A total apparent power, updated at 4kSPS
+#define 0x214 AFVAR_32 // Phase A fundamental reactive power, updated at 4kSPS
+#define 0x216 APF_32 // Phase A power factor, updated at 1.024 second
+
+#define 0x21D AMTREGION_32 // If multipoint gain and phase compensaion is enabled, with MTEN = 1 in the CONFIG0 register,these bits indicate which AIGAINXx and APHCALx is currently being used
+
+#define 0x22A BI_PCF_32 // Instantaneous Phase B current channel waveform processed by the DSP, 4kSPS
+#define 0x22B BV_PCF_32 // Instantaneous Phase B votage channel waveform processed by the DSP, 4kSPS
+#define 0x22C BIRMS_32 // Phase B filter based current RMS value, updates at 4kSPS
+#define 0x22D BVRMS_32 // Phase B filter based voltage RMS value, updates at 4kSPS
+#define 0x230 BWATT_32 // Phase B low-pass filtered total active power, updated at 4kSPS
+#define 0x231 BVAR_32 // Phase B low pass filtered total reactive power, updated at 4kSPS.
+#define 0x232 BVA_32 // Phase B total apparent power, updated at 4kSPS
+#define 0x234 BFVAR_32 // Phase B fundamental reactive power, updated at 4kSPS
+#define 0x236 BPF_32 // Phase B power factor, updated at 1.024 sec.
+
+#define 0x23D BMTREGION_32 // If multipoint gain and phase.....
+
+#define 0x24A CI_PCF_32 // Instantaneous Phase C current channel waveform proccessed by the DSP, at 4kSPS
+#define 0x24B CV_PCF_32 // Instantaneous Phase C voltage channel waveform proccessed by the DSP, at 4kSPS
+#define 0X24C CIRMS_32 // Phase C filter based current RMS value, updates at 4kSPS
+#define 0x24D CVRMS_32 // Phase C filter based voltage RMS value, updates at 4kSPS
+#define 0x250 CWATT_32 // Phase C low-pass filtered total active power, updated at 4kSPS
+#define 0x251 CVAR_32  // Phase C low pass filtered total reactive power, updated at 4kSPS.
+#define 0x252 CVA_32 // Phase C total apparent power, updated at 4kSPS
+#define 0x254 CFVAR_32 // Phase C fundamental reactive power, udpated at 4kSPS
+#define 0x256 CPF_32 // Phase C power factor, updated at 1.024 seconds
+
+#define 0X25D CMTREGION_32 // If multipoint gian and phase...
+#define 0x265 NI_PCF_32 // Instantaneous neutral current channel waveform processed by the DSP, at 4kSPS.
+#define 0x266 NIRMS_32 // Neutral current filter based RMS value
+#define 0x269 ISUMRMS_32 // Filter based RMS based on the sum of IA + IB + IC += IN.
+#define 0x26A VERSION2_32 // Indicates the version of the metrology algorithms after the user writes run = 1 to start the measuremnets.
+
+#define 0x2E5 AWATT_ACC_32 // Phase A accumulated total active power, updated after PWR_TIME 4 ksps samples
+#define 0x2E6 AWATTHR_LO_32 // Phase A accumulated total active energy, LSB's. Updated according to settings in EP_CFG and EGY_TIME Registers
+#define 0x2E7 AWATTHR_HI_32 // Phase A accumulated total active energy, MSB's....
+#define 0x2EF AVAR_ACC_32  // Phase A accumulated total reactive power, updated after PWR_TIME 4 kSPS samples.
+#define 0X2F0 AVARHR_LO_32 // Phase A accumulated total reactive energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
+#define 0x2F1 AVARHR_HI_32 // Phase A accumulated total reactive energy, MSB's...
+#define 0x2F9 AVA_ACC_32 // Phase A accumulated total apparent power, updated after PWR_TIME 4 kSPS samples
+#define 0x2FA AVAHR_LO_32 // Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x2FB AVAHR_HI_32 // Phase A accumulated total apparent energy, MSB's.
+
+#define 0x30D AFVAR_ACC_32 // Phase A accumulated fundamental reactive power, updated after PWR_TIME 4kSPS samples
+#define 0x30E AFVARHR_LO_32 // Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
+#define 0x30F AFVARHR_HI_32 // Phase A accumulated total apparent energy, MSB's...
+#define 0x321 BWATT_ACC_32 // Phase B accumulated total active power, updated after PWR_TIME 4 kSPS samples
+#define 0x322 BWATTHR_LO_32 // Phase B accumulated total active energy, LSB's, updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x323 BWATTHR_HI_32 // Phase B accumulated total active energy, MSB's...
+#define 0x32B BVAR_ACC_32  // Phase B accumulated total reactive power, updated after PWR_TIME 4 ksSPS samples.
+
+
+
+
+#define 0X60A AVRMS_1
+#define 0X60B BVRMS_1
+#define 0X60C CVRMS_1
+#define 0X60D NIRMS_1
+#define 0X60E AWATT_1
+#define 0X60F BWATT_1
+#define 0X610 CWATT_1
+#define 0X611 AVA_1
+#define 0X612 BVA_1
+#define 0X613 CVA_1
+#define 0X614 AVAR_1
+#define 0X615 BVAR_1
+#define 0X616 CVAR_1
+#define 0X617 AFVAR_1
+#define 0X618 BFVAR_1
+#define 0X619 CFVAR_1
+#define 0X61A APF_1
+#define 0X61B BPF_1
+#define 0X61C CPF_1
+#define 0X680 AV_PCF_2
+#define 0X681 AI_PCF_2
+#define 0X682 AIRMS_2
+#define 0X683 AVRMS_2
+#define 0X684 AWATT_2
+#define 0X685 AVA_2
+#define 0X686 AVAR_2
+#define 0X687 AFVAR_2
+#define 0X688 APF_2
+#define 0X693 BV_PCF_2
+#define 0X694 BI_PCF_2
+#define 0X695 BIRMS_2
+#define 0X696 BVRMS_2
+#define 0X697 BWATT_2
+#define 0X698 BVA_2
+#define 0X699 BVAR_2
+#define 0X69A BFVAR_2
+#define 0X69B BPF_2
+#define 0X6A6 CV_PCF_2
+#define 0X6A7 CI_PCF_2
+#define 0X6A8 CIRMS_2
+#define 0X6A9 CVRMS_2
+#define 0X6AA CWATT_2
+#define 0X6AB CVA_2
+#define 0X6AC CVAR_2
+#define 0X6AD CFVAR_2
+#define 0X6AE CPF_2
+#define 0X6B9 NI_PCF_2
+#define 0X6BA NIRMS_2
+
 
 //****************User Program Functions*****************
 
@@ -213,22 +415,22 @@ uint8_t ADE7953::getVersion(){
   return spiAlgorithm8_read(functionBitVal(Version_8,1), functionBitVal(Version_8,0));  //An example of the address lookup - the spiAlgorithm8_read((functionBitVal(addr,1), functionBitVal(addr,1)) would return the eqivenet to spiAlgorithm8_read(0x07,0x02) when working properly
 }
 
-float ADE7953::getPowerFactorA(){  
-	int16_t value=0;  
-	value=spiAlgorithm16_read((functionBitVal(PFA_16,1)),(functionBitVal(PFA_16,0))); 
+float ADE7953::getPowerFactorA(){
+	int16_t value=0;
+	value=spiAlgorithm16_read((functionBitVal(PFA_16,1)),(functionBitVal(PFA_16,0)));
 	float decimal = decimalize(value, 327.67, 0); //convert to float with calibration factors specified
 return abs(decimal);
-  }     
+  }
 
-int16_t ADE7953::getPhaseCalibA(){  
-	int16_t value=0;  
-	value=spiAlgorithm16_read((functionBitVal(PHCALA_16,1)),(functionBitVal(PHCALA_16,0))); 
+int16_t ADE7953::getPhaseCalibA(){
+	int16_t value=0;
+	value=spiAlgorithm16_read((functionBitVal(PHCALA_16,1)),(functionBitVal(PHCALA_16,0)));
 return value;
-  }   
+  }
 
-float ADE7953::getPeriod(){  
-	uint16_t value=0;  
-	value=spiAlgorithm16_read((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0))); 
+float ADE7953::getPeriod(){
+	uint16_t value=0;
+	value=spiAlgorithm16_read((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0)));
 	float decimal = decimalize(value, 1, 0); //convert to float with calibration factors specified
 return decimal;
   }
@@ -238,84 +440,84 @@ unsigned long ADE7953::getAPNOLOAD(){  //use signed long for signed registers, a
 	value=spiAlgorithm32_read((functionBitVal(AP_NOLOAD_32,1)),(functionBitVal(AP_NOLOAD_32,0))); //Call MSB and LSB from the register constant (template for how all functions should be called)
 return value;
   }
-  
-long ADE7953::getInstVoltage(){  
-	long value=0;  
+
+long ADE7953::getInstVoltage(){
+	long value=0;
 	value=spiAlgorithm32_read((functionBitVal(V_32,1)),(functionBitVal(V_32,0)));
 return value;
   }
-  
-float ADE7953::getVrms(){  
-	unsigned long value=0;  
+
+float ADE7953::getVrms(){
+	unsigned long value=0;
 	value=spiAlgorithm32_read((functionBitVal(VRMS_32,1)),(functionBitVal(VRMS_32,0)));
 	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
 return decimal;
-  }  
-  
-long ADE7953::getInstCurrentA(){  
-	long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(IA_32,1)),(functionBitVal(IA_32,0))); 
+  }
+
+long ADE7953::getInstCurrentA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(IA_32,1)),(functionBitVal(IA_32,0)));
 return value;
   }
-  
-float ADE7953::getIrmsA(){  
-	unsigned long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(IRMSA_32,1)),(functionBitVal(IRMSA_32,0))); 
+
+float ADE7953::getIrmsA(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(IRMSA_32,1)),(functionBitVal(IRMSA_32,0)));
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
 return decimal;
   }
-  
-unsigned long ADE7953::getVpeak(){  
-	unsigned long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(VPEAK_32,1)),(functionBitVal(VPEAK_32,0))); 
+
+unsigned long ADE7953::getVpeak(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(VPEAK_32,1)),(functionBitVal(VPEAK_32,0)));
 return value;
   }
 
-unsigned long ADE7953::getIpeakA(){  
-	unsigned long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(IAPEAK_32,1)),(functionBitVal(IAPEAK_32,0))); 
+unsigned long ADE7953::getIpeakA(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(IAPEAK_32,1)),(functionBitVal(IAPEAK_32,0)));
 return value;
   }
 
-long ADE7953::getActiveEnergyA(){  
-	long value=0; 
-	value=spiAlgorithm32_read((functionBitVal(AENERGYA_32,1)),(functionBitVal(AENERGYA_32,0))); 
-return value;
-  }
-  
-long ADE7953::getReactiveEnergyA(){  
-	long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(RENERGYA_32,1)),(functionBitVal(RENERGYA_32,0))); 
+long ADE7953::getActiveEnergyA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(AENERGYA_32,1)),(functionBitVal(AENERGYA_32,0)));
 return value;
   }
 
-long ADE7953::getApparentEnergyA(){ 
-	long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(APENERGYA_32,1)),(functionBitVal(APENERGYA_32,0))); 
+long ADE7953::getReactiveEnergyA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(RENERGYA_32,1)),(functionBitVal(RENERGYA_32,0)));
 return value;
   }
-    
-float ADE7953::getInstApparentPowerA(){  
-	long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(AVA_32,1)),(functionBitVal(AVA_32,0))); 
+
+long ADE7953::getApparentEnergyA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(APENERGYA_32,1)),(functionBitVal(APENERGYA_32,0)));
+return value;
+  }
+
+float ADE7953::getInstApparentPowerA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(AVA_32,1)),(functionBitVal(AVA_32,0)));
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
-  
-float ADE7953::getInstActivePowerA(){  
-	long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(AWATT_32,1)),(functionBitVal(AWATT_32,0))); 
+
+float ADE7953::getInstActivePowerA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(AWATT_32,1)),(functionBitVal(AWATT_32,0)));
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
-  
-float ADE7953::getInstReactivePowerA(){  
-	long value=0;  
-	value=spiAlgorithm32_read((functionBitVal(AVAR_32,1)),(functionBitVal(AVAR_32,0))); 
+
+float ADE7953::getInstReactivePowerA(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(AVAR_32,1)),(functionBitVal(AVAR_32,0)));
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return decimal;
   }
-  
+
 //*******************************************************
 
 
@@ -331,9 +533,9 @@ ADE7953::ADE7953(int SS, int SPI_freq)
 
 //****************Initialization********************
 void ADE7953::initialize(){
-    
+
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953:initialize function started "); 
+   Serial.print("ADE7953:initialize function started ");
   #endif
 
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
@@ -343,7 +545,7 @@ void ADE7953::initialize(){
   SPI.setBitOrder(MSBFIRST);  //Define MSB as first (explicitly)
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   delay(50);
-  
+
   //Write 0x00AD to Register Address 0x00FE. "This unlocks Register 0x120." per datasheet
   digitalWrite(_SS, LOW);//Enable data transfer by bringing SS line LOW.
   SPI.transfer(0x00); //Pass in MSB of register 0x00FE first.
@@ -351,7 +553,7 @@ void ADE7953::initialize(){
   SPI.transfer(WRITE); //This tells the ADE7953 that data is to be written to register 0x00FE, per datasheet
   SPI.transfer(0x00); //Pass in MSB of 0x00AD first to write to 0x00FE, per datasheet
   SPI.transfer(0xAD); //Pass in LSB of 0x00AD next to write to 0x00FE, per datasheet
-  
+
   //Write 0x0030 to Register Address 0x0120. "This configures the optimum settings." per datasheet
   SPI.transfer(0x01); //Pass in MSB of register 0x0120 first, per datasheet
   SPI.transfer(0x20); //Pass in LSB of register 0x0120 next, per datasheet
@@ -362,9 +564,9 @@ void ADE7953::initialize(){
   digitalWrite(_SS, HIGH);//End data transfer by bringing SS line HIGH.
   delay(100);
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print(" ADE7953:initialize function completed "); 
+   Serial.print(" ADE7953:initialize function completed ");
   #endif
-  
+
   //Default Calibrations - Per Datasheet
   //spiAlgorithm16_write((functionBitVal(PHCALA_16,1)),(functionBitVal(PHCALA_16,0)),0x00,0x00);
   //delay(100);
@@ -384,22 +586,22 @@ byte ADE7953::functionBitVal(int addr, uint8_t byteVal)
   int x = ((addr >> (8*byteVal)) & 0xff);
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::functionBitVal function details: ");
-   Serial.print("Address input (dec): ");  
+   Serial.print("Address input (dec): ");
    Serial.print(addr, DEC);
-   Serial.print(" Byte requested (dec): ");  
+   Serial.print(" Byte requested (dec): ");
    Serial.print(byteVal, DEC);
    Serial.print(" Returned Value (dec): ");
-   Serial.print(x, DEC);  
+   Serial.print(x, DEC);
    Serial.print(" Returned Value (HEX): ");
-   Serial.print(x, HEX); 
-   Serial.print(" ADE7953::functionBitVal function completed "); 
+   Serial.print(x, HEX);
+   Serial.print(" ADE7953::functionBitVal function completed ");
   #endif
   return x;
 }
 
 uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm8_read function started "); 
+   Serial.print("ADE7953::spiAlgorithm8_read function started ");
   #endif
   uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
@@ -411,32 +613,32 @@ uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorith
   //Read in values sequentially and bitshift for a 32 bit entry
   SPI.transfer(READ); //Send command to begin readout
   one = (SPI.transfer(WRITE));  //MSB Byte 1  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte
-  two = (SPI.transfer(WRITE));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte, 
+  two = (SPI.transfer(WRITE));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte,
   SPI.endTransaction(); //end SPI communication
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
-  
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm8_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Returned bytes (1(MSB) and 2 - 2nd is for 16-bit return form): ");
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.print(" ADE7953::spiAlgorithm8_read function completed "); 
+   Serial.print(" ADE7953::spiAlgorithm8_read function completed ");
   #endif
-  
+
   //Post-read packing and bitshifting operation
     readval_unsigned = one;  //Process MSB (nothing much to see here for only one 8 bit value - nothing to shift)
 	return readval_unsigned;  //uint8_t versus long because it is only an 8 bit value, function returns uint8_t.
  }
-  
+
 
 uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm16_read function started "); 
+   Serial.print("ADE7953::spiAlgorithm16_read function started ");
   #endif
   uint16_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
@@ -451,34 +653,34 @@ uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
   two = SPI.transfer(WRITE);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm16_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.print(" ADE7953::spiAlgorithm16_read function completed "); 
+   Serial.print(" ADE7953::spiAlgorithm16_read function completed ");
   #endif
-   
+
    //Post-read packing and bitshifting operation
    readval_unsigned = (one << 8);  //Process MSB  (Bitshift algorithm)
    readval_unsigned = readval_unsigned + two;  //Process LSB
-     
+
    //readval_unsigned = (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
-   return readval_unsigned;	
+   return readval_unsigned;
     }
-  
+
 
 
 uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm24_read function started "); 
-  #endif 
+   Serial.print("ADE7953::spiAlgorithm24_read function started ");
+  #endif
   //long readval_signed=0;
   uint32_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
@@ -495,12 +697,12 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
   three= SPI.transfer(WRITE); //LSB Byte 3  (Read in data on dummy write (null MOSI signal))
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  
+
  #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm24_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Returned bytes (1(MSB) to 3)[HEX]: ");
    Serial.print(one, HEX);
@@ -508,12 +710,12 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
    Serial.print(two, HEX);
    Serial.print(" ");
    Serial.print(three, HEX);
-   Serial.print(" ADE7953::spiAlgorithm24_read function completed "); 
+   Serial.print(" ADE7953::spiAlgorithm24_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operation
   readval_unsigned = (((uint32_t) one << 16)+ ((uint32_t) two << 8) + ((uint32_t) three)); //Shift algorithm
-      
+
  //(Alternative Bitshift algorithm)
  // readval_unsigned =  ((one << 16) & 0x00FF0000);  //process MSB  //(Alternative shift algorithm)
  // readval_unsigned = readval_unsigned + ((two << 8) & 0X0000FF00);
@@ -521,12 +723,12 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
 
 			return readval_unsigned;
   }
-  
+
 
 uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algorithm that reads from a 32 bit register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm32_read function started "); 
-  #endif 
+   Serial.print("ADE7953::spiAlgorithm32_read function started ");
+  #endif
   uint32_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
   byte two;
@@ -544,12 +746,12 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   four= SPI.transfer(WRITE); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm32_read function details: ");
-   //Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   //Serial.print("Address Byte 1(MSB)[HEX]: ");
    //Serial.print(MSB, BIN);
-   //Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   //Serial.print(" Address Byte 2(LSB)[HEX]: ");
    //Serial.print(LSB, BIN);
    Serial.print(" Returned bytes (1(MSB) to 4)[HEX]: ");
    Serial.print(one, BIN);
@@ -559,18 +761,18 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
    Serial.print(three, BIN);
    Serial.print(" ");
    Serial.print(four, BIN);
-   Serial.print(" ADE7953::spiAlgorithm32_read function completed "); 
+   Serial.print(" ADE7953::spiAlgorithm32_read function completed ");
   #endif
-  
+
   //Post-read packing and bitshifting operations
   readval_unsigned = (((uint32_t) one << 24)+ ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four);
-  
+
   //Alternate Bitshifting approach
-/*   readval_unsigned = (one << 24);  //Process MSB 
-  //Serial.println(readval_unsigned, HEX);  
-  readval_unsigned = readval_unsigned + (two << 16);  
+/*   readval_unsigned = (one << 24);  //Process MSB
   //Serial.println(readval_unsigned, HEX);
-  readval_unsigned = readval_unsigned + (three << 8);  
+  readval_unsigned = readval_unsigned + (two << 16);
+  //Serial.println(readval_unsigned, HEX);
+  readval_unsigned = readval_unsigned + (three << 8);
   //Serial.println(readval_unsigned, HEX);
   readval_unsigned = (readval_unsigned + (four));  //Process LSB
   Serial.println(readval_unsigned, BIN);  */
@@ -581,8 +783,8 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
 
 void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, byte three, byte fourlsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm32_write function started "); 
-  #endif 
+   Serial.print(" spiAlgorithm32_write function started ");
+  #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   SPI.transfer(MSB);  //Pass in MSB of register to be read first.
@@ -594,12 +796,12 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   SPI.transfer(three);
   SPI.transfer(fourlsb);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm32_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Written bytes (1(MSB) to 4)[HEX]: "); //MSB to LSB order
    Serial.print(onemsb, HEX);
@@ -609,14 +811,14 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
    Serial.print(three, HEX);
    Serial.print(" ");
    Serial.print(fourlsb, HEX);
-   Serial.print(" spiAlgorithm32_write function completed "); 
+   Serial.print(" spiAlgorithm32_write function completed ");
   #endif
   }
-  
-  
+
+
   void ADE7953::spiAlgorithm24_write(byte MSB, byte LSB, byte onemsb, byte two, byte threelsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm24_write function started "); 
+   Serial.print(" spiAlgorithm24_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
@@ -630,9 +832,9 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm24_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Written bytes (1(MSB) to 3)[HEX]: ");  //MSB to LSB order
    Serial.print(onemsb, HEX);
@@ -640,14 +842,14 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
    Serial.print(two, HEX);
    Serial.print(" ");
    Serial.print(threelsb, HEX);
-   Serial.print(" spiAlgorithm24_write function completed "); 
+   Serial.print(" spiAlgorithm24_write function completed ");
   #endif
   }
-  
-  
+
+
 void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm16_write function started "); 
+   Serial.print(" spiAlgorithm16_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
@@ -660,22 +862,22 @@ void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm16_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Written bytes (1(MSB) to 2)[HEX]: ");  //MSB to LSB order
    Serial.print(onemsb, HEX);
    Serial.print(" ");
    Serial.print(twolsb, HEX);
-   Serial.print(" spiAlgorithm16_write function completed "); 
+   Serial.print(" spiAlgorithm16_write function completed ");
   #endif
   }
-  
-  
+
+
 void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm8_write function started "); 
+   Serial.print(" spiAlgorithm8_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
@@ -687,17 +889,17 @@ void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is t
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm8_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");   
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Written bytes (1 of 1)[HEX]: ");  //MSB to LSB order
    Serial.print(onemsb, HEX);
-   Serial.print(" spiAlgorithm16_write function completed "); 
+   Serial.print(" spiAlgorithm16_write function completed ");
   #endif
   }
-  
-  
+
+
 float ADE7953::decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
   #ifdef ADE7953_VERBOSE_DEBUG
