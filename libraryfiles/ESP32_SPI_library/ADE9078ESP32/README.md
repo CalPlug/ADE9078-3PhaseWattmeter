@@ -2,11 +2,11 @@
 
 Example library for operating the ADE9078 3-Phase AC Line measurement IC over SPI interfacing 
 
-Created by 
+Created by Umar Kasmi, Sid Kasat, Crystal Lai, and Michael Klopfer
 
-Project mentors: Michael Klopfer, Ph.D. abnd prof. G.P. Li
+Project mentors: Michael Klopfer, Ph.D. and prof. G.P. Li
 
-ESP32 Extension Development by Luis Contreras as part of the CalPlug EVSE Project - https://github.com/CalPlug/EVSE_Smart_Charger
+ESP32 Extension Development for ESP32 by Luis Contreras as part of the CalPlug EVSE Project - https://github.com/CalPlug/EVSE_Smart_Charger
 
 University of California, Irvine - California Plug Load Research Center (CalPlug)
 
@@ -56,4 +56,4 @@ Multiphase demo to be added:
 
 Physical Demo Board
 ----------
-See Arduino/ESP8266 Example firmware for details
+See board files for more details
