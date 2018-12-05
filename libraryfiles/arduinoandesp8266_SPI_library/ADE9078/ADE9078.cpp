@@ -356,57 +356,251 @@
 #define 0x323 BWATTHR_HI_32 // Phase B accumulated total active energy, MSB's...
 #define 0x32B BVAR_ACC_32  // Phase B accumulated total reactive power, updated after PWR_TIME 4 ksSPS samples.
 
+#define 0x32C BVARHR_LO_32 //Phase B accumulate total ractive energy,LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x32D BVARHR_HI_32 // Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x335 BVA_ACC_32 //Phase B accumulated total apparent power, updated after PWR_TIME 4kSPS samples.
+#define 0x336 BVAHR_LO_32 //Phase B accumulatecd total apparent energy, LSbs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x337 BVAHR_HI_32 //Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x349 BFVAR_ACC_32 //Phase B accumulated fundamental ractive power, updated after PWR_TIME 4 kSPS samples.
+#define 0x34A BFVARHR_LO_32 //Phase B accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x34B BFVARHR_HI_32 //Phase B accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x35D CWATT_ACC_32 // Phase C accumulated total active power, updated after PWR_TIME 4 kSPS samples
+#define 0x35E CWARRHR_LO_32 //Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x35F CWATTHR_HI_32 //Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x367 CVAR_ACC_32 //Phase C accumulated total reactive power, updated after PWR_TIME 4kSPS samples.
+#define 0x368 CVARHR_LO_32 //Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x369 CVARHR_HI_32 //Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x371 CVA_ACC_32 //Phase C accumulated total apparent powerm updated after PWR_TIME 4 kSPS samples.
+#define 0x372 CVAHR_LO_32 //Phase C  accumulated total apparent energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x373 CVAHR_HI_32 //Phase C accumulated total apparent energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x385 CFVAR_ACC_32 //Phase C accumulated fundamental reactive power, updated after PWR_TIME 4 kSPS samples.
+#define 0x386 CFVARHR_LO_32 //Phase C accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x387 CFVVARHR_HI_32 //Phase C accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define 0x397 PWATT_ACC_32 //Accumulated Positive Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
+#define 0x39B NWATT_ACC_32 //Accumulated Negative Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
+#define 0x39F PVAR_ACC_32 //Accumulated Positive Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples.
+#define 0x3A3 NVAR_ACC_32 //Accumulated Negative Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples
+#define 0x400 IPEAK_32 //Current peak register.
+#define 0x401 VPEAK_32 //Voltage peak register
+#define 0x402 STATUS0_32 //Status Register 0
+#define 0x403 STATUS1_32 //Status Register 1.
+#define 0x404 EVENT_STATUS32 //Event Status Register.
+#define 0x405 MASK0_32 //Interrupt Enable Register 0.
+#define 0x406 MASK1_32 //Interrupt Enable Register 1.
+#define 0x407 EVENT_MASK_32 //Event enable register.
+#define 0x40E USER_PERIOD_32 //User configured line period value used for resampling when the UPERIOD_SEL bit in the CONFIG2 register is set.
+#define 0x40F VLEVEL_32 //Register used in the algorithm that computes the fundamental reactive power
+#define 0x418 APERIOD_32 //Line period on Phase A voltage
+#define 0x419 BPERIOD_32 //Line period on Phase B voltage
+#define 0x41A CPERIOD_32 //Line period on Phase C voltage
+#define 0x41B COM_PERIOD_32 //Line period measurement on combined signal from Phase A, Phase B, and Phase C voltages
+#define 0x41C ACT_NL_LVL_32 //No load threshold in the total active power datapath
+#define 0x41D REACT_NL_LVL_32 //No load threshold in the total and fundamental reactive power datapath.
+#define 0x41E APP_NL_LVL_32 //No load threshold in the total apparent power datapath.
+#define 0x41F PHNOLOAD_32 //Phase no load register.
+#define 0x420 WTHR_32 //Sets the maximum output rate from the digital to frequency converter for the total active power for the CF calibration pulse output. It is recommended to write WTHR = 0x0010 0000.
+#define 0x421 VARTHR_32 //Sets the maximum output rate from the digital to frequency converter for the total and fundamental reactive power for the CF calibration pulse output. It is recommended to write VARTHR = 0x0010 0000.
+#define 0x422 VATHR_32 //Sets the maximum output rate from the digital to frequency converter for the total apparent power for the CF calibration pulse output. It is recommended to write VATHR = 0x0010 0000.
+#define 0x423 LAST_DATA_32_32 //This register holds the data read or written during the last 32-bittransaction on the SPI port.
+#define 0x424 ADC_REDIRECT_32 //This register allows any ADC output to be redirected to any digital datapath.
+#define 0x425 CF_LCFG_32 //CF calibration pulse width configuration register.
+#define 0x472 PART_ID_32 //This register identifies the IC. If the ADE9000_ID bit is 0, the IC is an ADE9078
+
+//16-Bit Registers
+#define 0x480 RUN_16 //Write this register to 1 to start the measurements
+#define 0x481 CONFIG1_16 //Configuration Register 1.
+#define 0x482 ANGL_VA_VB_16 //Time between positive to negative zero crossings on Phase A and Phase B voltages.
+#define 0x483 ANGL_VB_VC_16 //Time between positive to negative zero crossings on Phase B and Phase C voltages.
+#define 0x484 ANGL_VA_VC_16 //Time between positive to negative zero crossings on Phase A and Phase C voltages.
+#define 0x485 ANGL_VA_IA_16 //Time between positive to negative zero crossings on Phase A voltage and current.
+#define 0x486 ANGL_VB_IB_16 //Time between positive to negative zero crossings on Phase B voltage and current.
+#define 0x487 ANGL_VC_IC_16 //Time between positive to negative zero crossings on Phase C voltage and current.
+#define 0x488 ANGL_IA_IB_16 //Time between positive to negative zero crossings on Phase A and Phase B current.
+#define 0x489 ANGL_IB_IC_16 //Time between positive to negative zero crossings on Phase B and Phase C current.
+#define 0x48A ANGL_IA_IC_16 //Time between positive to negative zero crossings on Phase A and Phase C current
+#define 0x490 CFMODE_16 //CFx configureation register
+#define 0x491 COMPMODE_16 //Computation mode register
+#define 0x492 ACCMODE_16 //Accumulation mode register
+#define 0x493 CONFIG3_16 //Configuraiton Register 3
+#define 0x494 CF1DEN_16 //CF1 denominator register
+#define 0x495 CF2DEN_16 //CF2 denominator register
+#define 0x496 CF3DEN_16 //CF3 denominator register
+#define 0x497 CF4DEN_16 //CF4 denomoinator register
+#define 0x498 ZXTOUT_16 //Zero-crossing timeout configuration register.
+#define 0x499 ZXTHRSH_16 //Voltage channel zero-crossing threshold register.
+#define 0x49A ZX_LP_SEL_16 //This register selects which zero crossing and which line period measurement are used for other calculations.
+#define 0x49C SEQ_CYC_16 //Number of line cycles used for phase sequence detection. It is recommended to set this register to 1.
+#define 0x49D PHSIGN_16 //Power sign register
+#define 0x4A0 WFB_CFG_16 //Waveform buffer configuration register
+#define 0x4A1 WFB_PG_IRQEN_16 //This register enables interrupts to occur after specific pages of the waveform buffer have been filled.
+#define 0x4A2 WFB_TRG_CFG_16 //This register enables events to trigger a capture in the waveform buffer
+#define 0x4A3 WFB_TRG_STAT_16 //This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
+#define 0x4A4 CONFIG5_16 //Configuration Register 5
+#define 0x4A8 CRC_RSLT_16 //This register holds the CRC of configuration registers.
+#define 0x4A9 CRC_SPI_16 //This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
+#define 0x4AC LAST_DATA_16 //This register holds the data read or written during the last 16-bit transaction on the SPI port.
+#define 0x4AE LAST_CMD_16 //This register holds the address and read/write operation request (CMD_HDR) for the last transaction on the SPI port.
+#define 0x4AF CONFIG2_16 //Configuration Register 2
+#define 0x4B0 EP_CFG_16 //Energy and power accumulation configuration
+#define 0x4B1 PWR_TIME_16 //POwer and time configuration
+#define 0x4B2 EGY_TIME_16 //Energy accumulation update time configuration
+#define 0x4B4 CRC_FORCE_16 //This register forces an update of the CRC of configuration registers.
+#define 0x4B5 CRC_OPTEN_16 //This register selects which registers are optionally included in the configuration register CRC feature
+
+
+#define 0x4B8 PSM2_CFG_16 /* This register configures settings for the low power PSM2 operating mode. This register value is retained in PSM2 and PSM3 but is rewritten to its default value when entering PSM0 and PSM1. */
+#define 0x4B9 PGA_GAIN_16 /*This register configures the PGA gain for each ADC */
+#define 0x4BA CHNL_DIS_16 /* This register can be disables the ADCs individually */
+#define 0x4BF WR_LOCK_16 /* This register enables the configuration lock feature */
+#define 0x4B0 VAR_DIS_16 /* Enable/disable total reactive power calculation */
+#define 0x4F0 RESERVED1_16 /* This register is reserved */
+#define 0x4FE VERSION_16 /* Version of the ADE9078 IC */
+#define 0x500 AI_SINC_DAT_32 /* Current Channel A ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x501 AV_SINC_DAT_32 /* Voltage Channel A ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x502 BI_SINC_DAT_32 /* Current Channel B ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x503 BV_SINC_DAT_32 /* Voltage Channel B ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x504 CI_SINC_DAT_32 /* Current Channel C ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x505 CV_SINC_DAT_32 /* Voltage Channel C ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x506 NI_SINC_DAT_32 /* Neutral current channel ADC waveforms from sinc4 output, at 16 kSPS */
+#define 0x510 AI_LPF_DAT_32 /* Current Channel A ADC waveforms from sinc4 + IIR LPF and decimator output, at 4 kSPS */
+#define 0x511 AV_LPF_DAT_32 /* Voltage Channel A ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define 0x512 BI_LPF_DAT_32 /* Current Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define 0x513 BV_LPF_DAT_32 /* Voltage Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define 0x514 CI_LPF_DAT_32 /* Current Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define 0x515 CV_LPF_DAT_32 /* Voltage Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define 0x516 NI_LPF_DAT_32 /* Neutral current channel ADC waveforms from since4 + IIR LPF output, at 4 kSPS*/
+#define 0x600 AV_PCF_1_32 /* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
+#define 0x601 BV_PCF_1_32 /* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
+#define 0x602 CV_PCF_1_32 /* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
+#define 0x603 NI_PCF-1_32 /* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
+#define 0x604 AI_PCF_1_32 /* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
+#define 0x605 BI_PCF_1_32 /* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
+#define 0x606 CI_PCF_1_32 /* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
+#define 0x607 AIRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
+#define 0x608 BIRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
+#define 0x609 CIRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
+#define 0x60A AVRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
+#define 0x60B BVRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
+#define 0x60C CVRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
+#define 0x60D NIRMS_1_32 /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
+#define 0x60E AWATT_1_32 /* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
+#define 0x60F BWATT_1_32 /* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
+#define 0x610 CWATT_1_32 /* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
+#define 0x611 AVA_1_32 /* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
+#define 0x612 BVA_1_32 /* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
+#define 0x613 CVA_1_32 /* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
+#define 0x614 AVAR_1_32 /* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
+#define 0x615 BVAR_1_32 /* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
+#define 0x616 CVAR_1_32 /* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
+#define 0x617 AFVAR_1_32 /* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
+#define 0x618 BFVAR_1_32 /* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
+#define 0x619 CFVAR_1_32 /* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
+#define 0x61A APF_1_32 /* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
+#define 0x61B BPF_1_32 /* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
+#define 0x61C CPF_1_32 /* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
+#define 0x680 AV_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
+#define 0x681 AI_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
+#define 0x682 AIRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
+#define 0x683 AVRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
+#define 0x684 AWATT_2_32 /* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
+#define 0x685 AVA_2_32 /* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
+#define 0x686 AVAR_2_32 /* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
+#define 0x687 AFVAR_2_32 /* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
+#define 0x688 APF_2_32 /* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
+#define 0x693 BV_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
+#define 0x694 BI_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
+#define 0x695 BIRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
+#define 0x696 BVRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
+#define 0x697 BWATT_2_32 /* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
+#define 0x698 BVA_2_32 /* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
+#define 0x699 BVAR_2_32 /* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
+#define 0x69A BFVAR_2_32 /* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
+#define 0x69B BPF_2_32 /* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
+#define 0x6A6 CV_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
+#define 0x6A7 CI_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
+#define 0x6A8 CIRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
+#define 0x6A9 CVRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
+#define 0x6AA CWATT_2_32 /* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
+#define 0x6AB CVA_2_32 /* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
+#define 0x6AC CVAR_2_32 /* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
+#define 0x6AD CFVAR_2_32 /* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
+#define 0x6AE CPF_2_32 /* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
+#define 0x6B9 NI_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
+#define 0x6BA NIRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
+
+#define 0X060 CONFIG0
+
+// For following 3: [31:4] RESERVED
+// 3:0 A/B/C_REGION... If multipoint gain and phase compensation is enabled, with MTEN=1 in the CONFIG0 register, these bits indicate which A/B/CI_GAINx and APHCALx is currently being used
+#define 0x21D AMTREGION
+#define 0x23D BMTREGION
+#define 0x25D CMTREGION
+
+#define 0x400 IPEAK // [31:27] reserved. [26:24] phase. [23:0] IPEAKVAL
+
+#define 0x401 VPEAK
+
+#define 0x402 STATUS0
+
+#define 0x403 STATUS1
+
+#define 0x404 EVENT_STATUS
+
+#define 0x405 MASK0
+
+#define 0X406 MASK1
+
+#define 0X407 EVENT_MASK
+
+#define 0x40F VLEVEL
+
+#define 0x41F PHNOLOAD
+
+#define 0x424 ADC_REDIRECT
+
+#define 0x425 CF_LCFG
+
+#define 0x472 PART_ID
+
+#define 0x481 CONFIG1
+
+#define 0x490 CFMODE
+
+#define 0X491 COMPMODE
+
+#define 0x492 ACCMODE
+
+#define 0x493 CONFIG3
+
+#define 0x49A ZX_LP_SEL
+
+#define 0x49D PHSIGN
+
+#define 0x4A0 WFB_CFG
+
+#define 0x4A2 WFB_TRG_CFG
+
+#define 0x4A3 WFB_TRG_STAT
+
+#define 0x4AF CONFIG2
+
+#define 0x4B0 EP_CFG
+
+#define 0x4B4 CRC_FORCE
+
+#define 0x4B5 CRC_OPTEN
+
+#define 0x4B8 PSM2_CFG
+
+d#define 0x4B9 PGA_GAIN
+
+#define 0x4BA CHNL_DIS
+
+#define 0x4E0 VAR_DIS
 
 
 
-#define 0X60A AVRMS_1
-#define 0X60B BVRMS_1
-#define 0X60C CVRMS_1
-#define 0X60D NIRMS_1
-#define 0X60E AWATT_1
-#define 0X60F BWATT_1
-#define 0X610 CWATT_1
-#define 0X611 AVA_1
-#define 0X612 BVA_1
-#define 0X613 CVA_1
-#define 0X614 AVAR_1
-#define 0X615 BVAR_1
-#define 0X616 CVAR_1
-#define 0X617 AFVAR_1
-#define 0X618 BFVAR_1
-#define 0X619 CFVAR_1
-#define 0X61A APF_1
-#define 0X61B BPF_1
-#define 0X61C CPF_1
-#define 0X680 AV_PCF_2
-#define 0X681 AI_PCF_2
-#define 0X682 AIRMS_2
-#define 0X683 AVRMS_2
-#define 0X684 AWATT_2
-#define 0X685 AVA_2
-#define 0X686 AVAR_2
-#define 0X687 AFVAR_2
-#define 0X688 APF_2
-#define 0X693 BV_PCF_2
-#define 0X694 BI_PCF_2
-#define 0X695 BIRMS_2
-#define 0X696 BVRMS_2
-#define 0X697 BWATT_2
-#define 0X698 BVA_2
-#define 0X699 BVAR_2
-#define 0X69A BFVAR_2
-#define 0X69B BPF_2
-#define 0X6A6 CV_PCF_2
-#define 0X6A7 CI_PCF_2
-#define 0X6A8 CIRMS_2
-#define 0X6A9 CVRMS_2
-#define 0X6AA CWATT_2
-#define 0X6AB CVA_2
-#define 0X6AC CVAR_2
-#define 0X6AD CFVAR_2
-#define 0X6AE CPF_2
-#define 0X6B9 NI_PCF_2
-#define 0X6BA NIRMS_2
+
 
 
 //****************User Program Functions*****************
