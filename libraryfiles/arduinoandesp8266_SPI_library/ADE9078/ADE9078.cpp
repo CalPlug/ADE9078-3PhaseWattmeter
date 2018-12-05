@@ -268,7 +268,7 @@ Setting CF1 Output Signal Configuration
 0111 CF1 is proportional to IRMS (Current Channel B)
 1000 CF1 is proportional to IRMS (Current Channel A) + IRMS (Current Channel B)
 1001 CF1 is proportional to active power (Current Channel A) + active power (Current Channel B)
-[7:4] CF2SEL 0000 Configuration of output signal on CF2 pin 
+[7:4] CF2SEL 0000 Configuration of output signal on CF2 pin
 Setting              CF2 Output Signal Configuration
 0000                 CF2 is proportional to active power (Current Channel A)
 0001                 CF2 is proportional to reactive power (Current Channel A)
@@ -471,16 +471,17 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0X000 AIGAIN_32 // Phase A current gain adjust
 
 // The following registers: // Phase A multipoint gain correction factor
-#define 0x001 AIGAIN0_32
-#define 0x003 AIGAIN1_32
-#define 0x004 AIGAIN2_32
-#define 0x005 AIGAIN3_32
+#define 0x001 AIGAIN0_32 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define 0x002 AIGAIN1_32 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define 0x003 AIGAIN2_32 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define 0x004 AIGAIN3_32 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define 0x005 AIGAIN4_32 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
 
-#define 0x006 APHCAL0_32
-#define 0x007 APHCAL1_32
-#define 0x008 APHCAL2_32
-#define 0x009 APHCAL3_32
-#define 0x00A APHCAL4_32
+#define 0x006 APHCAL0_32 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x007 APHCAL1_32 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x008 APHCAL2_32 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x009 APHCAL3_32 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x00A APHCAL4_32 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
 #define 0x00B AVGAIN_32 // Phase A voltage gain adjust
 #define 0X00C AIRMSOS_32 // Phase A voltage rms offset for filter based AIRMS calculation
@@ -491,18 +492,18 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x012 AFVAROS_32 // Phase A fundamental reactive power offset correction for AFVAR calculation
 
 #define 0x020 BIGAIN_32 // Phrase B current gain adjust
-#define 0x021 BIGAIN0_32 // Phase B multipoint gain correction factors
-#define 0x022 BIGAIN1_32 // ...
-#define 0x023 BIGAIN2_32 // ...
-#define 0x024 BIGAIN3_32 // ...
-#define 0x025 BIGAIN4_32 // ...
+#define 0x021 BIGAIN0_32 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x022 BIGAIN1_32 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x023 BIGAIN2_32 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x024 BIGAIN3_32 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x025 BIGAIN4_32 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
 // Phase B multipoint phase correction factor
-#define 0x026 BPHCAL0_32
-#define 0x027 BPHCAL1_32
-#define 0x028 BPHCAL2_32
-#define 0x029 BPHCAL3_32
-#define 0x02A BPHCAL4_32
+#define 0x026 BPHCAL0_32 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x027 BPHCAL1_32 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x028 BPHCAL2_32 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x029 BPHCAL3_32 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define 0x02A BPHCAL4_32 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
 #define 0x02B BVGAIN_32 // Phase B voltage gai nadjust
 #define 0x02C BIRMSOS_32 // Phase B current RMS offset for BIRMS calculation
@@ -515,17 +516,17 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x040 CIGAIN_32 // Phase C current gain nadjust
 
 // Phase C multipoint gain correction factor
-#define 0x041 CIGAIN0_32
-#define 0x042 CIGAIN1_32
-#define 0x043 CIGAIN2_32
-#define 0x044 CIGAIN3_32
-#define 0x045 CIGAIN4_32
+#define 0x041 CIGAIN0_32 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define 0x042 CIGAIN1_32 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define 0x043 CIGAIN2_32 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define 0x044 CIGAIN3_32 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define 0x045 CIGAIN4_32 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
 
-#define 0X046 CPHCAL0_32
-#define 0X047 CPHCAL1_32
-#define 0X048 CPHCAL2_32
-#define 0X049 CPHCAL3_32
-#define 0X04A CPHCAL4_32
+#define 0X046 CPHCAL0_32 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define 0X047 CPHCAL1_32 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define 0X048 CPHCAL2_32 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define 0X049 CPHCAL3_32 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define 0X04A CPHCAL4_32 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
 
 #define 0x04B CVGAIN_32 // Phase C voltage gain adjust
 #define 0x04C CIRMSOS_32 // Phase C current RMS offset for CIRMS calculation
@@ -538,17 +539,17 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x060 CONFIG0_32 // Configuration register 0
 
 // Multipoint phase/gain threshold.
-#define 0x061 MTTHR_L0_32
-#define 0x062 MTTHR_L1_32
-#define 0x063 MTTHR_L2_32
-#define 0x064 MTTHR_L3_32
-#define 0x065 MTTHR_L4_32
+#define 0x061 MTTHR_L0_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x062 MTTHR_L1_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x063 MTTHR_L2_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x064 MTTHR_L3_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x065 MTTHR_L4_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
 
-#define 0x066 MTTHR_H0_32
-#define 0x067 MTTHR_H1_32
-#define 0x068 MTTHR_H2_32
-#define 0x069 MTTHR_H3_32
-#define 0x06A MTTHR_H4_32
+#define 0x066 MTTHR_H0_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x067 MTTHR_H1_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x068 MTTHR_H2_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x069 MTTHR_H3_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define 0x06A MTTHR_H4_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
 
 #define 0x06B NIRMSOS_32 // Neutral current RMS offset for NIRMS calculations
 #define 0x06C ISUMRMSOS_32 // Offset correction for ISUMRMS calculation based on the sume of IA + IB + IC +- IN.
@@ -790,9 +791,23 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x6BA NIRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
 
 #define 0X060 CONFIG0
+// Bits: [31:14] BitName: RESERVED Description: Reserved
+// Bits: 13 BitName: DISRPLPF Description: Set this bit to disable the low-pass filter in the total reactive power datapath.
+// Bits: 12 BitName: DISAPLPF Description: Set this bit to disable the low-pass filter in the total active power datapath.
+// Bits: 11 BitName: ININTEN Description: Set this bit to enable the digital integrator in the Neutral Current channel.
+// Bits: 10 BitName: VNOMC_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase C total apparent power, CVA.
+// Bits: 9 BitName: VNOMB_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase B total apparent power, BVA.
+// Bits: 8 BitName: VNOMA_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase A total apparent power, AVA.
+// Bits: 7 BitName: RESERVED Description: Reserved
+// Bits: 6 BitName: ZX_SRC_SEL Description: This bit selects whether data going into the zero-crossing detection circuit comes before the highpass filter, integrator, and phase compensation or afterwards. Setting: 0 for After the high-pass filter, integrator, and phase compensation. Setting: 1 for Before the high-pass filter, integrator, and phase compensation.
+// Bits: 5 BitName: INTEN Description: Set this bit to enable the integrators in the phase current channels. The neutral current channel integrator is managed byb the ININTEN bit in the CONFIG0 register.
+// Bits: 4 BitName: MTEN Description: Set this bit to enable multipoint phase and gain compensation. If enabled, an additional gain factor, xIGAIN0 through xIGAIN4, is applied to the current channel based on the xIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.
+// Bits: 3 BitName: HPFDIS Description: Set this bit to disable high-pass filters in all the voltage and current channels.
+// Bits: 2 BitName: RESERVED Description: Reserved
+// Bits: [1:0] BitName: ISUM_CFG Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
 
 // For following 3: [31:4] RESERVED
-// 3:0 A/B/C_REGION... If multipoint gain and phase compensation is enabled, with MTEN=1 in the CONFIG0 register, these bits indicate which A/B/CI_GAINx and APHCALx is currently being used
+// 3:0 A/B/C_REGION... If multipoint gain and phase compensation is enabled, with MTEN=1 in the CONFIG0 register, these bits indicate which A/B/CI_GAINx and A/B/CPHCALx is currently being used. Settings: 0000 for A/B/CIGAIN0, A/C/BPHCAL0. Settings 0001 for A/B/CIGAIN1, A/B/CPHCAL1. Settings: 0010 for A/B/CIGAIN2, A/B/CPHCAL2. Settings: 0011 for A/B/CIGAIN3, A/B/CPHCAL3. Settings: 0100 for A/B/CIGAIN4, A/B/CPHCAL4. Settings: 1111 -> This feature is disabled because MTEN = 0 in the CONFIG0 register.
 #define 0x21D AMTREGION
 #define 0x23D BMTREGION
 #define 0x25D CMTREGION
