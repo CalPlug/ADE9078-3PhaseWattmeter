@@ -829,26 +829,105 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0X407 EVENT_MASK
 
 #define 0x40F VLEVEL
+// Bits: [31:24] BitName: RESERVED Description: Reserved
+// Bits: [23:0] BitName: VLEVEL_VAL Description: Register used in the algorithm that computes the fundamental reactive power.
 
 #define 0x41F PHNOLOAD
+// Bits: [31:17] BitName: RESERVED Description: Reserved
+// Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
+// Bits: 15 BitName: RESERVED Description: Reserved
+// Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
+// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
+// Bits: 11 BitName: RESERVED Description: Reserved
+// Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
+// Bits: 9 BitName: RESERVED Description: Reserved
+// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load. 
+// Bits: 7 BitName: BVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 6 BitName: BWATTNL Description: This bit is set if the Phase B total active energy is in no load.
+// Bits: 5 BitName: RESERVED Description: Reserved
+// Bits: 4 BitName: AFVARNL Description: This bit is set if the Phase A fundamental reactive energy is in no load.
+// Bits: 3 BitName: RESERVED Description: Reserved
+// Bits: 2 BitName: AVANL Description: This bit is set if the Phase A total apparent energy is in no load.
+// Bits: 1 BitName: AVARNL Description: This bit is set if the Phase A total reactive energy is in no load.
+// Bits: 0 BitName: AWATTNL Description: This bit is set if the Phase A total active energy is in no load.
+
 
 #define 0x424 ADC_REDIRECT
+// Bits: [31:21] BitName: RESERVED Description: Reserved
+// Bits: [20:18] BitName: VC_DIN Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
+// Bits: [17:15] BitName: VB_DIN Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
+// Bits: [14:12] BitName: VA_DIN Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
+// Bits: [11:9] BitName: IN_DIN Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
+// Bits: [8:6] BitName: IC_DIN Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
+// Bits: [5:3] BitName: IB_DIN Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
+// Bits: [2:0] BitName: IA_DIN Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
 
 #define 0x425 CF_LCFG
+// Bits: [31:23] BitName: RESERVED Description: Reserved
+// Bits: 22 BitName: CF4_LT Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 21 BitName: CF3_LT Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 20 BitName: CF2_LT Description: If this bit is set, the CF2 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 19 BitName: CF1_LT Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: [18:0] BitName: CF_LTMR Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
 
 #define 0x472 PART_ID
+// Bits: [31:22] BitName: RESERVED Description: Reserved
+// Bits: 21 BitName: Description: This bit is set to identify an ADE73370 IC.
+// Bits: 20 BitName: Description: This bit is set to identify an ADE9000 IC.
+// Bits: [19:17]  BitName: RESERVED Description: Reserved
+// Bits: 16 BitName: Description: This bit is set to identify an ADE9004 IC.
+// Bits: [15:0] BitName: RESERVED Description: Reserved
 
 #define 0x481 CONFIG1
+// Bits: 15 BitName: EXT_REF Description:
+// Bits: [14:13] BitName: RESERVED Description: Reserved
+// Bits: 12 BitName: IRQ0_ON_IRQ1 Description:
+// Bits: 11 BitName: BURST_EN Description:
+// Bits: 10 BitName: RESERVED Description: Reserved
+// Bits: [9:8] BitName: PWR_SETTLE Description:
+// Bits: [7:6] BitName: RESERVED Description: Reserved
+// Bits: 5 BitName: CF_ACC_CLR Description: Set this bit to clear the acculumation in the digital to frequency converter and CFDEN counter. Note that this bit automatically clears itself.
+// Bits: 4 BitName: RESERVED Description: Reserved
+// Bits: [3:2] BitName: Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
+// Bits: 1 BitName: CF3_CFG Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
+// Bits: 0 BitName: SWRST Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
 
 #define 0x490 CFMODE
+// Bits: 15 BitName: CF4DIS Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
+// Bits: 14 BitName: CF3DIS Description: CF1 output disable -- see CF4DIS
+// Bits: 13 BitName: CF2DIS Description: CF1 output disable -- see CF4DIS
+// Bits: 12 BitName: CF1DIS Description: CF1 output disable -- see CF4DIS
+// Bits: [11:9] BitName: CF4SEL Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
+// Bits: [8:6] BitName: CF3SEL Description: Selects type of energy output on CF3 pin --see CF4SEL
+// Bits: [5:3] BitName: CF2SEL Description: Selects type of energy output on CF2 pin --see CF4SEL
+// Bits: [2:0] BitName: CF1SEL Description: Selects type of energy output on CF1 pin --see CF4SEL
 
 #define 0X491 COMPMODE
+// Bits: [15:12] BitName: RESERVED Description: Reserved
+// Bits: [11:9] BitName: TERMSEL4 Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
+// Bits: [8:6] BitName: TERMSEL3 Description: Phases to include in CF3 pulse output --see TERMSEL4
+// Bits: [5:3] BitName: TERMSEL2 Description: Phases to include in CF2 pulse output --see TERMSEL4
+// Bits: [2:0] BitName: TERMSEL1 Description: Phases to include in CF1 pulse output --see TERMSEL4
 
 #define 0x492 ACCMODE
+// Bits: [15:9] BitName: RESERVED Description: Reserved
+// Bits: 8 BitName: Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
+// Bits: 7 BitName: ICONSEL Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
+// Bits: [6:4] BitName: VCONSEL Description: Three-wire and four-wire hardware configuration selection. Setting: 000 for 4-wire wye. Setting: 001 for 3-wire delta. VB' = VA-VC. Setting: 010 for 4-wire delta, non-Blondel compliant. VB' = -VA - VC. Setting: 011 for 4-wire delta non-Blondel compliant. VB' = -VA. Setting: 100 for 3-wire delta. VA'=VA-VB; VB' = VA-VC; VC'=VC-VB.
+// Bits: [3:2] BitName: VARACC Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
+// Bits: [1:0] BitName: WATTACC Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
 
 #define 0x493 CONFIG3
+// Bits: [15:5] BitName: RESERVED Description: Reserved
+// Bits: [4:2] BitName: PEAKSEL Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
+// Bits: [1:0] BitName: RESERVED Description: Reserved
 
 #define 0x49A ZX_LP_SEL
+// Bits: [15:5] BitName: RESERVED Description: Reserved
+// Bits: [4:3] BitName: LP_SEL Description: Selects line period measurement used for resampling. Setting: 00 APERIOD, line period measurement from Phase A voltage. Setting: 01 for BPERIOD, line period measurement from Phase B voltage. Setting: 10 for CPERIOD, line period measurement from Phase C voltage. Setting: 11 for COM_PERIOD, line period measurement on combined signal from VA, VB, and VC.
+// Bits: [2:1] BitName: ZX_SEL Description: Selects the zero-crossing signal, which can be routed to CF3/ZX output pin and which is used for line cycle energy accumulation. Setting: 00 for ZXVA, Phase A voltage zero-crossing signal. Setting: 01 ZXVB, Phase B voltage zero-crossing signal.  Setting: 10 for ZXVC, Phase C voltage zero-crossing signal. Setting: 11 for ZXCOMB, zero crossing on combined signal from VA,VB and VC.
+// Bits: 0 BitName: RESERVED Description: Reserved
 
 #define 0x49D PHSIGN
 
@@ -868,12 +947,11 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 
 #define 0x4B8 PSM2_CFG
 
-d#define 0x4B9 PGA_GAIN
+#define 0x4B9 PGA_GAIN
 
 #define 0x4BA CHNL_DIS
 
 #define 0x4E0 VAR_DIS
-
 
 
 
