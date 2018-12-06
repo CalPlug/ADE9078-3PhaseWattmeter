@@ -18,452 +18,8 @@
 //Debug Control:
 //#define ADE7953_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
 
-//******************************************************************************************
 
 
-//*****************ADE7953 Register Value Constants*****************//
-//The #define used to save space where functions are not invoked - list of full general commands for ADE7953, not all implemented in current code - put in place as prep for potential extended development.
-
-//8-bit Registers
-#define SAGCYC_8 0x000 //SAGCYC, (R/W) Default: 0x00, Unsigned, Sag lines Cycle
-#define DISNOLOAD_8 0x001 //DISNOLOAD, (R/W) Default: 0x00, Unsigned, No-load detection disable*
-#define LCYCMODE_8 0x004 //LCYCMODE, (R/W) Default: 0x40, Unsigned, Line cycle accumulation mode configuration **
-#define PGA_V_8 0x007 //PGA_V, (R/W) Default: 0x00, Unsigned, Voltage channel gain configuration (Bits[2:0])
-#define PGA_IA_8 0x008 //PGA_IA, (R/W) Default: 0x00, Unsigned, Current Channel A gain configuration (Bits[2:0])
-#define PGA_IB_8 0x009 //PGA_IB, (R/W) Default: 0x00, Unsigned, Current Channel B gain configuration (Bits[2:0])
-#define WRITE_PROTECT_8 0x040 //WRITE_PROTECT, (R/W) Default: 0x00, Unsigned, Write protection bits (Bits[2:0])
-#define LAST_OP_8 0x0FD //LAST_OP, (R/W) Default: 0x00, Unsigned, Contains the type (read or write) of the last successful communication (0x35 read 0xCA = write)
-#define LAST_RWDATA_8 0x0FF //LAST_RWDATA_8, (R/W) Default: 0x00, Unsigned, Contains the data from the last successful 8-bit register communication
-#define Version_8 0x702 //Version, (R/W) Default: N/A, Unsigned, Contains the silicon version number
-#define EX_REF_8 0x800 //EX_REF, (R/W) Default: 0x00, Unsigned, Reference input configuration:0 = internal 1 = external
-
-//*DISNOLOAD register
-//**LCYCMODE register
-
-
-//16-bit Registers
-#define ZXTOUT_16 0x100 //ZXTOUT, (R/W) Default:0xFFFF, Unsigned,Zero-crossing timeout
-#define LINECYC_16 0x101 //LINCYC, (R/W) Default:0x0000, Unsigned,Number of half line cycles for line cycle energy accumulation mode
-#define CONFIG_16 0x102 //CONFIG, (R/W) Default:0x8004, Unsigned,Configuration register***
-#define CF1DEN_16 0x103 //CF1DEN, (R/W) Default:0x003F, Unsigned,CF1 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful.
-#define CF2DEN_16 0x104 //CF2DEN, (R/W) Default:0x003F, Unsigned,CF2 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful.
-#define CFMODE_16 0x107 //CFMODE, (R/W) Default:0x0300, Unsigned, CF output selection */
-#define PHCALA_16 0x108 //PHCALA, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel A). This register is in sign magnitude format.
-#define PHCALB_16 0x109 //PHCALB, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel B). This register is in sign magnitude format.
-#define PFA_16 0x10A //PFA, (R) Default:0x0000, Signed,Power factor (Current Channel A)
-#define PFB_16 0x10B //PFB, (R) Default:0x0000, Signed,Power factor (Current Channel B)
-#define ANGLE_A_16 0x10C //ANGLE_A, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel A input
-#define ANGLE_B_16 0x10D //ANGLE_B, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel B input
-#define Period_16 0x11E //Period, (R) Default:0x0000, Unsigned, Period register
-#define ALT_OUTPUT_16 0x110 //ALT_OUTPUT, (R/W) Default:0x0000, Unsigned,Alternative output functions**/
-#define LAST_ADD_16 0x1FE //LAST_ADD, (R) Default:0x0000, Unsigned, Contains the address of the last successful communication
-#define LAST_RWDATA_16 0x1FF //LAST_RWDATA_16, (R) Default:0x0000, Unsigned,Contains the data from the last successful 16-bit register communication
-#define Reserved_16 0x120 //Reserved, (R/W) Default:0x0000, Unsigned,This register should be set to 30h to meet the performance specified in Table 1. To modify this register, it must be unlocked by setting Register Address 0xFE to 0xAD immediately prior. (16 bit)
-
-
-//*** CONFIG register
-//*/ CFMODE register
-//**/ALT_OUTPUT register
-
-
-//24-bit and 32-bit registers
-#define SAGLVL_24 0x200 //SAGLVL, (R/W) Default: 0x000000, Unsigned, Sag Voltage Level (24 bit)
-#define SAGLVL_32 0x300 //SAGLVL, (R/W) Default: 0x000000, Unsigned, Sag Voltage Level (32 bit)
-#define ACCMODE_24 0x201 //ACCMODE, (R/W) Default:0x000000, Unsigned, Accumulation mode(24 bit)
-#define ACCMODE_32 0x301 //ACCMODE, (R/W) Default: 0x000000, Unsigned, Accumulation mode(32 bit)
-#define AP_NOLOAD_24 0x203 //AP_NOLOAD, (R/W) Default: 0x00E419, Unsigned,Active power no-load level(24 bit)
-#define AP_NOLOAD_32 0x303 //AP_NOLOAD, (R/W) Default: 0x00E419, Unsigned,Active power no-load level(32 bit)
-#define VAR_NOLOAD_24 0x204 //VAR_NOLOAD, (R/W) Default: 0x000000, Unsigned,Reactive power no-load level(24 bit)
-#define VAR_NOLOAD_32 0x304 //VAR_NOLOAD, (R/W) Default: 0x000000, Unsigned,Reactive power no-load level(32 bit)
-#define VA_NOLOAD_24 0x205 //VA_NOLOAD, (R/W) Default: 0x000000, Unsigned,Apparent power no-load level(24 bit)
-#define VA_NOLOAD_32 0x305 //VA_NOLOAD, (R/W) Default: 0x000000, Unsigned,Apparent power no-load level(32 bit)
-#define AVA_24 0x210 //AVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel A)(24 bit)
-#define AVA_32 0x310 //AVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel A)(32 bit)
-#define BVA_24 0x211 //BVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel B)(24 bit)
-#define BVA_32 0x311 //BVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel B)(32 bit)
-#define AWATT_24 0x212 //AWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel A)(24 bit)
-#define AWATT_32 0x312 //AWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel A)(32 bit)
-#define BWATT_24 0x213 //BWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel B)(24 bit)
-#define BWATT_32 0x313 //BWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel B)(32 bit)
-#define AVAR_24 0x214 //AVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel A)(24 bit)
-#define AVAR_32 0x314 //AVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel A)(32 bit)
-#define BVAR_24 0x215 //BVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel B)(24 bit)
-#define BVAR_32 0x315 //BVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel B)(32 bit)
-#define IA_24 0x216 //IA, (R) Default: 0x000000, Signed, Instantaneous current (Current Channel A)(24 bit)
-#define IA_32 0x316 //IA, (R) Default: 0x000000, Signed,Instantaneous current (Current Channel A)(32 bit)
-#define IB_24 0x217 //IB, (R) Default: 0x000000, Signed,Instantaneous current (Current Channel B)(24 bit)
-#define IB_32 0x317 //IB, (R) Default: 0x000000, Signed,Instantaneous current (Current Channel B)(32 bit)
-#define V_24 0x218 //V, (R) Default: 0x000000, Signed,Instantaneous voltage (voltage channel)(24 bit)
-#define V_32 0x318 //V, (R) Default: 0x000000, Signed,Instantaneous voltage (voltage channel)(32 bit)
-#define IRMSA_24 0x21A //IRMSA, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel A)(24 bit)
-#define IRMSA_32 0x31A //IRMSA, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel A)(32 bit)
-#define IRMSB_24 0x21B //IRMSB, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel B)(24 bit)
-#define IRMSB_32 0x31B //IRMSB, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel B)(32 bit)
-#define VRMS_24 0x21C //VRMS, (R) Default: 0x000000, Unsigned, VRMS register (24 bit)
-#define VRMS_32 0x31C //VRMS, (R) Default: 0x000000, Unsigned, VRMS register (32 bit)
-
-#define AENERGYA_24 0x21E //AENERYGA, (R) Default: 0x000000, Signed,Active energy (Current Channel A) (24 bit)
-#define AENERGYA_32 0x31E //AENERYGA, (R) Default: 0x000000, Signed,Active energy (Current Channel A)(32 bit)
-#define AENERGYB_24 0x21F //AENERYGB, (R) Default: 0x000000, Signed,Active energy (Current Channel B)(24 bit)
-#define AENERGYB_32 0x31F //AENERYGB, (R) Default: 0x000000, Signed,Active energy (Current Channel B)(32 bit)
-#define RENERGYA_24 0x220 //RENERGYA, (R) Default: 0x000000, Signed,Reactive energy (Current Channel A) (24 bit)
-#define RENERGYA_32 0x320 //RENERGYA, (R) Default: 0x000000, Signed,Reactive energy (Current Channel A)(32 bit)
-#define RENERGYB_24 0x221 //RENERGYB, (R) Default: 0x000000, Signed,Reactive energy (Current Channel B) (24 bit)
-#define RENERGYB_32 0x321 //RENERGYB, (R) Default: 0x000000, Signed,Reactive energy (Current Channel B)(32 bit)
-#define APENERGYA_24 0x222 //APENERGYA, (R) Default: 0x000000, Signed,Apparent energy (Current Channel A) (24 bit)
-#define APENERGYA_32 0x322 //APENERGYA, (R) Default: 0x000000, Signed,Apparent energy (Current Channel A)(32 bit)
-#define APENERGYB_24 0x223 //APENERGYB, (R) Default: 0x000000, Signed,Apparent energy (Current Channel B)(24 bit)
-#define APENERGYB_32 0x323 //APENERGYB, (R) Default: 0x000000, Signed,Apparent energy (Current Channel B)(32 bit)
-#define OVLVL_24 0x224 //OVLVL, (R/W) Default: 0xFFFFFF, Unsigned, Overvoltage level(24 bit)
-#define OVLVL_32 0x324 //OVLVL, (R/W) Default: 0xFFFFFF, Unsigned,Overvoltage level(32 bit)
-
-#define OILVL_24 0x225 //OILVL, (R/W) Default: 0xFFFFFF,Unsigned, Overcurrent level (24 bit)
-#define OILVL_32 0x325 //OILVL, (R/W) Default: 0xFFFFFF, Unsigned,Overcurrent level (32 bit)
-
-#define VPEAK_24 0x226 //VPEAK, (R) Default: 0x000000, Unsigned, Voltage channel peak(24 bit)
-#define VPEAK_32 0x326 //VPEAK, (R) Default: 0x000000, Unsigned,Voltage channel peak(32 bit)
-#define RSTVPEAK_24 0x227 //RSTVPEAK, (R) Default: 0x000000, Unsigned,Read voltage peak with reset (24 bit)
-#define RSTVPEAK_32 0x327 //RSTVPEAK, (R) Default: 0x000000, Unsigned,Read voltage peak with reset(32 bit)
-#define IAPEAK_24 0x228 //IAPEAK, (R) Default: 0x000000, Unsigned,Current Channel A peak(24 bit)
-#define IAPEAK_32 0x328 //IAPEAK, (R) Default: 0x000000, Unsigned,Current Channel A peak(32 bit)
-#define RSTIAPEAK_24 0x229 //RSTIAPEAK, (R) Default: 0x000000, Unsigned, Read Current Channel A peak with reset(24 bit)
-#define RSTIAPEAK_32 0x329 //RSTIAPEAK, (R) Default: 0x000000, Unsigned,Read Current Channel A peak with reset(32 bit)
-#define IBPEAK_24 0x22A //IBPEAK, (R) Default: 0x000000, Unsigned, Current Channel B peak(24 bit)
-#define IBPEAK_32 0x32A //IBPEAK, (R) Default: 0x000000, Unsigned,Current Channel B peak(32 bit)
-#define RSTIBPEAK_24 0x22B //RSTIBPEAK, (R) Default: 0x000000, Unsigned, Read Current Channel B peak with reset(24 bit)
-#define RSTIBPEAK_32 0x32B //RSTIBPEAK, (R) Default: 0x000000, Unsigned,Read Current Channel B peak with reset(32 bit)
-#define IRQENA_24 0x22C //IRQENA, (R/W) Default: 0x100000, Unsigned,Interrupt enable (Current Channel A (24 bit)
-#define IRQENA_32 0x32C //IRQENA, (R/W) Default: 0x100000, Unsigned,Interrupt enable (Current Channel A(32 bit)
-#define IRQSTATA_24 0x22D //IRQSTATA, (R) Default: 0x000000, Unsigned, Interrupt status (Current Channel A(24 bit)
-#define IRQSTATA_32 0x32D //IRQSTATA, (R) Default: 0x000000, Unsigned,Interrupt status (Current Channel A(32 bit)
-#define RSTIRQSTATA_24 0x22E //RSTIRQSTATA, (R) Default: 0x000000, Unsigned, Reset interrupt status (Current Channel A) (24 bit)
-#define RSTIRQSTATA_32 0x32E //RSTIRQSTATA, (R) Default: 0x000000, Unsigned,Reset interrupt status (Current Channel A)(32 bit)
-#define IRQENB_24 0x22F //IRQENB, (R/W) Default: 0x000000, Unsigned,Interrupt enable (Current Channel B (24 bit)
-#define IRQENB_32 0x32F //IRQENB, (R/W) Default: 0x000000, Unsigned,Interrupt enable (Current Channel B (32 bit)
-#define IRQSTATB_24 0x230 //IRQSTATB, (R) Default: 0x000000, Unsigned, Interrupt status (Current Channel B(24 bit)
-#define IRQSTATB_32 0x330 //IRQSTATB, (R) Default: 0x000000, Unsigned,Interrupt status (Current Channel B(32 bit)
-#define RSTIRQSTATB_24 0x231 //RSTIRQSTATB, (R) Default: 0x000000, Unsigned,Reset interrupt status (Current Channel B) (24 bit)
-#define RSTIRQSTATB_32 0x331 //RSTIRQSTATB, (R) Default: 0x000000, Unsigned, Reset interrupt status (Current Channel B)(32 bit)
-#define CRC_24 0x000 //CRC, (R) Default: 0x000000, Unsigned, Checksum(24 bit)
-#define CRC_32 0x37F //CRC, (R) Default: 0xFFFFFF, Unsigned,Checksum(32 bit)
-#define AIGAIN_24 0x280 //AIGAIN, (R/W) Default: 0x400000, Unsigned, Current channel gain (Current Channel A)(24 bit)
-#define AIGAIN_32 0x380 //AIGAIN, (R/W) Default: 0x400000, Unsigned,Current channel gain (Current Channel A)(32 bit)
-#define AVGAIN_24 0x281 //AVGAIN, (R/W) Default: 0x400000, Unsigned, Voltage channel gain(24 bit)
-#define AVGAIN_32 0x381 //AVGAIN, (R/W) Default: 0x400000, Unsigned,Voltage channel gain(32 bit)
-#define AWGAIN_24 0x282 //AWGAIN, (R/W) Default: 0x400000, Unsigned,Active power gain (Current Channel A)(24 bit)
-#define AWGAIN_32 0x382 //AWGAIN, (R/W) Default: 0x400000, Unsigned,Active power gain (Current Channel A)(32 bit)
-#define AVARGAIN_24 0x283 //AVARGAIN, (R/W) Default: 0x400000, Unsigned, Reactive power gain (Current Channel A)(24 bit)
-#define AVARGAIN_32 0x383 //AVARGAIN, (R/W) Default: 0x400000, Unsigned, Reactive power gain (Current Channel A)(32 bit)
-#define AVAGAIN_24 0x284 //AVAGAIN, (R/W) Default: 0x400000, Unsigned, Apparent power gain (Current Channel A) (24 bit)
-#define AVAGAIN_32 0x384 //AVAGAIN, (R/W) Default: 0x400000, Unsigned,Apparent power gain (Current Channel A)(32 bit)
-#define Reserved_24 0x285 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved_32 0x385 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-
-#define AIRMSOS_24 0x286 //AIRMSOS, (R/W) Default: 0x000000, Signed,IRMS offset (Current Channel A) (24 bit)
-#define AIRMSOS_32 0x386 //AIRMSOS, (R/W) Default: 0x000000, Signed,IRMS offset (Current Channel A)(32 bit)
-#define Reserved1_24 0x287 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved1_32 0x387 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-#define VRMSOS_24 0x288 //VRMSOS, (R/W) Default: 0x000000, Signed, VRMS offset(24 bit)
-#define VRMSOS_32 0x388 //VRMSOS, (R/W) Default: 0x000000, Signed,VRMS offset(32 bit)
-#define AWATTOS_24 0x289 //AWATTOS, (R/W) Default: 0x000000, Signed, Active power offset correction (Current Channel A)(24 bit)
-#define AWATTOS_32 0x389 //AWATTOS, (R/W) Default: 0x000000, Signed,Active power offset correction (Current Channel A)(32 bit)
-#define AVAROS_24 0x28A //AVAROS, (R/W) Default: 0x000000, Signed, Reactive power offset correction (Current Channel A)(24 bit)
-#define AVAROS_32 0x38A //AVAROS, (R/W) Default: 0x000000, Signed, Reactive power offset correction (Current Channel A)(32 bit)
-#define AVAOS_24 0x28B //AVAOS, (R/W) Default: 0x000000, Signed, Apparent power offset correction (Current Channel A(24 bit)
-#define AVAOS_32 0x38B //AVAOS, (R/W) Default: 0x000000, Signed,Apparent power offset correction (Current Channel A(32 bit)
-#define BIGAIN_24 0x28C //BIGAIN, (R/W) Default: 0x400000, Unsigned,Current channel gain (Current Channel B) (24 bit)
-#define BIGAIN_32 0x38C //BIGAIN, (R/W) Default: 0x400000, Unsigned,Current channel gain (Current Channel B)(32 bit)
-#define BVGAIN_24 0x28D //BVGAIN, (R/W) Default: 0x400000, Unsigned, This register should not be modified(24 bit)
-#define BVGAIN_32 0x38D //BVGAIN, (R/W) Default: 0x400000, Unsigned,This register should not be modified(32 bit)
-#define BWGAIN_24 0x28E //BWGAIN, (R/W) Default: 0x400000, Unsigned, Active power gain (Current Channel B)(24 bit)
-#define BWGAIN_32 0x38E //BWGAIN, (R/W) Default: 0x400000, Unsigned,Active power gain (Current Channel B)(32 bit)
-#define BVARGAIN_24 0x28F //BVARGAIN, (R/W) Default: 0x400000, Unsigned, Reactive power gain (Current Channel B)(24 bit)
-#define BVARGAIN_32 0x38F //BVARGAIN, (R/W) Default: 0x400000, Unsigned,Reactive power gain (Current Channel B)(32 bit)
-#define BVAGAIN_24 0x290 //BVAGAIN, (R/W) Default: 0x400000, Unsigned, Apparent power gain (Current Channel B)(24 bit)
-#define BVAGAIN_32 0x390 //BVAGAIN, (R/W) Default: 0x400000, Unsigned,Apparent power gain (Current Channel B)(32 bit)
-
-#define Reserved2_24 0x291 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved2_32 0x391 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-#define BIRMSOS_24 0x292 //BIRMSOS, (R/W) Default: 0x000000, Unsigned, IRMS offset (Current Channel B)(24 bit)
-#define BIRMSOS_32 0x392 //BIRMSOS, (R/W) Default: 0x000000, Unsigned,IRMS offset (Current Channel B)(32 bit)
-
-#define Reserved3_24 0x293 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved3_32 0x393 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-#define Reserved4_24 0x294 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved4_32 0x394 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-#define BWATTOS_24 0x295 //BWATTOS, (R/W) Default: 0x000000, Unsigned, Active power offset correction (Current Channel B)(24 bit)
-#define BWATTOS_32 0x395 //BWATTOS, (R/W) Default: 0x000000, Unsigned,Active power offset correction (Current Channel B)(32 bit)
-#define BVAROS_24 0x296 //BVAROS, (R/W) Default: 0x000000, Unsigned,Reactive power offset correction (Current Channel B)(24 bit)
-#define BVAROS_32 0x396 //BVAROS, (R/W) Default: 0x000000, Unsigned,Reactive power offset correction (Current Channel B)(32 bit)
-#define BVAOS_24 0x297 //BVAOS, (R/W) Default: 0x000000, Unsigned, Apparent power offset correction (Current Channel B)(24 bit)
-#define BVAOS_32 0x397 //BVAOS, (R/W) Default: 0x000000, Unsigned,Apparent power offset correction (Current Channel B)(32 bit)
-#define LAST_RWDATA_24 0x2FF //LAST_RWDATA, (R) Default: 0x000000, Unsigned, Contains the data from the last successful 24-bit/32-bit register communication(24 bit)
-#define LAST_RWDATA_32 0x3FF //LAST_RWDATA, (R) Default: 0x000000, Unsigned, Contains the data from the last successful 24-bit/32-bit register communication(32 bit)
-
-
-//*********************
-/*
-ADE7953 REGISTER DESCRIPTIONS
-
-DISNOLOAD Register (Address 0x001)
-Bits Bit Name Default Description
-0 DIS_APNLOAD 0 1 = disable the active power no-load feature on Current Channel A and Current Channel B
-1 DIS_VARNLOAD 0 1 = disable the reactive power no-load feature on Current Channel A and Current Channel B
-2 DIS_VANLOAD 0 1 = disable the apparent power no-load feature on Current Channel A and Current Channel B
-
-LCYCMODE Register (Address 0x004)
-Bits Bit Name Default Description
-0 ALWATT 0 0 = disable active energy line cycle accumulation mode on Current Channel A
-1 = enable active energy line cycle accumulation mode on Current Channel A
-1 BLWATT 0 0 = disable active energy line cycle accumulation mode on Current Channel B
-1 = enable active energy line cycle accumulation mode on Current Channel B
-2 ALVAR 0 0 = disable reactive energy line cycle accumulation mode on Current Channel A
-1 = enable reactive energy line cycle accumulation mode on Current Channel A
-3 BLVAR 0 0 = disable reactive energy line cycle accumulation mode on Current Channel B
-1 = enable reactive energy line cycle accumulation mode on Current Channel B
-4 ALVA 0 0 = disable apparent energy line cycle accumulation mode on Current Channel A
-1 = enable apparent energy line cycle accumulation mode on Current Channel A
-5 BLVA 0 0 = disable apparent energy line cycle accumulation mode on Current Channel B
-1 = enable apparent energy line cycle accumulation mode on Current Channel B
-6 RSTREAD 1 0 = disable read with reset for all registers
-1 = enable read with reset for all registers
-
-CONFIG Register (Address 0x102)
-Bits Bit Name Default Description
-0 INTENA 0 1 = integrator enable (Current Channel A)
-1 INTENB 0 1 = integrator enable (Current Channel B)
-2 HPFEN 1 1 = HPF enable (all channels)
-3 PFMODE 0 0 = power factor is based on instantaneous powers, 1 = power factor is based on line cycle accumulation mode energies
-4 REVP_CF 0 0 = REVP is updated on CF1, 1 = REVP is updated on CF2
-5 REVP_PULSE 0 0 = REVP is high when reverse polarity is true, low when reverse polarity is false, 1 = REVP outputs a 1 Hz pulse when reverse polarity is true and is low when reverse polarity is false
-6 ZXLPF 0 0 = ZX LPF is enabled, 1 = ZX LPF is disabled
-7 SWRST 0 Setting this bit enables a software reset
-8 CRC_ENABLE 0 0 = CRC is disabled, 1 = CRC is enabled
-[10:9] Reserved 00 Reserved
-11 ZX_I 0 0 = ZX_I is based on Current Channel A, 1 = ZX_I is based on Current Channel B
-[13:12] ZX_EDGE 00 Zero-crossing interrupt edge selection
-Setting               Edge Selection
-00                    Interrupt is issued on both positive-going and negative-going zero crossing
-01                    Interrupt is issued on negative-going zero crossing
-10                    Interrupt is issued on positive-going zero crossing
-11                    Interrupt is issued on both positive-going and negative-going zero crossing
-14                    Reserved 0 Reserved
-15                    COMM_LOCK 1 0 = communication locking feature is enabled, 1 = communication locking feature is disabled
-
-CFMODE Register (Address 0x107)
-Bits Bit Name Default Description
-[3:0] CF1SEL 0000 Configuration of output signal on CF1 pin
-Setting CF1 Output Signal Configuration
-0000 CF1 is proportional to active power (Current Channel A)
-0001 CF1 is proportional to reactive power (Current Channel A)
-0010 CF1 is proportional to apparent power (Current Channel A)
-0011 CF1 is proportional to IRMS (Current Channel A)
-0100 CF1 is proportional to active power (Current Channel B)
-0101 CF1 is proportional to reactive power (Current Channel B)
-0110 CF1 is proportional to apparent power (Current Channel B)
-0111 CF1 is proportional to IRMS (Current Channel B)
-1000 CF1 is proportional to IRMS (Current Channel A) + IRMS (Current Channel B)
-1001 CF1 is proportional to active power (Current Channel A) + active power (Current Channel B)
-[7:4] CF2SEL 0000 Configuration of output signal on CF2 pin
-Setting              CF2 Output Signal Configuration
-0000                 CF2 is proportional to active power (Current Channel A)
-0001                 CF2 is proportional to reactive power (Current Channel A)
-0010                 CF2 is proportional to apparent power (Current Channel A)
-0011                 CF2 is proportional to IRMS (Current Channel A)
-0100                 CF2 is proportional to active power (Current Channel B)
-0101                 CF2 is proportional to reactive power (Current Channel B)
-0110                 CF2 is proportional to apparent power (Current Channel B)
-0111                 CF2 is proportional to IRMS (Current Channel B)
-1000                 CF2 is proportional to IRMS (Current Channel A) + IRMS (Current Channel B)
-1001                 CF2 is proportional to active power (Current Channel A) + active power(Current Channel B)
-8 CF1DIS 1     0 = CF1 output is enabled, 1 = CF1 output is disabled
-9 CF2DIS 1     0 = CF2 output is enabled, 1 = CF2 output is disabled
-
-ALT_OUTPUT Register (Address 0x110)
-Bits Bit Name Default Description
-[3:0] ZX_ALT 0000 Configuration of ZX pin (Pin 1)
-Setting 		ZX Pin Configuration
-0000 			ZX detection is output on Pin 1 (default)
-0001 			Sag detection is output on Pin 1
-0010 			Reserved
-0011 			Reserved
-0100 			Reserved
-0101 			Active power no-load detection (Current Channel A) is output on Pin 1
-0110 			Active power no-load detection (Current Channel B) is output on Pin 1
-0111 			Reactive power no-load detection (Current Channel A) is output on Pin 1
-1000 			Reactive power no-load detection (Current Channel B) is output on Pin 1
-1001 			Unlatched waveform sampling signal is output on Pin 1
-1010 			IRQ signal is output on Pin 1
-1011 			ZX_I detection is output on Pin 1
-1100 			REVP detection is output on Pin 1
-1101 			Reserved (set to default value)
-111x 			Reserved (set to default value)
-[7:4] ZXI_ALT 0000 Configuration of ZX_I pin (Pin 21)
-Setting 		ZX_I Pin Configuration
-0000 			ZX_I detection is output on Pin 21 (default)
-0001 			Sag detection is output on Pin 21
-0010 			Reserved
-0011 			Reserved
-0100 			Reserved
-0101 			Active power no-load detection (Current Channel A) is output on Pin 21
-0110 			Active power no-load detection (Current Channel B) is output on Pin 21
-0111 			Reactive power no-load detection (Current Channel A) is output on Pin 21
-1000 			Reactive power no-load detection (Current Channel B) is output on Pin 21
-1001 			Unlatched waveform sampling signal is output on Pin 21
-1010 			IRQ signal is output on Pin 21
-1011 			ZX detection is output on Pin 21
-1100 			REVP detection is output on Pin 21
-1101 			Reserved (set to default value)
-111x 			Reserved (set to default value)
-
-[11:8] REVP_ALT 0000 Configuration of REVP pin (Pin 20)
-Setting			REVP Pin Configuration
-0000 			REVP detection is output on Pin 20 (default)
-0001 			Sag detection is output on Pin 20
-0010 			Reserved
-0011 			Reserved
-0100 			Reserved
-0101 			Active power no-load detection (Current Channel A) is output on Pin 20
-0110 			Active power no-load detection (Current Channel B) is output on Pin 20
-0111 			Reactive power no-load detection (Current Channel A) is output on Pin 20
-1000 			Reactive power no-load detection (Current Channel B) is output on Pin 20
-1001 			Unlatched waveform sampling signal is output on Pin 20
-1010 			IRQ signal is output on Pin 20
-1011 			ZX detection is output on Pin 20
-1100 			ZX_I detection is output on Pin 20
-1101 			Reserved (set to default value)
-111x 			Reserved (set to default value)
-
-ACCMODE Register (Address 0x201 and Address 0x301)
-Bits Bit Name Default Description
-[1:0] AWATTACC 00 Current Channel A active energy accumulation mode
-Setting Active Energy Accumulation Mode (Current Channel A)
-	00 Normal mode
-	01 Positive-only accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-[3:2] BWATTACC 00 Current Channel B active energy accumulation mode
-Setting Active Energy Accumulation Mode (Current Channel B)
-	00 Normal mode
-	01 Positive-only accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-[5:4] AVARACC 00 Current Channel A reactive energy accumulation mode
-Setting Reactive Energy Accumulation Mode (Current Channel A)
-	00 Normal mode
-	01 Antitamper accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-[7:6] BVARACC 00 Current Channel B reactive energy accumulation mode
-Setting Reactive Energy Accumulation Mode (Current Channel B)
-	00 Normal mode
-	01 Antitamper accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-8 AVAACC 0 0 = Current Channel A apparent energy accumulation is in normal mode, 1 = Current Channel A apparent energy accumulation is based on IRMSA
-9 BVAACC 0 0 = Current Channel B apparent energy accumulation is in normal mode, 1 = Current Channel B apparent energy accumulation is based on IRMSB
-10 APSIGN_A 0 0 = active power on Current Channel A is positive, 1 = active power on Current Channel A is negative
-11 APSIGN_B 0 0 = active power on Current Channel B is positive, 1 = active power on Current Channel B is negative
-12 VARSIGN_A 0 0 = reactive power on Current Channel A is positive, 1 = reactive power on Current Channel A is negative
-13 VARSIGN_B 0 0 = reactive power on Current Channel B is positive, 1 = reactive power on Current Channel B is negative
-[15:14] Reserved 00 Reserved
-16 ACTNLOAD_A 0 0 = Current Channel A active energy is out of no-load condition, 1 = Current Channel A active energy is in no-load condition
-17 VANLOAD_A 0 0 = Current Channel A apparent energy is out of no-load condition, 1 = Current Channel A apparent energy is in no-load condition
-18 VARNLOAD_A 0 0 = Current Channel A reactive energy is out of no-load condition, 1 = Current Channel A reactive energy is in no-load condition
-19 ACTNLOAD_B 0 0 = Current Channel B active energy is out of no-load condition, 1 = Current Channel B active energy is in no-load condition
-20 VANLOAD_B 0 0 = Current Channel B apparent energy is out of no-load condition, 1 = Current Channel B apparent energy is in no-load condition
-21 VARNLOAD_B 0 0 = Current Channel B reactive energy is out of no-load condition, 1 = Current Channel B reactive energy is in no-load condition
-
-*/
-
-//Interrupt Configuration
-//Note: For IRQENA Register (Address 0x22C and Address 0x32C)), each binary position of the 16- bit response has the following configuration options
-//Bits Bit Name Description
-//0 AEHFA Set to 1 to enable an interrupt when the active energy is half full (Current Channel A)
-//1 VAREHFA Set to 1 to enable an interrupt when the reactive energy is half full (Current Channel A)
-//2 VAEHFA Set to 1 to enable an interrupt when the apparent energy is half full (Current Channel A)
-//3 AEOFA Set to 1 to enable an interrupt when the active energy has overflowed or underflowed (Current Channel A)
-//4 VAREOFA Set to 1 to enable an interrupt when the reactive energy has overflowed or underflowed (Current Channel A)
-//5 VAEOFA Set to 1 to enable an interrupt when the apparent energy has overflowed or underflowed (Current Channel A)
-//6 AP_NOLOADA Set to 1 to enable an interrupt when the active power no-load condition is detected on Current Channel A
-//7 VAR_NOLOADA Set to 1 to enable an interrupt when the reactive power no-load condition is detected on Current Channel A
-//8 VA_NOLOADA Set to 1 to enable an interrupt when the apparent power no-load condition is detected on Current Channel A
-//9 APSIGN_A Set to 1 to enable an interrupt when the sign of active energy has changed (Current Channel A)
-//10 VARSIGN_A Set to 1 to enable an interrupt when the sign of reactive energy has changed (Current Channel A)
-//11 ZXTO_IA Set to 1 to enable an interrupt when the zero crossing has been missing on Current Channel A for the length of time specified in the ZXTOUT register
-//12 ZXIA Set to 1 to enable an interrupt when the current Channel A zero crossing occurs
-//13 OIA Set to 1 to enable an interrupt when the current Channel A peak has exceeded the overcurrent threshold set in the OILVL register
-//14 ZXTO Set to 1 to enable an interrupt when a zero crossing has been missing on the voltage channel for the length of time specified in the ZXTOUT register
-//15 ZXV Set to 1 to enable an interrupt when the voltage channel zero crossing occurs
-//16 OV Set to 1 to enable an interrupt when the voltage peak has exceeded the overvoltage threshold set in the OVLVL register
-//17 WSMP Set to 1 to enable an interrupt when new waveform data is acquired
-//18 CYCEND Set to 1 to enable an interrupt when it is the end of a line cycle accumulation period
-//19 Sag Set to 1 to enable an interrupt when a sag event has occurred
-//20 Reset This interrupt is always enabled and cannot be disabled
-//21 CRC Set to 1 to enable an interrupt when the checksum has changed
-
-//IRQSTATA Register (Address 0x22D and Address 0x32D) and RSTIRQSTATA Register (Address 0x22E and Address 0x32E)
-//Bits Bit Name Description
-//0 AEHFA Set to 1 when the active energy register is half full (Current Channel A)
-//1 VAREHFA Set to 1 when the reactive energy register is half full (Current Channel A)
-//2 VAEHFA Set to 1 when the apparent energy register is half full (Current Channel A)
-//3 AEOFA Set to 1 when the active energy register has overflowed or underflowed (Current Channel A)
-//4 VAREOFA Set to 1 when the reactive energy register has overflowed or underflowed (Current Channel A)
-//5 VAEOFA Set to 1 when the apparent energy register has overflowed or underflowed (Current Channel A)
-//6 AP_NOLOADA Set to 1 when the active power no-load condition is detected Current Channel A
-//7 VAR_NOLOADA Set to 1 when the reactive power no-load condition is detected Current Channel A
-//8 VA_NOLOADA Set to 1 when the apparent power no-load condition is detected Current Channel A
-//9 APSIGN_A Set to 1 when the sign of active energy has changed (Current Channel A)
-//10 VARSIGN_A Set to 1 when the sign of reactive energy has changed (Current Channel A)
-//11 ZXTO_IA Set to 1 when a zero crossing has been missing on Current Channel A for the length of time specified in the ZXTOUT register
-//12 ZXIA Set to 1 when a current Channel A zero crossing is detected
-//13 OIA Set to 1 when the current Channel A peak has exceeded the overcurrent threshold set in the OILVL register
-//14 ZXTO Set to 1 when a zero crossing has been missing on the voltage channel for the length of time specified in the ZXTOUT register
-//15 ZXV Set to 1 when the voltage channel zero crossing is detected
-//16 OV Set to 1 when the voltage peak has exceeded the overvoltage threshold set in the OVLVL register
-//17 WSMP Set to 1 when new waveform data is acquired
-//18 CYCEND Set to 1 at the end of a line cycle accumulation period
-//19 Sag Set to 1 when a sag event has occurred
-//20 Reset Set to 1 at the end of a software or hardware reset
-//21 CRC Set to 1 when the checksum has changed
-
-//IRQENB Register (Address 0x22F and Address 0x32F)
-//Bits Bit Name Description
-//0 AEHFB Set to 1 to enable an interrupt when the active energy is half full (Current Channel B)
-//1 VAREHFB Set to 1 to enable an interrupt when the reactive energy is half full (Current Channel B)
-//2 VAEHFB Set to 1 to enable an interrupt when the apparent energy is half full (Current Channel B)
-//3 AEOFB Set to 1 to enable an interrupt when the active energy has overflowed or underflowed (Current Channel B)
-//4 VAREOFB Set to 1 to enable an interrupt when the reactive energy has overflowed or underflowed (Current Channel B)
-//5 VAEOFB Set to 1 to enable an interrupt when the apparent energy has overflowed or underflowed (Current Channel B)
-//6 AP_NOLOADB Set to 1 to enable an interrupt when the active power no-load detection on Current Channel B occurs
-//7 VAR_NOLOADB Set to 1 to enable an interrupt when the reactive power no-load detection on Current Channel B occurs
-//8 VA_NOLOADB Set to 1 to enable an interrupt when the apparent power no-load detection on Current Channel B occurs
-//9 APSIGN_B Set to 1 to enable an interrupt when the sign of active energy has changed (Current Channel B)
-//10 VARSIGN_B Set to 1 to enable an interrupt when the sign of reactive energy has changed (Current Channel B)
-//11 ZXTO_IB Set to 1 to enable an interrupt when a zero crossing has been missing on Current Channel B for the length of time specified in the ZXTOUT register
-//12 ZXIB Set to 1 to enable an interrupt when the current Channel B zero crossing occurs
-//13 OIB Set to 1 to enable an interrupt when the current Channel B peak has exceeded the overcurrent threshold set in the OILVL register
-
-//IRQSTATB Register (Address 0x230 and Address 0x330) and RSTIRQSTATB Register (Address 0x231 and Address 0x331)
-//Bits Bit Name Description
-//0 AEHFB Set to 1 when the active energy register is half full (Current Channel B)
-//1 VAREHFB Set to 1 when the reactive energy register is half full (Current Channel B)
-//2 VAEHFB Set to 1 when the apparent energy register is half full (Current Channel B)
-//3 AEOFB Set to 1 when the active energy register has overflowed or underflowed (Current Channel B)
-//4 VAREOFB Set to 1 when the reactive energy register has overflowed or underflowed (Current Channel B)
-//5 VAEOFB Set to 1 when the apparent energy register has overflowed or underflowed (Current Channel B)
-//6 AP_NOLOADB Set to 1 when the active power no-load condition is detected on Current Channel B
-//7 VAR_NOLOADB Set to 1 when the reactive power no-load condition is detected on Current Channel B
-//8 VA_NOLOADB Set to 1 when the apparent power no-load condition is detected on Current Channel B
-//9 APSIGN_B Set to 1 when the sign of active energy has changed (Current Channel B)
-//10 VARSIGN_B Set to 1 when the sign of reactive energy has changed (Current Channel B)
-//11 ZXTO_IB Set to 1 when a zero crossing has been missing on Current Channel B for the length of time specified in the ZXTOUT register
-//12 ZXIB Set to 1 when a current Channel B zero crossing is obtained
-//13 OIB Set to 1 when current Channel B peak has exceeded the overcurrent threshold set in the OILVL register
 
 //*******************************************************************************************
 
@@ -536,7 +92,21 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x050 CVAROS_32 // Phase C total reactive power offset correction for CVAR calculation
 #define 0x052 CFVAROS_32 // Phase C total reactive power offset correction for CVAR calculations
 
-#define 0x060 CONFIG0_32 // Configuration register 0
+#define 0x060 CONFIG0_32
+// Bits: [31:14] BitName: RESERVED Description: Reserved
+// Bits: 13 BitName: DISRPLPF Description: Set this bit to disable the low-pass filter in the total reactive power datapath.
+// Bits: 12 BitName: DISAPLPF Description: Set this bit to disable the low-pass filter in the total active power datapath.
+// Bits: 11 BitName: ININTEN Description: Set this bit to enable the digital integrator in the Neutral Current channel.
+// Bits: 10 BitName: VNOMC_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase C total apparent power, CVA.
+// Bits: 9 BitName: VNOMB_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase B total apparent power, BVA.
+// Bits: 8 BitName: VNOMA_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase A total apparent power, AVA.
+// Bits: 7 BitName: RESERVED Description: Reserved
+// Bits: 6 BitName: ZX_SRC_SEL Description: This bit selects whether data going into the zero-crossing detection circuit comes before the highpass filter, integrator, and phase compensation or afterwards. Setting: 0 for After the high-pass filter, integrator, and phase compensation. Setting: 1 for Before the high-pass filter, integrator, and phase compensation.
+// Bits: 5 BitName: INTEN Description: Set this bit to enable the integrators in the phase current channels. The neutral current channel integrator is managed byb the ININTEN bit in the CONFIG0 register.
+// Bits: 4 BitName: MTEN Description: Set this bit to enable multipoint phase and gain compensation. If enabled, an additional gain factor, xIGAIN0 through xIGAIN4, is applied to the current channel based on the xIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.
+// Bits: 3 BitName: HPFDIS Description: Set this bit to disable high-pass filters in all the voltage and current channels.
+// Bits: 2 BitName: RESERVED Description: Reserved
+// Bits: [1:0] BitName: ISUM_CFG Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
 
 // Multipoint phase/gain threshold.
 #define 0x061 MTTHR_L0_32 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
@@ -594,7 +164,8 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x254 CFVAR_32 // Phase C fundamental reactive power, udpated at 4kSPS
 #define 0x256 CPF_32 // Phase C power factor, updated at 1.024 seconds
 
-#define 0X25D CMTREGION_32 // If multipoint gian and phase...
+#define 0X25D CMTREGION_32 // If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx is currently being used.
+
 #define 0x265 NI_PCF_32 // Instantaneous neutral current channel waveform processed by the DSP, at 4kSPS.
 #define 0x266 NIRMS_32 // Neutral current filter based RMS value
 #define 0x269 ISUMRMS_32 // Filter based RMS based on the sum of IA + IB + IC += IN.
@@ -651,7 +222,11 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x406 MASK1_32 //Interrupt Enable Register 1.
 #define 0x407 EVENT_MASK_32 //Event enable register.
 #define 0x40E USER_PERIOD_32 //User configured line period value used for resampling when the UPERIOD_SEL bit in the CONFIG2 register is set.
+
 #define 0x40F VLEVEL_32 //Register used in the algorithm that computes the fundamental reactive power
+// Bits: [31:24] BitName: RESERVED Description: Reserved
+// Bits: [23:0] BitName: VLEVEL_VAL Description: Register used in the algorithm that computes the fundamental reactive power.
+
 #define 0x418 APERIOD_32 //Line period on Phase A voltage
 #define 0x419 BPERIOD_32 //Line period on Phase B voltage
 #define 0x41A CPERIOD_32 //Line period on Phase C voltage
@@ -659,18 +234,75 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x41C ACT_NL_LVL_32 //No load threshold in the total active power datapath
 #define 0x41D REACT_NL_LVL_32 //No load threshold in the total and fundamental reactive power datapath.
 #define 0x41E APP_NL_LVL_32 //No load threshold in the total apparent power datapath.
+
 #define 0x41F PHNOLOAD_32 //Phase no load register.
+// Bits: [31:17] BitName: RESERVED Description: Reserved
+// Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
+// Bits: 15 BitName: RESERVED Description: Reserved
+// Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
+// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
+// Bits: 11 BitName: RESERVED Description: Reserved
+// Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
+// Bits: 9 BitName: RESERVED Description: Reserved
+// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load.
+// Bits: 7 BitName: BVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 6 BitName: BWATTNL Description: This bit is set if the Phase B total active energy is in no load.
+// Bits: 5 BitName: RESERVED Description: Reserved
+// Bits: 4 BitName: AFVARNL Description: This bit is set if the Phase A fundamental reactive energy is in no load.
+// Bits: 3 BitName: RESERVED Description: Reserved
+// Bits: 2 BitName: AVANL Description: This bit is set if the Phase A total apparent energy is in no load.
+// Bits: 1 BitName: AVARNL Description: This bit is set if the Phase A total reactive energy is in no load.
+// Bits: 0 BitName: AWATTNL Description: This bit is set if the Phase A total active energy is in no load.
+
 #define 0x420 WTHR_32 //Sets the maximum output rate from the digital to frequency converter for the total active power for the CF calibration pulse output. It is recommended to write WTHR = 0x0010 0000.
 #define 0x421 VARTHR_32 //Sets the maximum output rate from the digital to frequency converter for the total and fundamental reactive power for the CF calibration pulse output. It is recommended to write VARTHR = 0x0010 0000.
 #define 0x422 VATHR_32 //Sets the maximum output rate from the digital to frequency converter for the total apparent power for the CF calibration pulse output. It is recommended to write VATHR = 0x0010 0000.
 #define 0x423 LAST_DATA_32_32 //This register holds the data read or written during the last 32-bittransaction on the SPI port.
+
 #define 0x424 ADC_REDIRECT_32 //This register allows any ADC output to be redirected to any digital datapath.
+// Bits: [31:21] BitName: RESERVED Description: Reserved
+// Bits: [20:18] BitName: VC_DIN Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
+// Bits: [17:15] BitName: VB_DIN Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
+// Bits: [14:12] BitName: VA_DIN Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
+// Bits: [11:9] BitName: IN_DIN Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
+// Bits: [8:6] BitName: IC_DIN Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
+// Bits: [5:3] BitName: IB_DIN Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
+// Bits: [2:0] BitName: IA_DIN Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
+
 #define 0x425 CF_LCFG_32 //CF calibration pulse width configuration register.
+// Bits: [31:23] BitName: RESERVED Description: Reserved
+// Bits: 22 BitName: CF4_LT Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 21 BitName: CF3_LT Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 20 BitName: CF2_LT Description: If this bit is set, the CF2 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 19 BitName: CF1_LT Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: [18:0] BitName: CF_LTMR Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
+
 #define 0x472 PART_ID_32 //This register identifies the IC. If the ADE9000_ID bit is 0, the IC is an ADE9078
+// Bits: [31:22] BitName: RESERVED Description: Reserved
+// Bits: 21 BitName: Description: This bit is set to identify an ADE73370 IC.
+// Bits: 20 BitName: Description: This bit is set to identify an ADE9000 IC.
+// Bits: [19:17]  BitName: RESERVED Description: Reserved
+// Bits: 16 BitName: Description: This bit is set to identify an ADE9004 IC.
+// Bits: [15:0] BitName: RESERVED Description: Reserved
 
 //16-Bit Registers
 #define 0x480 RUN_16 //Write this register to 1 to start the measurements
+
 #define 0x481 CONFIG1_16 //Configuration Register 1.
+// Bits: 15 BitName: EXT_REF Description:
+// Bits: [14:13] BitName: RESERVED Description: Reserved
+// Bits: 12 BitName: IRQ0_ON_IRQ1 Description:
+// Bits: 11 BitName: BURST_EN Description:
+// Bits: 10 BitName: RESERVED Description: Reserved
+// Bits: [9:8] BitName: PWR_SETTLE Description:
+// Bits: [7:6] BitName: RESERVED Description: Reserved
+// Bits: 5 BitName: CF_ACC_CLR Description: Set this bit to clear the acculumation in the digital to frequency converter and CFDEN counter. Note that this bit automatically clears itself.
+// Bits: 4 BitName: RESERVED Description: Reserved
+// Bits: [3:2] BitName: Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
+// Bits: 1 BitName: CF3_CFG Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
+// Bits: 0 BitName: SWRST Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
+
 #define 0x482 ANGL_VA_VB_16 //Time between positive to negative zero crossings on Phase A and Phase B voltages.
 #define 0x483 ANGL_VB_VC_16 //Time between positive to negative zero crossings on Phase B and Phase C voltages.
 #define 0x484 ANGL_VA_VC_16 //Time between positive to negative zero crossings on Phase A and Phase C voltages.
@@ -680,10 +312,37 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x488 ANGL_IA_IB_16 //Time between positive to negative zero crossings on Phase A and Phase B current.
 #define 0x489 ANGL_IB_IC_16 //Time between positive to negative zero crossings on Phase B and Phase C current.
 #define 0x48A ANGL_IA_IC_16 //Time between positive to negative zero crossings on Phase A and Phase C current
+
 #define 0x490 CFMODE_16 //CFx configureation register
+// Bits: 15 BitName: CF4DIS Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
+// Bits: 14 BitName: CF3DIS Description: CF1 output disable -- see CF4DIS
+// Bits: 13 BitName: CF2DIS Description: CF1 output disable -- see CF4DIS
+// Bits: 12 BitName: CF1DIS Description: CF1 output disable -- see CF4DIS
+// Bits: [11:9] BitName: CF4SEL Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
+// Bits: [8:6] BitName: CF3SEL Description: Selects type of energy output on CF3 pin --see CF4SEL
+// Bits: [5:3] BitName: CF2SEL Description: Selects type of energy output on CF2 pin --see CF4SEL
+// Bits: [2:0] BitName: CF1SEL Description: Selects type of energy output on CF1 pin --see CF4SEL
+
 #define 0x491 COMPMODE_16 //Computation mode register
+// Bits: [15:12] BitName: RESERVED Description: Reserved
+// Bits: [11:9] BitName: TERMSEL4 Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
+// Bits: [8:6] BitName: TERMSEL3 Description: Phases to include in CF3 pulse output --see TERMSEL4
+// Bits: [5:3] BitName: TERMSEL2 Description: Phases to include in CF2 pulse output --see TERMSEL4
+// Bits: [2:0] BitName: TERMSEL1 Description: Phases to include in CF1 pulse output --see TERMSEL4
+
 #define 0x492 ACCMODE_16 //Accumulation mode register
+// Bits: [15:9] BitName: RESERVED Description: Reserved
+// Bits: 8 BitName: Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
+// Bits: 7 BitName: ICONSEL Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
+// Bits: [6:4] BitName: VCONSEL Description: Three-wire and four-wire hardware configuration selection. Setting: 000 for 4-wire wye. Setting: 001 for 3-wire delta. VB' = VA-VC. Setting: 010 for 4-wire delta, non-Blondel compliant. VB' = -VA - VC. Setting: 011 for 4-wire delta non-Blondel compliant. VB' = -VA. Setting: 100 for 3-wire delta. VA'=VA-VB; VB' = VA-VC; VC'=VC-VB.
+// Bits: [3:2] BitName: VARACC Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
+// Bits: [1:0] BitName: WATTACC Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
+
 #define 0x493 CONFIG3_16 //Configuraiton Register 3
+// Bits: [15:5] BitName: RESERVED Description: Reserved
+// Bits: [4:2] BitName: PEAKSEL Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
+// Bits: [1:0] BitName: RESERVED Description: Reserved
+
 #define 0x494 CF1DEN_16 //CF1 denominator register
 #define 0x495 CF2DEN_16 //CF2 denominator register
 #define 0x496 CF3DEN_16 //CF3 denominator register
@@ -714,7 +373,7 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x4B9 PGA_GAIN_16 /*This register configures the PGA gain for each ADC */
 #define 0x4BA CHNL_DIS_16 /* This register can be disables the ADCs individually */
 #define 0x4BF WR_LOCK_16 /* This register enables the configuration lock feature */
-#define 0x4B0 VAR_DIS_16 /* Enable/disable total reactive power calculation */
+#define 0x4E0 VAR_DIS_16 /* Enable/disable total reactive power calculation */
 #define 0x4F0 RESERVED1_16 /* This register is reserved */
 #define 0x4FE VERSION_16 /* Version of the ADE9078 IC */
 #define 0x500 AI_SINC_DAT_32 /* Current Channel A ADC waveforms from sinc4 output, at 16 kSPS */
@@ -790,22 +449,6 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 #define 0x6B9 NI_PCF_2_32 /* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
 #define 0x6BA NIRMS_2_32 /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
 
-#define 0X060 CONFIG0
-// Bits: [31:14] BitName: RESERVED Description: Reserved
-// Bits: 13 BitName: DISRPLPF Description: Set this bit to disable the low-pass filter in the total reactive power datapath.
-// Bits: 12 BitName: DISAPLPF Description: Set this bit to disable the low-pass filter in the total active power datapath.
-// Bits: 11 BitName: ININTEN Description: Set this bit to enable the digital integrator in the Neutral Current channel.
-// Bits: 10 BitName: VNOMC_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase C total apparent power, CVA.
-// Bits: 9 BitName: VNOMB_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase B total apparent power, BVA.
-// Bits: 8 BitName: VNOMA_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase A total apparent power, AVA.
-// Bits: 7 BitName: RESERVED Description: Reserved
-// Bits: 6 BitName: ZX_SRC_SEL Description: This bit selects whether data going into the zero-crossing detection circuit comes before the highpass filter, integrator, and phase compensation or afterwards. Setting: 0 for After the high-pass filter, integrator, and phase compensation. Setting: 1 for Before the high-pass filter, integrator, and phase compensation.
-// Bits: 5 BitName: INTEN Description: Set this bit to enable the integrators in the phase current channels. The neutral current channel integrator is managed byb the ININTEN bit in the CONFIG0 register.
-// Bits: 4 BitName: MTEN Description: Set this bit to enable multipoint phase and gain compensation. If enabled, an additional gain factor, xIGAIN0 through xIGAIN4, is applied to the current channel based on the xIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.
-// Bits: 3 BitName: HPFDIS Description: Set this bit to disable high-pass filters in all the voltage and current channels.
-// Bits: 2 BitName: RESERVED Description: Reserved
-// Bits: [1:0] BitName: ISUM_CFG Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
-
 // For following 3: [31:4] RESERVED
 // 3:0 A/B/C_REGION... If multipoint gain and phase compensation is enabled, with MTEN=1 in the CONFIG0 register, these bits indicate which A/B/CI_GAINx and A/B/CPHCALx is currently being used. Settings: 0000 for A/B/CIGAIN0, A/C/BPHCAL0. Settings 0001 for A/B/CIGAIN1, A/B/CPHCAL1. Settings: 0010 for A/B/CIGAIN2, A/B/CPHCAL2. Settings: 0011 for A/B/CIGAIN3, A/B/CPHCAL3. Settings: 0100 for A/B/CIGAIN4, A/B/CPHCAL4. Settings: 1111 -> This feature is disabled because MTEN = 0 in the CONFIG0 register.
 #define 0x21D AMTREGION
@@ -828,100 +471,8 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 
 #define 0X407 EVENT_MASK
 
-#define 0x40F VLEVEL
-// Bits: [31:24] BitName: RESERVED Description: Reserved
-// Bits: [23:0] BitName: VLEVEL_VAL Description: Register used in the algorithm that computes the fundamental reactive power.
-
-#define 0x41F PHNOLOAD
-// Bits: [31:17] BitName: RESERVED Description: Reserved
-// Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
-// Bits: 15 BitName: RESERVED Description: Reserved
-// Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
-// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
-// Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
-// Bits: 11 BitName: RESERVED Description: Reserved
-// Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
-// Bits: 9 BitName: RESERVED Description: Reserved
-// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load. 
-// Bits: 7 BitName: BVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
-// Bits: 6 BitName: BWATTNL Description: This bit is set if the Phase B total active energy is in no load.
-// Bits: 5 BitName: RESERVED Description: Reserved
-// Bits: 4 BitName: AFVARNL Description: This bit is set if the Phase A fundamental reactive energy is in no load.
-// Bits: 3 BitName: RESERVED Description: Reserved
-// Bits: 2 BitName: AVANL Description: This bit is set if the Phase A total apparent energy is in no load.
-// Bits: 1 BitName: AVARNL Description: This bit is set if the Phase A total reactive energy is in no load.
-// Bits: 0 BitName: AWATTNL Description: This bit is set if the Phase A total active energy is in no load.
 
 
-#define 0x424 ADC_REDIRECT
-// Bits: [31:21] BitName: RESERVED Description: Reserved
-// Bits: [20:18] BitName: VC_DIN Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
-// Bits: [17:15] BitName: VB_DIN Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
-// Bits: [14:12] BitName: VA_DIN Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
-// Bits: [11:9] BitName: IN_DIN Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
-// Bits: [8:6] BitName: IC_DIN Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
-// Bits: [5:3] BitName: IB_DIN Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
-// Bits: [2:0] BitName: IA_DIN Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
-
-#define 0x425 CF_LCFG
-// Bits: [31:23] BitName: RESERVED Description: Reserved
-// Bits: 22 BitName: CF4_LT Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: 21 BitName: CF3_LT Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: 20 BitName: CF2_LT Description: If this bit is set, the CF2 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: 19 BitName: CF1_LT Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: [18:0] BitName: CF_LTMR Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
-
-#define 0x472 PART_ID
-// Bits: [31:22] BitName: RESERVED Description: Reserved
-// Bits: 21 BitName: Description: This bit is set to identify an ADE73370 IC.
-// Bits: 20 BitName: Description: This bit is set to identify an ADE9000 IC.
-// Bits: [19:17]  BitName: RESERVED Description: Reserved
-// Bits: 16 BitName: Description: This bit is set to identify an ADE9004 IC.
-// Bits: [15:0] BitName: RESERVED Description: Reserved
-
-#define 0x481 CONFIG1
-// Bits: 15 BitName: EXT_REF Description:
-// Bits: [14:13] BitName: RESERVED Description: Reserved
-// Bits: 12 BitName: IRQ0_ON_IRQ1 Description:
-// Bits: 11 BitName: BURST_EN Description:
-// Bits: 10 BitName: RESERVED Description: Reserved
-// Bits: [9:8] BitName: PWR_SETTLE Description:
-// Bits: [7:6] BitName: RESERVED Description: Reserved
-// Bits: 5 BitName: CF_ACC_CLR Description: Set this bit to clear the acculumation in the digital to frequency converter and CFDEN counter. Note that this bit automatically clears itself.
-// Bits: 4 BitName: RESERVED Description: Reserved
-// Bits: [3:2] BitName: Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
-// Bits: 1 BitName: CF3_CFG Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
-// Bits: 0 BitName: SWRST Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
-
-#define 0x490 CFMODE
-// Bits: 15 BitName: CF4DIS Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
-// Bits: 14 BitName: CF3DIS Description: CF1 output disable -- see CF4DIS
-// Bits: 13 BitName: CF2DIS Description: CF1 output disable -- see CF4DIS
-// Bits: 12 BitName: CF1DIS Description: CF1 output disable -- see CF4DIS
-// Bits: [11:9] BitName: CF4SEL Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
-// Bits: [8:6] BitName: CF3SEL Description: Selects type of energy output on CF3 pin --see CF4SEL
-// Bits: [5:3] BitName: CF2SEL Description: Selects type of energy output on CF2 pin --see CF4SEL
-// Bits: [2:0] BitName: CF1SEL Description: Selects type of energy output on CF1 pin --see CF4SEL
-
-#define 0X491 COMPMODE
-// Bits: [15:12] BitName: RESERVED Description: Reserved
-// Bits: [11:9] BitName: TERMSEL4 Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
-// Bits: [8:6] BitName: TERMSEL3 Description: Phases to include in CF3 pulse output --see TERMSEL4
-// Bits: [5:3] BitName: TERMSEL2 Description: Phases to include in CF2 pulse output --see TERMSEL4
-// Bits: [2:0] BitName: TERMSEL1 Description: Phases to include in CF1 pulse output --see TERMSEL4
-
-#define 0x492 ACCMODE
-// Bits: [15:9] BitName: RESERVED Description: Reserved
-// Bits: 8 BitName: Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
-// Bits: 7 BitName: ICONSEL Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
-// Bits: [6:4] BitName: VCONSEL Description: Three-wire and four-wire hardware configuration selection. Setting: 000 for 4-wire wye. Setting: 001 for 3-wire delta. VB' = VA-VC. Setting: 010 for 4-wire delta, non-Blondel compliant. VB' = -VA - VC. Setting: 011 for 4-wire delta non-Blondel compliant. VB' = -VA. Setting: 100 for 3-wire delta. VA'=VA-VB; VB' = VA-VC; VC'=VC-VB.
-// Bits: [3:2] BitName: VARACC Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
-// Bits: [1:0] BitName: WATTACC Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
-
-#define 0x493 CONFIG3
-// Bits: [15:5] BitName: RESERVED Description: Reserved
-// Bits: [4:2] BitName: PEAKSEL Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
-// Bits: [1:0] BitName: RESERVED Description: Reserved
 
 #define 0x49A ZX_LP_SEL
 // Bits: [15:5] BitName: RESERVED Description: Reserved
