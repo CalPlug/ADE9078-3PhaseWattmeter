@@ -837,12 +837,12 @@ Setting Reactive Energy Accumulation Mode (Current Channel B)
 // Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
 // Bits: 15 BitName: RESERVED Description: Reserved
 // Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
-// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase C total reactive energy is in no load.
 // Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
 // Bits: 11 BitName: RESERVED Description: Reserved
 // Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
 // Bits: 9 BitName: RESERVED Description: Reserved
-// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load. 
+// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load.
 // Bits: 7 BitName: BVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
 // Bits: 6 BitName: BWATTNL Description: This bit is set if the Phase B total active energy is in no load.
 // Bits: 5 BitName: RESERVED Description: Reserved
