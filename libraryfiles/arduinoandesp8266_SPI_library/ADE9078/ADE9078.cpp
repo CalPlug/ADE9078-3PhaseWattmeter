@@ -637,8 +637,9 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 0 CRC_MASK0_EN - Set this bit to include the MASK0 register in the configuration register CRC calculation.
 
 
-#define PSM2_CFG_16 0x4B8 /* This register configures settings for the low power PSM2 operating mode. This register value is retained in PSM2 and PSM3 but is rewritten to its default value when entering PSM0 and PSM1. */
-// Bits: [15:9] - Reservedd
+#define PSM2_CFG_16 0x4B8 //Reset: 0x001F Access: R/W
+/* This register configures settings for the low power PSM2 operating mode. This register value is retained in PSM2 and PSM3 but is rewritten to its default value when entering PSM0 and PSM1. */
+// Bits: [15:9] - Reserved
 // Bits: [8:5] - PKDET_LVL //These bits configure the PSM2 low power comparator peak current detection Level, listed as the input signal level with respect to full scale. The register value is retained in PSM2 and PSM3. It returns to its default value if PSM0 is entered.
     // 0000 100:1
     // 0001 200:1
@@ -661,7 +662,8 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 //  retains its value in PSM2 and PSM3 operating
 //  modes but is reset to its default value upon entering PSM0 or PSM1.
 
-#define PGA_GAIN_16 0x4B9 /*This register configures the PGA gain for each ADC */
+#define PGA_GAIN_16 0x4B9 //Reset: 0x0000 Access: R/W
+/*This register configures the PGA gain for each ADC */
 // Bits: [15:14] RESERVED - Reserved.
 // Bits: [13:12] VC_GAIN - PGA gain for Voltage Channel C ADC. 0x0 R/W
     //  00 Gain = 1.
@@ -675,7 +677,8 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: [3:2] IB_GAIN - PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
 // Bits: [1:0] IA_GAIN - PGA gain for Current Channel A ADC. See 0x0 R/W VC_GAIN.
 
-#define 0x4BA CHNL_DIS_16 /* This register can be disables the ADCs individually */
+#define 0x4BA CHNL_DIS_16 //Reset: 0x0000 Access: R/W
+/* This register can be disables the ADCs individually */
 // Bits: [15:7] RESERVED - Reserved.
 // Bits: 6 VC_DISAD - Set this bit to one to disable the ADC.
 // Bits: 5 VB_DISADC - Set this bit to one to disable the ADC.
@@ -686,85 +689,161 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 0 IA_DISADC - Set this bit to one to disable the ADC.
 
 
-#define WR_LOCK_16 0x4BF /* This register enables the configuration lock feature */
-#define VAR_DIS_16 0x4E0 /* Enable/disable total reactive power calculation */
+#define WR_LOCK_16 0x4BF //Reset: 0x0000 Access: R/W
+/* This register enables the configuration lock feature */
+#define VAR_DIS_16 0x4E0 //Reset: 0x0000 Access: R/W
+/* Enable/disable total reactive power calculation */
 // [15:1] - Reserved - Reserved.
 // 0 - VARDIS - Set this bit to disable the total VAR calculation. This 0x0 R/W bit must be set before writing the run bit for proper operation.
 
-#define RESERVED1_16 0x4F0 /* This register is reserved */
-#define VERSION_16 0x4FE /* Version of the ADE9078 IC */
-#define AI_SINC_DAT_32 0x500 /* Current Channel A ADC waveforms from sinc4 output, at 16 kSPS */
-#define AV_SINC_DAT_32 0x501 /* Voltage Channel A ADC waveforms from sinc4 output, at 16 kSPS */
-#define BI_SINC_DAT_32 0x502 /* Current Channel B ADC waveforms from sinc4 output, at 16 kSPS */
-#define BV_SINC_DAT_32 0x503 /* Voltage Channel B ADC waveforms from sinc4 output, at 16 kSPS */
-#define CI_SINC_DAT_32 0x504 /* Current Channel C ADC waveforms from sinc4 output, at 16 kSPS */
-#define CV_SINC_DAT_32 0x505 /* Voltage Channel C ADC waveforms from sinc4 output, at 16 kSPS */
-#define NI_SINC_DAT_32 0x506 /* Neutral current channel ADC waveforms from sinc4 output, at 16 kSPS */
-#define AI_LPF_DAT_32 0x510 /* Current Channel A ADC waveforms from sinc4 + IIR LPF and decimator output, at 4 kSPS */
-#define AV_LPF_DAT_32 0x511 /* Voltage Channel A ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
-#define BI_LPF_DAT_32 0x512 /* Current Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
-#define BV_LPF_DAT_32 0x513 /* Voltage Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
-#define CI_LPF_DAT_32 0x514 /* Current Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
-#define CV_LPF_DAT_32 0x515 /* Voltage Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
-#define NI_LPF_DAT_32 0x516 /* Neutral current channel ADC waveforms from since4 + IIR LPF output, at 4 kSPS*/
-#define AV_PCF_1_32 0x600 /* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
-#define BV_PCF_1_32 0x601 /* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
-#define CV_PCF_1_32 0x602 /* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
-#define NI_PCF 0x603-1_32 /* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
-#define AI_PCF_1_32 0x604 /* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
-#define BI_PCF_1_32 0x605 /* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
-#define CI_PCF_1_32 0x606 /* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
-#define AIRMS_1_32 0x607 /* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
-#define BIRMS_1_32 0x608 /* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
-#define CIRMS_1_32 0x609 /* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
-#define AVRMS_1_32 0x60A /* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
-#define BVRMS_1_32 0x60B /* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
-#define CVRMS_1_32 0x60C /* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
-#define NIRMS_1_32 0x60D /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
-#define AWATT_1_32 0x60E /* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
-#define BWATT_1_32 0x60F /* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
-#define CWATT_1_32 0x610 /* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
-#define AVA_1_32 0x611 /* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
-#define BVA_1_32 0x612 /* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
-#define CVA_1_32 0x613 /* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
-#define AVAR_1_32 0x614 /* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
-#define BVAR_1_32 0x615 /* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
-#define CVAR_1_32 0x616 /* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
-#define AFVAR_1_32 0x617 /* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
-#define BFVAR_1_32 0x618 /* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
-#define CFVAR_1_32 0x619 /* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
-#define APF_1_32 0x61A /* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
-#define BPF_1_32 0x61B /* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
-#define CPF_1_32 0x61C /* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
-#define AV_PCF_2_32 0x680 /* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
-#define AI_PCF_2_32 0x681 /* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
-#define AIRMS_2_32 0x682 /* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
-#define AVRMS_2_32 0x683 /* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
-#define AWATT_2_32 0x684 /* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
-#define AVA_2_32 0x685 /* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
-#define AVAR_2_32 0x686 /* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
-#define AFVAR_2_32 0x687 /* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
-#define APF_2_32 0x688 /* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
-#define BV_PCF_2_32 0x693 /* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
-#define BI_PCF_2_32 0x694 /* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
-#define BIRMS_2_32 0x695 /* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
-#define BVRMS_2_32 0x696 /* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
-#define BWATT_2_32 0x697 /* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
-#define BVA_2_32 0x698 /* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
-#define BVAR_2_32 0x699 /* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
-#define BFVAR_2_32 0x69A /* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
-#define BPF_2_32 0x69B /* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
-#define CV_PCF_2_32 0x6A6 /* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
-#define CI_PCF_2_32 0x6A7 /* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
-#define CIRMS_2_32 0x6A8 /* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
-#define CVRMS_2_32 0x6A9 /* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
-#define CWATT_2_32 0x6AA /* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
-#define CVA_2_32 0x6AB /* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
-#define CVAR_2_32 0x6AC /* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
-#define CFVAR_2_32 0x6AD /* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
-#define CPF_2_32 0x6AE /* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
-#define NI_PCF_2_32 0x6B9 /* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
-#define NIRMS_2_32 0x6BA /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
+#define RESERVED1_16 0x4F0 //Reset: 0x0000 Access: R
+/* This register is reserved */
+#define VERSION_16 0x4FE //Reset: 0x0040 Access: R
+/* Version of the ADE9078 IC */
+#define AI_SINC_DAT_32 0x500 //Reset: 0x00000000 Access: R
+/* Current Channel A ADC waveforms from sinc4 output, at 16 kSPS */
+#define AV_SINC_DAT_32 0x501 //Reset: 0x00000000 Access: R
+/* Voltage Channel A ADC waveforms from sinc4 output, at 16 kSPS */
+#define BI_SINC_DAT_32 0x502 //Reset: 0x00000000 Access: R
+/* Current Channel B ADC waveforms from sinc4 output, at 16 kSPS */
+#define BV_SINC_DAT_32 0x503 //Reset: 0x00000000 Access: R
+/* Voltage Channel B ADC waveforms from sinc4 output, at 16 kSPS */
+#define CI_SINC_DAT_32 0x504 //Reset: 0x00000000 Access: R
+/* Current Channel C ADC waveforms from sinc4 output, at 16 kSPS */
+#define CV_SINC_DAT_32 0x505 //Reset: 0x00000000 Access: R
+/* Voltage Channel C ADC waveforms from sinc4 output, at 16 kSPS */
+#define NI_SINC_DAT_32 0x506 //Reset: 0x00000000 Access: R
+/* Neutral current channel ADC waveforms from sinc4 output, at 16 kSPS */
+#define AI_LPF_DAT_32 0x510 //Reset: 0x00000000 Access: R
+/* Current Channel A ADC waveforms from sinc4 + IIR LPF and decimator output, at 4 kSPS */
+#define AV_LPF_DAT_32 0x511 //Reset: 0x00000000 Access: R
+/* Voltage Channel A ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define BI_LPF_DAT_32 0x512 //Reset: 0x00000000 Access: R
+/* Current Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define BV_LPF_DAT_32 0x513 //Reset: 0x00000000 Access: R
+/* Voltage Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define CI_LPF_DAT_32 0x514 //Reset: 0x00000000 Access: R
+/* Current Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define CV_LPF_DAT_32 0x515 //Reset: 0x00000000 Access: R
+/* Voltage Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define NI_LPF_DAT_32 0x516 //Reset: 0x00000000 Access: R
+/* Neutral current channel ADC waveforms from since4 + IIR LPF output, at 4 kSPS*/
+#define AV_PCF_1_32 0x600 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
+#define BV_PCF_1_32 0x601 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
+#define CV_PCF_1_32 0x602 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
+#define NI_PCF 0x603-1_32 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
+#define AI_PCF_1_32 0x604 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
+#define BI_PCF_1_32 0x605 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
+#define CI_PCF_1_32 0x606 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
+#define AIRMS_1_32 0x607 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
+#define BIRMS_1_32 0x608 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
+#define CIRMS_1_32 0x609 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
+#define AVRMS_1_32 0x60A //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
+#define BVRMS_1_32 0x60B //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
+#define CVRMS_1_32 0x60C //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
+#define NIRMS_1_32 0x60D //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
+#define AWATT_1_32 0x60E //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
+#define BWATT_1_32 0x60F //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
+#define CWATT_1_32 0x610 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
+#define AVA_1_32 0x611 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
+#define BVA_1_32 0x612 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
+#define CVA_1_32 0x613 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
+#define AVAR_1_32 0x614 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
+#define BVAR_1_32 0x615 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
+#define CVAR_1_32 0x616 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
+#define AFVAR_1_32 0x617 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
+#define BFVAR_1_32 0x618 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
+#define CFVAR_1_32 0x619 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
+#define APF_1_32 0x61A //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
+#define BPF_1_32 0x61B //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
+#define CPF_1_32 0x61C //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
+#define AV_PCF_2_32 0x680 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
+#define AI_PCF_2_32 0x681 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
+#define AIRMS_2_32 0x682 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
+#define AVRMS_2_32 0x683 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
+#define AWATT_2_32 0x684 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
+#define AVA_2_32 0x685 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
+#define AVAR_2_32 0x686 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
+#define AFVAR_2_32 0x687 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
+#define APF_2_32 0x688 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
+#define BV_PCF_2_32 0x693 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
+#define BI_PCF_2_32 0x694 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
+#define BIRMS_2_32 0x695 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
+#define BVRMS_2_32 0x696//Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
+#define BWATT_2_32 0x697 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
+#define BVA_2_32 0x698 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
+#define BVAR_2_32 0x699 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
+#define BFVAR_2_32 0x69A //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
+#define BPF_2_32 0x69B //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
+#define CV_PCF_2_32 0x6A6 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
+#define CI_PCF_2_32 0x6A7 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
+#define CIRMS_2_32 0x6A8 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
+#define CVRMS_2_32 0x6A9 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
+#define CWATT_2_32 0x6AA //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
+#define CVA_2_32 0x6AB //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
+#define CVAR_2_32 0x6AC //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
+#define CFVAR_2_32 0x6AD //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
+#define CPF_2_32 0x6AE //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
+#define NI_PCF_2_32 0x6B9 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
+#define NIRMS_2_32 0x6BA //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
 
 
 
