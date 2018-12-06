@@ -352,20 +352,88 @@
 #define 0x49A ZX_LP_SEL_16 //This register selects which zero crossing and which line period measurement are used for other calculations.
 #define 0x49C SEQ_CYC_16 //Number of line cycles used for phase sequence detection. It is recommended to set this register to 1.
 #define 0x49D PHSIGN_16 //Power sign register
+// Bits: [15:10] Bitname: RESERVED Description: Reserved
+// Bits: 9 BitName: SUM4SIGN Description: Sign of the sum of the powers included in the CF4 datapath. The CF4 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 8 BitName: SUM3SIGN Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 7 BitName: SUM2SIGN Description: Sign of the sum of the powers included in the CF2 datapath. The CF2 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 6 BitName: SUM1SIGN Description: Sign of the sum of the powers included in the CF1 datapath. The CF1 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 5 BitName: CVARSIGN Description: Phase C reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 4 BitName: CWSIGN Description: Phase C active power sign bit
+// Bits: 3 BitName: BVARSIGN Description: Phase B reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 2 BitName: BWSIGN Description: Phase B active power sign bit.
+// Bits: 1 BitName: AVARSIGN Description: Phase A reactive power sign bit.  The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 0 BitName: AWSIGN Description: Phase A active power sign bit
 #define 0x4A0 WFB_CFG_16 //Waveform buffer configuration register
+// Bits: [15:13] Bitname: RESERVED Description: Reserved
+// Bits: 12 BitName: WF_IN_EN Description: This setting determines whether the IN waveform samples are read out of the waveform buffer through SPI. 0: IN waveform samples are not read out of waveform buffer through SPI. 1: IN waveform samples are read out of waveform buffer through SPI
+// Bits: [11:10] BitName: RESERVED Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: [9:8] BitName: WF_SRC Description: Waveform buffer souce and DREADY, data ready update rate, selection. 00: Sinc4 output, at 16kSPS. 01: Reserved. 10: Sinc4 + IIR LPF output, at 4 kSPS. 11: Current and voltage channel waveform samples, processed by the DSP (xl_PCF, xV_PCF) at 4 kSPS.
+// Bits: [7:6] BitName: WF_MODE Description: fixed data rate waveforms filling and trigger based modes. 00: stop when waveform buffer is full. 01: continuous fill-stop only on enabled trigger events. 10: Continuous filling-center capture around enabled trigger events. 11: continuous fill-save event address of enabled trigger events
+// Bits: 5 BitName: WF_CAP_SEL Description: This bit selects whether the waveform buffer is filled with resampled data or fixed data rate data, selected in the WF_CAP_SEL bits. 0: resampled data. 1: fixed data rate data
+// Bits: 4 BitName: WF_CAP_EN Description: When this bit is set, waveform capture is started. 0: the waveform capture is disabled. the waveform buffer contents are maintained. 1: the waveform capture is started, according to the type of capture in WF_CAP_SEL and the WF_SRC bits when this bit goes from a 0 to a 1.
+// Bits: [3:0] BitName: BURST_CHAN Description: selects which data to read out of the waveform buffer through SPI. 0000: all channels. 0001: IA and VA. 0010: IB and VB. 0011: IC and VC. 1000: IA. 1001: VA. 1010: IB. 1011:VB 1100:IC. 1101:VC. 1110:In if WF_IN_EN =1 in the WFB_CFG registers. 1111: single address read (SPI burst read mode is disabled)
 #define 0x4A1 WFB_PG_IRQEN_16 //This register enables interrupts to occur after specific pages of the waveform buffer have been filled.
 #define 0x4A2 WFB_TRG_CFG_16 //This register enables events to trigger a capture in the waveform buffer
+// Bits: [15:11] Bitname: RESERVED Description: Reserved
+// Bits: 10 Bitname: TRIG_FORCE Description: Set this bit to trigger an even to stop the waveform buffer filling
+// Bits: 9 Bitname: ZXCOMB Description: Zero crossing on combined signal from VA, VB, and VC
+// Bits: 8 Bitname: ZXVC Description: Phase C voltage zero crossing.
+// Bits: 7 Bitname: ZXVB Description: Phase B voltage zero crossing.
+// Bits: 6 Bitname: ZXVA Description: Phase A voltage zero crossing.
+// Bits: 5 Bitname: ZXIC Description: Phase C current zero crossing.
+// Bits: 4 Bitname: ZXIB Description: Phase B current zero crossing.
+// Bits: 3 Bitname: ZXIA Description: Phase A current zero crossing.
+// Bits: [2:0] Bitname: RESERVED Description: Reserved
 #define 0x4A3 WFB_TRG_STAT_16 //This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
+// Bits: [15:12] Bitname: WFB_LAST_PAGE Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
+// Bits: 11 Bitname: RESERVED Description: Reserved
+// Bits: [10:0]  Bitname: UPERIOD_SEL Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
 #define 0x4A4 CONFIG5_16 //Configuration Register 5
 #define 0x4A8 CRC_RSLT_16 //This register holds the CRC of configuration registers.
 #define 0x4A9 CRC_SPI_16 //This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
 #define 0x4AC LAST_DATA_16 //This register holds the data read or written during the last 16-bit transaction on the SPI port.
 #define 0x4AE LAST_CMD_16 //This register holds the address and read/write operation request (CMD_HDR) for the last transaction on the SPI port.
 #define 0x4AF CONFIG2_16 //Configuration Register 2
+// Bits [15:13] Bitname: RESERVED Description: Reserved
+// Bits 12 Bitname: UPERIOD_SEL Description: Set this bit to use a user configured line period, in USER_PERIOD, for the resampling calculation. If this bit is clear, the phase voltage line period selected by the LP_SEL[1:0] bits in the ZX_LP_SEL register is used.
+// Bits [11:9] Bitname: HPF_CRN Description: High-Pass filter corner (f3dB) enabled when the HPFDIS is bit in the CONFIGO register=0
+//000 38.695 Hz.
+//001 19.6375 Hz.
+//010 9.895 Hz.
+//011 4.9675 Hz.
+//100 2.49 Hz.
+//101 1.2475 Hz.
+//110 0.625 Hz.
+//111 0.3125 Hz.
+// Bits [8:0] Bitname: RESERVED Description: Reserved.
 #define 0x4B0 EP_CFG_16 //Energy and power accumulation configuration
+// Bits [15:13] Bitname: NOLOAD_TMR Description: This register configures how many 4 kSPS samples to evaluate the no load condition convert
+//000 64.
+//001 128.
+//010 256.
+//011 512.
+//100 1024.
+//101 2048.
+//110 4096.
+//111 Disable no load threshold.
+
+// Bits [12:8] Bitname: RESERVED Description: Reserved
+// Bits 7 Bitname: PWR_SIGN_SEL Description: Selects whether the REVRPx bit follows the sign of the total or fundamental reactive power. 0: Total reactive power. 1: Fundamental reactive power
+// Bits 6 Bitname: RESERVED  Description: Reserved
+// Bits 5 Bitname: RD_RST_EN Description: Set this bit to enable the energy register read with reset feature. If this bit is set, when one of the xWATTHR, xVAHR, xVARHR and xFVARHR register is read, it is reset and begins accumulating energy from zero.
+// Bits 4 Bitname: EGY_LD_ACCUM Description: If this bit = 0, the internal energy register is added to the user accessible energy register. If the bit is set, the internal energy register overwrites the user accessible energy register when the EGYRDY event occurs.
+// Bits [3:2] Bitname: RESERVED Description: Reserved
+// Bits 1 Bitname: EGY_TMR_MODE Description: This bit determines whether energy is accumulated based on the number of 4 kSPS samples or zero crossing events configured in the EGY_TIME register
+        // 0 Accumulate energy based on 4 kSPS samples.
+        // 1 Accumulate energy based on the zero crossing selected by the ZX_SEL bits in the ZX_LP_SEL register.
+// Bits 0 Bitname: EGY_PWR_EN Description: Set this bit to enable the energy and power accumulator, when the run bit is also set.
+
 #define 0x4B1 PWR_TIME_16 //POwer and time configuration
 #define 0x4B2 EGY_TIME_16 //Energy accumulation update time configuration
 #define 0x4B4 CRC_FORCE_16 //This register forces an update of the CRC of configuration registers.
+// Bits [15:1] Bitname: RESERVED Description: RESERVED
+// Bits 0 Bitname: FORCE_CRC_UPDATE Description: Write this bit to force the configuration register CRC calculation to start. When the calculation is complete, the CRC_DONE bit is set in the STATUS1 register
+
 #define 0x4B5 CRC_OPTEN_16 //This register selects which registers are optionally included in the configuration register CRC feature
 
 
@@ -516,19 +584,6 @@
 // Bits: [2:1] BitName: ZX_SEL Description: Selects the zero-crossing signal, which can be routed to CF3/ZX output pin and which is used for line cycle energy accumulation. Setting: 00 for ZXVA, Phase A voltage zero-crossing signal. Setting: 01 ZXVB, Phase B voltage zero-crossing signal.  Setting: 10 for ZXVC, Phase C voltage zero-crossing signal. Setting: 11 for ZXCOMB, zero crossing on combined signal from VA,VB and VC.
 // Bits: 0 BitName: RESERVED Description: Reserved
 
-#define 0x49D PHSIGN
-
-#define 0x4A0 WFB_CFG
-
-#define 0x4A2 WFB_TRG_CFG
-
-#define 0x4A3 WFB_TRG_STAT
-
-#define 0x4AF CONFIG2
-
-#define 0x4B0 EP_CFG
-
-#define 0x4B4 CRC_FORCE
 
 #define 0x4B5 CRC_OPTEN
 
