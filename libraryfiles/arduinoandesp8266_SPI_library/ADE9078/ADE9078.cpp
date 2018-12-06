@@ -240,7 +240,7 @@
 // Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
 // Bits: 15 BitName: RESERVED Description: Reserved
 // Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
-// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase C total reactive energy is in no load.
 // Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
 // Bits: 11 BitName: RESERVED Description: Reserved
 // Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
@@ -471,42 +471,12 @@
 
 #define 0X407 EVENT_MASK
 
-<<<<<<< HEAD
-=======
 #define 0x40F VLEVEL
 // Bits: [31:24] BitName: RESERVED Description: Reserved
 // Bits: [23:0] BitName: VLEVEL_VAL Description: Register used in the algorithm that computes the fundamental reactive power.
 
-#define 0x41F PHNOLOAD
-// Bits: [31:17] BitName: RESERVED Description: Reserved
-// Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
-// Bits: 15 BitName: RESERVED Description: Reserved
-// Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
-// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase C total reactive energy is in no load.
-// Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
-// Bits: 11 BitName: RESERVED Description: Reserved
-// Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
-// Bits: 9 BitName: RESERVED Description: Reserved
-// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load.
-// Bits: 7 BitName: BVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
-// Bits: 6 BitName: BWATTNL Description: This bit is set if the Phase B total active energy is in no load.
-// Bits: 5 BitName: RESERVED Description: Reserved
-// Bits: 4 BitName: AFVARNL Description: This bit is set if the Phase A fundamental reactive energy is in no load.
-// Bits: 3 BitName: RESERVED Description: Reserved
-// Bits: 2 BitName: AVANL Description: This bit is set if the Phase A total apparent energy is in no load.
-// Bits: 1 BitName: AVARNL Description: This bit is set if the Phase A total reactive energy is in no load.
-// Bits: 0 BitName: AWATTNL Description: This bit is set if the Phase A total active energy is in no load.
 
 
-#define 0x424 ADC_REDIRECT
-// Bits: [31:21] BitName: RESERVED Description: Reserved
-// Bits: [20:18] BitName: VC_DIN Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
-// Bits: [17:15] BitName: VB_DIN Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
-// Bits: [14:12] BitName: VA_DIN Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
-// Bits: [11:9] BitName: IN_DIN Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
-// Bits: [8:6] BitName: IC_DIN Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
-// Bits: [5:3] BitName: IB_DIN Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
-// Bits: [2:0] BitName: IA_DIN Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
 
 #define 0x425 CF_LCFG
 // Bits: [31:23] BitName: RESERVED Description: Reserved
@@ -537,7 +507,6 @@
 // Bits: [3:2] BitName: Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
 // Bits: 1 BitName: CF3_CFG Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
 // Bits: 0 BitName: SWRST Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
->>>>>>> 7fe4ca1e34bf242a0e849529c976d87c89e70f61
 
 
 
