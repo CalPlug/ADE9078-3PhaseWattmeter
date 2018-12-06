@@ -22,75 +22,74 @@
 
 
 //*******************************************************************************************
-
 //****************ADE 9078 REGISTERS *****************************************************
-#define 0X000 AIGAIN_32 // Phase A current gain adjust
+#define PFA_16 0x10A //PFA, (R/W) Reset:0x0000,
 
-// The following registers: // Phase A multipoint gain correction factor
-#define AIGAIN0_32 0x001 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
-#define AIGAIN1_32 0x002 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
-#define AIGAIN2_32 0x003 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
-#define AIGAIN3_32 0x004 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
-#define AIGAIN4_32 0x005 /* Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define 0X000 AIGAIN_32 // Reset: 0x00000000 Access: R/W Description: Phase A current gain adjust
 
-#define APHCAL0_32 0x006 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define APHCAL1_32 0x007 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define APHCAL2_32 0x008 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define APHCAL3_32 0x009 /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define APHCAL4_32 0x00A /* Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define AIGAIN0_32 0x001 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN1_32 0x002 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN2_32 0x003 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN3_32 0x004 /* Reset: 0x00000000 Access: R/W Description:  Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN4_32 0x005 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
 
-#define AVGAIN_32 0x00B // Phase A voltage gain adjust
-#define AIRMSOS_32 0X00C // Phase A voltage rms offset for filter based AIRMS calculation
-#define AVRMSOS_32 0X00D // Phase A current RMS offset for filter based AIRMS calucation
-#define APGAIN_32 0X00E // Phase A power gain adjust for AWATT, AVA, avar, and AFVAR calculation
-#define AWATTOS_32 0X00F // Phase A total active power offset correction for AWATT calculation.
-#define AVAROS_32 0X010 // Phase A total active power offset correction for AVAR calculation.
-#define AFVAROS_32 0x012 // Phase A fundamental reactive power offset correction for AFVAR calculation
+#define APHCAL0_32 0x006 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL1_32 0x007 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL2_32 0x008 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL3_32 0x009 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL4_32 0x00A /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
-#define BIGAIN_32 0x020 // Phrase B current gain adjust
-#define BIGAIN0_32 0x021 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BIGAIN1_32 0x022 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BIGAIN2_32 0x023 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BIGAIN3_32 0x024 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BIGAIN4_32 0x025 /* Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define AVGAIN_32 0x00B // Reset: 0x00000000 Access: R/W Description: Phase A voltage gain adjust
+#define AIRMSOS_32 0X00C // Reset: 0x00000000 Access: R/W Description: Phase A voltage rms offset for filter based AIRMS calculation
+#define AVRMSOS_32 0X00D // Reset: 0x00000000 Access: R/W Description: Phase A current RMS offset for filter based AIRMS calucation
+#define APGAIN_32 0X00E // Reset: 0x00000000 Access: R/W Description: Phase A power gain adjust for AWATT, AVA, avar, and AFVAR calculation
+#define AWATTOS_32 0X00F // Reset: 0x00000000 Access: R/W Description: Phase A total active power offset correction for AWATT calculation.
+#define AVAROS_32 0X010 // Reset: 0x00000000 Access: R/W Description: Phase A total active power offset correction for AVAR calculation.
+#define AFVAROS_32 0x012 // Reset: 0x00000000 Access: R/W Description: Phase A fundamental reactive power offset correction for AFVAR calculation
 
-// Phase B multipoint phase correction factor
-#define BPHCAL0_32 0x026 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BPHCAL1_32 0x027 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BPHCAL2_32 0x028 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BPHCAL3_32 0x029 /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
-#define BPHCAL4_32 0x02A /* Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN_32 0x020 // Reset: 0x00000000 Access: R/W Description: Phrase B current gain adjust
+#define BIGAIN0_32 0x021 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN1_32 0x022 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN2_32 0x023 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN3_32 0x024 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN4_32 0x025 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
-#define BVGAIN_32 0x02B // Phase B voltage gai nadjust
-#define BIRMSOS_32 0x02C // Phase B current RMS offset for BIRMS calculation
-#define BVRMSOS_32 0x02D // Phase B voltage RMS offset for BVRMS calculation
-#define BPGAIN_32 0X02E // Phase B power gain adjust for BWATT, BVA, BVAR, and BFVAR calculations
-#define BWATTOS_32 0X02F // Phase B total active power offset correction for BWATT calculation
-#define BVAROS_32 0x030 // Phase B total active offset correction for BVAR calculation
-#define BFVAROS_32 0x032 // Phase B fundamental reactive power offset correction for BFVAR calculation
+#define BPHCAL0_32 0x026 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL1_32 0x027 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL2_32 0x028 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL3_32 0x029 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL4_32 0x02A /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
-#define CIGAIN_32 0x040 // Phase C current gain nadjust
+#define BVGAIN_32 0x02B // Reset: 0x00000000 Access: R/W Description: Phase B voltage gai nadjust
+#define BIRMSOS_32 0x02C // Reset: 0x00000000 Access: R/W Description: Phase B current RMS offset for BIRMS calculation
+#define BVRMSOS_32 0x02D // Reset: 0x00000000 Access: R/W Description: Phase B voltage RMS offset for BVRMS calculation
+#define BPGAIN_32 0X02E // Reset: 0x00000000 Access: R/W Description: Phase B power gain adjust for BWATT, BVA, BVAR, and BFVAR calculations
+#define BWATTOS_32 0X02F // Reset: 0x00000000 Access: R/W Description: Phase B total active power offset correction for BWATT calculation
+#define BVAROS_32 0x030 // Reset: 0x00000000 Access: R/W Description: Phase B total active offset correction for BVAR calculation
+#define BFVAROS_32 0x032 // Reset: 0x00000000 Access: R/W Description: Phase B fundamental reactive power offset correction for BFVAR calculation
+
+#define CIGAIN_32 0x040 // Reset: 0x00000000 Access: R/W Description: Phase C current gain nadjust
 
 // Phase C multipoint gain correction factor
-#define CIGAIN0_32 0x041 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
-#define CIGAIN1_32 0x042 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
-#define CIGAIN2_32 0x043 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
-#define CIGAIN3_32 0x044 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
-#define CIGAIN4_32 0x045 /* Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN0_32 0x041 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN1_32 0x042 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN2_32 0x043 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN3_32 0x044 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN4_32 0x045 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
 
-#define CPHCAL0_32 0X046 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
-#define CPHCAL1_32 0X047 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
-#define CPHCAL2_32 0X048 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
-#define CPHCAL3_32 0X049 /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
-#define CPHCAL4_32 0X04A /* Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL0_32 0X046 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL1_32 0X047 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL2_32 0X048 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL3_32 0X049 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL4_32 0X04A /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
 
-#define CVGAIN_32 0x04B // Phase C voltage gain adjust
-#define CIRMSOS_32 0x04C // Phase C current RMS offset for CIRMS calculation
-#define CVRMSOS_32 0x04D // Phase C voltage RMS offset for CVRMS calcuation
-#define CPGAIN_32 0x04E // Phase C power gain adjust for CWATT, CVA, CVAR, and CFVAR calculations
-#define CWATTOS_32 0x04F // Phase C total active power offset correction for CWATT calculations
-#define CVAROS_32 0x050 // Phase C total reactive power offset correction for CVAR calculation
-#define CFVAROS_32 0x052 // Phase C total reactive power offset correction for CVAR calculations
+#define CVGAIN_32 0x04B // Reset: 0x00000000 Access: R/W Description: Phase C voltage gain adjust
+#define CIRMSOS_32 0x04C // Reset: 0x00000000 Access: R/W Description: Phase C current RMS offset for CIRMS calculation
+#define CVRMSOS_32 0x04D // Reset: 0x00000000 Access: R/W Description: Phase C voltage RMS offset for CVRMS calcuation
+#define CPGAIN_32 0x04E // Reset: 0x00000000 Access: R/W Description: Phase C power gain adjust for CWATT, CVA, CVAR, and CFVAR calculations
+#define CWATTOS_32 0x04F // Reset: 0x00000000 Access: R/W Description: Phase C total active power offset correction for CWATT calculations
+#define CVAROS_32 0x050 // Reset: 0x00000000 Access: R/W Description: Phase C total reactive power offset correction for CVAR calculation
+#define CFVAROS_32 0x052 // Reset: 0x00000000 Access: R/W Description: Phase C total reactive power offset correction for CVAR calculations
 
 #define CONFIG0_32 0x060
 // Bits: [31:14] BitName: RESERVED Description: Reserved
@@ -109,62 +108,64 @@
 // Bits: [1:0] BitName: ISUM_CFG Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
 
 // Multipoint phase/gain threshold.
-#define MTTHR_L0_32 0x061 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_L1_32 0x062 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_L2_32 0x063 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_L3_32 0x064 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_L4_32 0x065 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L0_32 0x061 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L1_32 0x062 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L2_32 0x063 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L3_32 0x064 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L4_32 0x065 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
 
-#define MTTHR_H0_32 0x066 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_H1_32 0x067 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_H2_32 0x068 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_H3_32 0x069 /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
-#define MTTHR_H4_32 0x06A /* Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H0_32 0x066 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H1_32 0x067 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H2_32 0x068 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H3_32 0x069 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H4_32 0x06A /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
 
-#define NIRMSOS_32 0x06B // Neutral current RMS offset for NIRMS calculations
-#define ISUMRMSOS_32 0x06C // Offset correction for ISUMRMS calculation based on the sume of IA + IB + IC +- IN.
-#define NIGAIN_32 0X06D // Neutral current again adjust
-#define NPHCAL_32 0x06E // Neutral current-phase compensation
-#define VNOM_32 0x071 // Nominal phase voltage RMS used in the computation of apparent power, xVA, when VNOMx_EN bit is set in the CONFIG0 register
-#define DICOEFF_32 0x072 // Value used in the digital integrator algorithm
-#define ISUMLVL_32 0x073 // Threshold to compare ISUMRMS against
+#define NIRMSOS_32 0x06B // Reset: 0x00000000 Access: R/W Description: Neutral current RMS offset for NIRMS calculations
+#define ISUMRMSOS_32 0x06C // Reset: 0x00000000 Access: R/W Description: Offset correction for ISUMRMS calculation based on the sume of IA + IB + IC +- IN.
+#define NIGAIN_32 0X06D // Reset: 0x00000000 Access: R/W Description: Neutral current again adjust
+#define NPHCAL_32 0x06E // Reset: 0x00000000 Access: R/W Description: Neutral current-phase compensation
+#define VNOM_32 0x071 // Reset: 0x00000000 Access: R/W Description: Nominal phase voltage RMS used in the computation of apparent power, xVA, when VNOMx_EN bit is set in the CONFIG0 register
+#define DICOEFF_32 0x072 // Reset: 0x00000000 Access: R/W Description: Value used in the digital integrator algorithm
+#define ISUMLVL_32 0x073 // Reset: 0x00000000 Access: R/W Description: Threshold to compare ISUMRMS against
 
-#define AI_PCF_32 0x20A // Instantaneous Phase A current channel waveform processed by the DSP, at 4 kSPS.
-#define AV_PCF_32 0x20B // Instantaneous Phase A voltage channel waveform processed by the DSP, at 4 kSPS.
-#define AIRMS_32 0x20C // Phase A filter based current RMS value, updates at 4kSPS
-#define AVRMS_32 0x20D // Phase A filter based voltage RMS value, updates at 4kSPS
+// Access changes to read only here
 
-#define AWATT_32 0x210 // Phase A low-pass filtere total active power, updated at 4 4kSPS
-#define AVAR_32 0x211 // Phase A low pass filtered total reactive power, updated at 4kSPS
-#define AVA_32 0x212 // Phase A total apparent power, updated at 4kSPS
-#define AFVAR_32 0x214 // Phase A fundamental reactive power, updated at 4kSPS
-#define APF_32 0x216 // Phase A power factor, updated at 1.024 second
+#define AI_PCF_32 0x20A // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase A current channel waveform processed by the DSP, at 4 kSPS.
+#define AV_PCF_32 0x20B // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase A voltage channel waveform processed by the DSP, at 4 kSPS.
+#define AIRMS_32 0x20C // Reset: 0x00000000 Access: Read only Description: Phase A filter based current RMS value, updates at 4kSPS
+#define AVRMS_32 0x20D // Reset: 0x00000000 Access: Read only Description: Phase A filter based voltage RMS value, updates at 4kSPS
 
-#define AMTREGION_32 0x21D // If multipoint gain and phase compensaion is enabled, with MTEN = 1 in the CONFIG0 register,these bits indicate which AIGAINXx and APHCALx is currently being used
-/*
-[31:4] : RESERVED
-[3:0] : AREGION
-If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which AIGAINx and APHCALx currently being used.
-0000 AIGAIN0, APHCAL0.
-0001 AIGAIN1, APHCAL1.
-0010 AIGAIN2, APHCAL2.
-0011 AIGAIN3, APHCAL3.
-0100 AIGAIN4, APHCAL4.
-1111 This feature is disabled because MTEN = 0 in the CONFIG0 register.
-*/
+#define AWATT_32 0x210 // Reset: 0x00000000 Access: Read only Description: Phase A low-pass filtere total active power, updated at 4 4kSPS
+#define AVAR_32 0x211 // Reset: 0x00000000 Access: Read only Description: Phase A low pass filtered total reactive power, updated at 4kSPS
+#define AVA_32 0x212 // Reset: 0x00000000 Access: Read only Description: Phase A total apparent power, updated at 4kSPS
+#define AFVAR_32 0x214 // Reset: 0x00000000 Access: Read only Description: Phase A fundamental reactive power, updated at 4kSPS
+#define APF_32 0x216 // Reset: 0x00000000 Access: Read only Description: Phase A power factor, updated at 1.024 second
+
+#define AMTREGION_32 0x21D // Reset: 0x00000000 Access: Read only Description: If multipoint gain and phase compensaion is enabled, with MTEN = 1 in the CONFIG0 register,these bits indicate which AIGAINXx and APHCALx is currently being used
+
+// [31:4] : RESERVED
+// [3:0] : AREGION
+// If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which AIGAINx and APHCALx currently being used.
+// 0000 AIGAIN0, APHCAL0.
+// 0001 AIGAIN1, APHCAL1.
+// 0010 AIGAIN2, APHCAL2.
+// 0011 AIGAIN3, APHCAL3.
+// 0100 AIGAIN4, APHCAL4.
+// 1111 This feature is disabled because MTEN = 0 in the CONFIG0 register.
 
 
-#define BI_PCF_32 0x22A // Instantaneous Phase B current channel waveform processed by the DSP, 4kSPS
-#define BV_PCF_32 0x22B // Instantaneous Phase B votage channel waveform processed by the DSP, 4kSPS
-#define BIRMS_32 0x22C // Phase B filter based current RMS value, updates at 4kSPS
-#define BVRMS_32 0x22D // Phase B filter based voltage RMS value, updates at 4kSPS
-#define BWATT_32 0x230 // Phase B low-pass filtered total active power, updated at 4kSPS
-#define BVAR_32 0x231 // Phase B low pass filtered total reactive power, updated at 4kSPS.
-#define BVA_32 0x232 // Phase B total apparent power, updated at 4kSPS
-#define BFVAR_32 0x234 // Phase B fundamental reactive power, updated at 4kSPS
-#define BPF_32 0x236 // Phase B power factor, updated at 1.024 sec.
 
-#define BMTREGION_32 0x23D // If multipoint gain and phase.....
+#define BI_PCF_32 0x22A // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase B current channel waveform processed by the DSP, 4kSPS
+#define BV_PCF_32 0x22B //Reset: 0x00000000 Access: Read only Description:  Instantaneous Phase B votage channel waveform processed by the DSP, 4kSPS
+#define BIRMS_32 0x22C // Reset: 0x00000000 Access: Read only Description: Phase B filter based current RMS value, updates at 4kSPS
+#define BVRMS_32 0x22D // Reset: 0x00000000 Access: Read only Description: Phase B filter based voltage RMS value, updates at 4kSPS
+#define BWATT_32 0x230 // Reset: 0x00000000 Access: Read only Description: Phase B low-pass filtered total active power, updated at 4kSPS
+#define BVAR_32 0x231 //Reset: 0x00000000 Access: Read only Description:  Phase B low pass filtered total reactive power, updated at 4kSPS.
+#define BVA_32 0x232 // Reset: 0x00000000 Access: Read only Description: Phase B total apparent power, updated at 4kSPS
+#define BFVAR_32 0x234 // Reset: 0x00000000 Access: Read only Description: Phase B fundamental reactive power, updated at 4kSPS
+#define BPF_32 0x236 // Reset: 0x00000000 Access: Read only Description: Phase B power factor, updated at 1.024 sec.
+
+#define BMTREGION_32 0x23D // Reset: 0x00000000 Access: Read only Description: If multipoint gain and phase.....
 /*
 [31:4] : RESERVED
 [3:0] : BREGION
@@ -178,21 +179,19 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 */
 
 
-#define CI_PCF_32 0x24A // Instantaneous Phase C current channel waveform proccessed by the DSP, at 4kSPS
-#define CV_PCF_32 0x24B // Instantaneous Phase C voltage channel waveform proccessed by the DSP, at 4kSPS
-#define CIRMS_32 0X24C // Phase C filter based current RMS value, updates at 4kSPS
-#define CVRMS_32 0x24D // Phase C filter based voltage RMS value, updates at 4kSPS
-#define CWATT_32 0x250 // Phase C low-pass filtered total active power, updated at 4kSPS
-#define CVAR_32 0x251  // Phase C low pass filtered total reactive power, updated at 4kSPS.
-#define CVA_32 0x252 // Phase C total apparent power, updated at 4kSPS
-#define CFVAR_32 0x254 // Phase C fundamental reactive power, udpated at 4kSPS
-#define CPF_32 0x256 // Phase C power factor, updated at 1.024 seconds
+#define CI_PCF_32 0x24A //Reset: 0x00000000 Access: Read only Description:  Instantaneous Phase C current channel waveform proccessed by the DSP, at 4kSPS
+#define CV_PCF_32 0x24B // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase C voltage channel waveform proccessed by the DSP, at 4kSPS
+#define CIRMS_32 0X24C // Reset: 0x00000000 Access: Read only Description: Phase C filter based current RMS value, updates at 4kSPS
+#define CVRMS_32 0x24D //Reset: 0x00000000 Access: Read only Description: Phase C filter based voltage RMS value, updates at 4kSPS
+#define CWATT_32 0x250 // Reset: 0x00000000 Access: Read only Description: Phase C low-pass filtered total active power, updated at 4kSPS
+#define CVAR_32 0x251  // Reset: 0x00000000 Access: Read only Description: Phase C low pass filtered total reactive power, updated at 4kSPS.
+#define CVA_32 0x252 // Reset: 0x00000000 Access: Read only Description: Phase C total apparent power, updated at 4kSPS
+#define CFVAR_32 0x254 // Reset: 0x00000000 Access: Read only Description: Phase C fundamental reactive power, udpated at 4kSPS
+#define CPF_32 0x256 // Reset: 0x00000000 Access: Read only Description: Phase C power factor, updated at 1.024 seconds
 
 #define CMTREGION_32 0X25D // If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx is currently being used.
-
-Bits: [31:4] : RESERVED
-Bits: [3:0] : CREGION
-// Bit Name: BREGION Description: If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx currently being used.
+// Bits: [31:4] : RESERVED
+// Bits: [3:0] : CREGION - Description: If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx currently being used.
 // Settings
 // 0000 CIGAIN0, CPHCAL0.
 // 0001 CIGAIN1, CPHCAL1.
@@ -201,66 +200,66 @@ Bits: [3:0] : CREGION
 // 0100 CIGAIN4, CPHCAL4.
 // 1111 This feature is disabled because MTEN = 0 in the CONFIG0 register.
 
-#define NI_PCF_32 0x265 // Instantaneous neutral current channel waveform processed by the DSP, at 4kSPS.
-#define NIRMS_32 0x266 // Neutral current filter based RMS value
-#define ISUMRMS_32 0x269 // Filter based RMS based on the sum of IA + IB + IC += IN.
-#define VERSION2_32 0x26A // Indicates the version of the metrology algorithms after the user writes run = 1 to start the measuremnets.
+#define NI_PCF_32 0x265 // Reset: 0x00000000 Access: Read only Description: Instantaneous neutral current channel waveform processed by the DSP, at 4kSPS.
+#define NIRMS_32 0x266 // Reset: 0x00000000 Access: Read only Description: Neutral current filter based RMS value
+#define ISUMRMS_32 0x269 // Reset: 0x00000000 Access: Read only Description: Filter based RMS based on the sum of IA + IB + IC += IN.
+#define VERSION2_32 0x26A // Reset: 0x00000000 Access: Read only Description: Indicates the version of the metrology algorithms after the user writes run = 1 to start the measuremnets.
 
-#define AWATT_ACC_32 0x2E5 // Phase A accumulated total active power, updated after PWR_TIME 4 ksps samples
-#define AWATTHR_LO_32 0x2E6 // Phase A accumulated total active energy, LSB's. Updated according to settings in EP_CFG and EGY_TIME Registers
-#define AWATTHR_HI_32 0x2E7 // Phase A accumulated total active energy, MSB's....
-#define AVAR_ACC_32 0x2EF  // Phase A accumulated total reactive power, updated after PWR_TIME 4 kSPS samples.
-#define AVARHR_LO_32 0X2F0 // Phase A accumulated total reactive energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
-#define AVARHR_HI_32 0x2F1 // Phase A accumulated total reactive energy, MSB's...
-#define AVA_ACC_32 0x2F9 // Phase A accumulated total apparent power, updated after PWR_TIME 4 kSPS samples
-#define AVAHR_LO_32 0x2FA // Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define AVAHR_HI_32 0x2FB // Phase A accumulated total apparent energy, MSB's.
+#define AWATT_ACC_32 0x2E5 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total active power, updated after PWR_TIME 4 ksps samples
+#define AWATTHR_LO_32 0x2E6 //Reset: 0x00000000 Access: Read only Description:  Phase A accumulated total active energy, LSB's. Updated according to settings in EP_CFG and EGY_TIME Registers
+#define AWATTHR_HI_32 0x2E7 //Reset: 0x00000000 Access: Read only Description:  Phase A accumulated total active energy, MSB's....
+#define AVAR_ACC_32 0x2EF  // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total reactive power, updated after PWR_TIME 4 kSPS samples.
+#define AVARHR_LO_32 0X2F0 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total reactive energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
+#define AVARHR_HI_32 0x2F1 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total reactive energy, MSB's...
+#define AVA_ACC_32 0x2F9 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent power, updated after PWR_TIME 4 kSPS samples
+#define AVAHR_LO_32 0x2FA // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define AVAHR_HI_32 0x2FB // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, MSB's.
 
-#define AFVAR_ACC_32 0x30D // Phase A accumulated fundamental reactive power, updated after PWR_TIME 4kSPS samples
-#define AFVARHR_LO_32 0x30E // Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
-#define AFVARHR_HI_32 0x30F // Phase A accumulated total apparent energy, MSB's...
-#define BWATT_ACC_32 0x321 // Phase B accumulated total active power, updated after PWR_TIME 4 kSPS samples
-#define BWATTHR_LO_32 0x322 // Phase B accumulated total active energy, LSB's, updated according to the settings in EP_CFG and EGY_TIME registers.
-#define BWATTHR_HI_32 0x323 // Phase B accumulated total active energy, MSB's...
-#define BVAR_ACC_32 0x32B  // Phase B accumulated total reactive power, updated after PWR_TIME 4 ksSPS samples.
+#define AFVAR_ACC_32 0x30D // Reset: 0x00000000 Access: Read only Description: Phase A accumulated fundamental reactive power, updated after PWR_TIME 4kSPS samples
+#define AFVARHR_LO_32 0x30E // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
+#define AFVARHR_HI_32 0x30F // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, MSB's...
+#define BWATT_ACC_32 0x321 // Reset: 0x00000000 Access: Read only Description: Phase B accumulated total active power, updated after PWR_TIME 4 kSPS samples
+#define BWATTHR_LO_32 0x322 //Reset: 0x00000000 Access: Read only Description:  Phase B accumulated total active energy, LSB's, updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BWATTHR_HI_32 0x323 //Reset: 0x00000000 Access: Read only Description:  Phase B accumulated total active energy, MSB's...
+#define BVAR_ACC_32 0x32B  // Reset: 0x00000000 Access: Read only Description: Phase B accumulated total reactive power, updated after PWR_TIME 4 ksSPS samples.
 
-#define BVARHR_LO_32 0x32C //Phase B accumulate total ractive energy,LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define BVARHR_HI_32 0x32D // Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define BVA_ACC_32 0x335 //Phase B accumulated total apparent power, updated after PWR_TIME 4kSPS samples.
-#define BVAHR_LO_32 0x336 //Phase B accumulatecd total apparent energy, LSbs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define BVAHR_HI_32 0x337 //Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define BFVAR_ACC_32 0x349 //Phase B accumulated fundamental ractive power, updated after PWR_TIME 4 kSPS samples.
-#define BFVARHR_LO_32 0x34A //Phase B accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define BFVARHR_HI_32 0x34B //Phase B accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define CWATT_ACC_32 0x35D // Phase C accumulated total active power, updated after PWR_TIME 4 kSPS samples
-#define CWARRHR_LO_32 0x35E //Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
-#define CWATTHR_HI_32 0x35F //Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
-#define CVAR_ACC_32 0x367 //Phase C accumulated total reactive power, updated after PWR_TIME 4kSPS samples.
-#define CVARHR_LO_32 0x368 //Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
-#define CVARHR_HI_32 0x369 //Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
-#define CVA_ACC_32 0x371 //Phase C accumulated total apparent powerm updated after PWR_TIME 4 kSPS samples.
-#define CVAHR_LO_32 0x372 //Phase C  accumulated total apparent energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define CVAHR_HI_32 0x373 //Phase C accumulated total apparent energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define CFVAR_ACC_32 0x385 //Phase C accumulated fundamental reactive power, updated after PWR_TIME 4 kSPS samples.
-#define CFVARHR_LO_32 0x386 //Phase C accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define CFVVARHR_HI_32 0x387 //Phase C accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define PWATT_ACC_32 0x397 //Accumulated Positive Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
-#define NWATT_ACC_32 0x39B //Accumulated Negative Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
-#define PVAR_ACC_32 0x39F //Accumulated Positive Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples.
-#define NVAR_ACC_32 0x3A3 //Accumulated Negative Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples
-#define IPEAK_32 0x400 //Current peak register.
+#define BVARHR_LO_32 0x32C //Reset: 0x00000000 Access: Read only Description: Phase B accumulate total ractive energy,LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BVARHR_HI_32 0x32D // Reset: 0x00000000 Access: Read only Description: Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BVA_ACC_32 0x335 //Reset: 0x00000000 Access: Read only Description: Phase B accumulated total apparent power, updated after PWR_TIME 4kSPS samples.
+#define BVAHR_LO_32 0x336 //Reset: 0x00000000 Access: Read only Description: Phase B accumulatecd total apparent energy, LSbs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BVAHR_HI_32 0x337 //Reset: 0x00000000 Access: Read only Description: Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BFVAR_ACC_32 0x349 //Reset: 0x00000000 Access: Read only Description: Phase B accumulated fundamental ractive power, updated after PWR_TIME 4 kSPS samples.
+#define BFVARHR_LO_32 0x34A //Reset: 0x00000000 Access: Read only Description: Phase B accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BFVARHR_HI_32 0x34B //Reset: 0x00000000 Access: Read only Description: Phase B accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CWATT_ACC_32 0x35D // Reset: 0x00000000 Access: Read only Description: Phase C accumulated total active power, updated after PWR_TIME 4 kSPS samples
+#define CWARRHR_LO_32 0x35E //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CWATTHR_HI_32 0x35F //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVAR_ACC_32 0x367 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total reactive power, updated after PWR_TIME 4kSPS samples.
+#define CVARHR_LO_32 0x368 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVARHR_HI_32 0x369 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVA_ACC_32 0x371 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total apparent powerm updated after PWR_TIME 4 kSPS samples.
+#define CVAHR_LO_32 0x372 //Reset: 0x00000000 Access: Read only Description: Phase C  accumulated total apparent energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVAHR_HI_32 0x373 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total apparent energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CFVAR_ACC_32 0x385 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated fundamental reactive power, updated after PWR_TIME 4 kSPS samples.
+#define CFVARHR_LO_32 0x386 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CFVVARHR_HI_32 0x387 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define PWATT_ACC_32 0x397 //Reset: 0x00000000 Access: Read only Description: Accumulated Positive Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
+#define NWATT_ACC_32 0x39B //Reset: 0x00000000 Access: Read only Description: Accumulated Negative Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
+#define PVAR_ACC_32 0x39F //Reset: 0x00000000 Access: Read only Description: Accumulated Positive Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples.
+#define NVAR_ACC_32 0x3A3 //Reset: 0x00000000 Access: Read only Description: Accumulated Negative Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples
+#define IPEAK_32 0x400 //Reset: 0x00000000 Access: Read only Description: Current peak register.
 
 // Bits: [31:27] RESERVED
 // Bits: [26:24]: IPPHASE- These bits indicate which phases generate IPEAKVAL value. Note that the PEAKSEL[2:0] bits the CONFIG3 register determine which current channel to monitor the peak value on. When IPPHASE, Bit 0 is set to 1, Phase A current generated IPEAKVAL, Bits[23:0] value. Similarly, IPPHASE, Bit 1 indicates Phase B and IPPHASE, Bit 2 indicates Phase C current generated the peak value.
 // Bits: [23:0]: IPEAKVAL- The IPEAK register stores the absolute value of the peak current. IPEAK is equal to xI_PCF/25
 
 
-#define VPEAK_32 0x401 //Voltage peak register
+#define VPEAK_32 0x401 //Reset: 0x00000000 Access: Read only Description:  Voltage peak register
 // Bits: [31:27] Reserved
 // Bits: [26:24] VPPHASE- These bits indicate which phases generate VPEAKVAL value. Note that the PEAKSEL[2:0] bits in the CONFIG3 register determine which voltage channels to monitor the peak value on. When VPPHASE[0] is 1, Phase A voltage generated VPEAKVAL[23:0] value. Similarly, VPPHASE[1] indicates Phase B and VPPHASE[2] indicates Phase C voltage generated the peak value.
 // Bits: [23:0] VPEAKVAL- The VPEAK register stores the absolute value of the peak voltage. VPEAK is equal to xV_PCF/25.
 
-#define STATUS0_32 0x402 //Status Register 0
+#define STATUS0_32 0x402 //Reset: 0x00000000 Access: Read only Description:  Status Register 0
 // Bits: [31:25] RESERVED
 // Bits: 24 MISMTCH - This bit is set to indicate a change in the relationship between ISUMRMS and ISUMLVL
 // Bits: 23 COH_WFB_FULL - This bitis set when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
@@ -288,7 +287,7 @@ Bits: [3:0] : CREGION
 // Bits: 1 - REVAPA - This bit indicates if the Phase A total active power has changed sign. See REVAPC.
 // Bits: 0 - EGYRDY - This bit is set when the power values in the xWATTHR, xVAHR, xVARHR, xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
 
-#define STATUS1_32 0x403 //Status Register 1.
+#define STATUS1_32 0x403 //Reset: 0x00000000 Access: Read only Description:  Status Register 1.
 
 // Bits: 31- ERROR3 - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
 // Bits: 30 - ERROR2 - This bit indicates that an error was detected and corrected. No action is required.
@@ -317,7 +316,7 @@ Bits: [3:0] : CREGION
 // Bits: 1 RNLOAD - This bit is set when one or more phase total reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
 // Bits: 0 - ANLOAD - This bit is set when one or more phase total active energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
 
-#define EVENT_STATUS32 0x404 //Event Status Register.
+#define EVENT_STATUS32 0x404 //Reset: 0x00000000 Access: Read only Description:  Event Status Register.
 // Bits: [31:17] - RESERVED - Reserved
 // Bits: 16 - DREADY - This bit changes from a one to a zero when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
 // Bits: 15 - RESERED - Reserved
@@ -333,7 +332,7 @@ Bits: [3:0] : CREGION
 // Bits: 5[:0] - Reserved - Reserved
 
 
-#define MASK0_32 0x405 //Interrupt Enable Register 0.
+#define MASK0_32 0x405 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 0.
 // Bits: [31:25] - Reserved
 // Bits: 24 MISMTCH - Set this bit to enable an interrupt when there is a change in the relationship between ISUMRMS and ISUMLVL.
 // Bits: 23 - COH_WFB_FULL - Set this bit to enable an interrupt when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
@@ -360,7 +359,7 @@ Bits: [3:0] : CREGION
 // Bits: 1 - REVAPA - Set this bit to enable an interrupt when the Phase A total active power has changed sign.
 // Bits: 0 - EGYRDY - Set this bit to enable an interrupt when the power values in the xWATTHR, xVAHR, xVARHR, and xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
 
-#define MASK1_32 0x406 //Interrupt Enable Register 1.
+#define MASK1_32 0x406 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 1.
 // Bits: 31 - ERROR3 - Set this bit to enable an interrupt if ERROR3 occurs. Issue a software reset or hardware reset to clear this error.
 // Bits: 30 - ERROR2 - Set this bit to enable an interrupt if ERROR2 occurs.
 // Bits: 29 - ERROR1 - This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
@@ -387,7 +386,7 @@ Bits: [3:0] : CREGION
 // Bits: 1 - RNLOAD - Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
 // Bits: 0 - ANLOAD - Set this bit to set an interrupt when one or more phase total active energy enters or exits the no load condition.
 
-#define EVENT_MASK_32 0x407 //Event enable register.
+#define EVENT_MASK_32 0x407 //Reset: 0x00000000 Access: Read only Description: Event enable register.
 // [31:17] - RESERVED - Reserved.
 // Bits: 16 - DREADY - Set this bit to enable the EVENT pin to go low when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
 // Bits: 15 - RESERVED - Reserved.
@@ -402,21 +401,21 @@ Bits: [3:0] : CREGION
 // Bits: 6 - REVPSUM1 - Set this bit to enable the EVENT pin to go low to indicate if the last CF1 pulse was from negative energy. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
 // Bits: [5:0] - RESERVED - Reserved.
 
-#define USER_PERIOD_32 0x40E //User configured line period value used for resampling when the UPERIOD_SEL bit in the CONFIG2 register is set.
+#define USER_PERIOD_32 0x40E //Reset: 0x00500000 Access: R/W Description: User configured line period value used for resampling when the UPERIOD_SEL bit in the CONFIG2 register is set.
 
-#define VLEVEL_32 0x40F //Register used in the algorithm that computes the fundamental reactive power
+#define VLEVEL_32 0x40F //Reset: 0x00045D45 Access: R/W Description: Register used in the algorithm that computes the fundamental reactive power
 // Bits: [31:24] BitName: RESERVED Description: Reserved
 // Bits: [23:0] BitName: VLEVEL_VAL Description: Register used in the algorithm that computes the fundamental reactive power.
 
-#define APERIOD_32 0x418 //Line period on Phase A voltage
-#define BPERIOD_32 0x419 //Line period on Phase B voltage
-#define CPERIOD_32 0x41A //Line period on Phase C voltage
-#define COM_PERIOD_32 0x41B //Line period measurement on combined signal from Phase A, Phase B, and Phase C voltages
-#define ACT_NL_LVL_32 0x41C //No load threshold in the total active power datapath
-#define REACT_NL_LVL_32 0x41D //No load threshold in the total and fundamental reactive power datapath.
-#define APP_NL_LVL_32 0x41E //No load threshold in the total apparent power datapath.
+#define APERIOD_32 0x418 //Reset: 0x00A00000 Access: Read only Description: Line period on Phase A voltage
+#define BPERIOD_32 0x419 //Reset: 0x00A00000 Access: Read only Description: Line period on Phase B voltage
+#define CPERIOD_32 0x41A //Reset: 0x00A00000 Access: Read only Description: Line period on Phase C voltage
+#define COM_PERIOD_32 0x41B //Reset: 0x00A00000 Access: Read only Description: Line period measurement on combined signal from Phase A, Phase B, and Phase C voltages
+#define ACT_NL_LVL_32 0x41C //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total active power datapath
+#define REACT_NL_LVL_32 0x41D //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total and fundamental reactive power datapath.
+#define APP_NL_LVL_32 0x41E //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total apparent power datapath.
 
-#define PHNOLOAD_32 0x41F //Phase no load register.
+#define PHNOLOAD_32 0x41F //Reset: 0x00000000 Access: Read only Description: Phase no load register.
 // Bits: [31:17] BitName: RESERVED Description: Reserved
 // Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
 // Bits: 15 BitName: RESERVED Description: Reserved
@@ -436,12 +435,13 @@ Bits: [3:0] : CREGION
 // Bits: 1 BitName: AVARNL Description: This bit is set if the Phase A total reactive energy is in no load.
 // Bits: 0 BitName: AWATTNL Description: This bit is set if the Phase A total active energy is in no load.
 
-#define WTHR_32 0x420 //Sets the maximum output rate from the digital to frequency converter for the total active power for the CF calibration pulse output. It is recommended to write WTHR = 0x0010 0000.
-#define VARTHR_32 0x421 //Sets the maximum output rate from the digital to frequency converter for the total and fundamental reactive power for the CF calibration pulse output. It is recommended to write VARTHR = 0x0010 0000.
-#define VATHR_32 0x422 //Sets the maximum output rate from the digital to frequency converter for the total apparent power for the CF calibration pulse output. It is recommended to write VATHR = 0x0010 0000.
-#define LAST_DATA_32_32 0x423 //This register holds the data read or written during the last 32-bittransaction on the SPI port.
+#define WTHR_32 0x420 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total active power for the CF calibration pulse output. It is recommended to write WTHR = 0x0010 0000.
+#define VARTHR_32 0x421 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total and fundamental reactive power for the CF calibration pulse output. It is recommended to write VARTHR = 0x0010 0000.
+#define VATHR_32 0x422 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total apparent power for the CF calibration pulse output. It is recommended to write VATHR = 0x0010 0000.
 
-#define ADC_REDIRECT_32 0x424 //This register allows any ADC output to be redirected to any digital datapath.
+#define LAST_DATA_32_32 0x423 //Reset: 0x00000000 Access: Read only Description: This register holds the data read or written during the last 32-bittransaction on the SPI port.
+
+#define ADC_REDIRECT_32 0x424 //Reset: 0x001FFFFF Access: R/W Description: This register allows any ADC output to be redirected to any digital datapath.
 // Bits: [31:21] BitName: RESERVED Description: Reserved
 // Bits: [20:18] BitName: VC_DIN Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
 // Bits: [17:15] BitName: VB_DIN Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
@@ -451,7 +451,7 @@ Bits: [3:0] : CREGION
 // Bits: [5:3] BitName: IB_DIN Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
 // Bits: [2:0] BitName: IA_DIN Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
 
-#define CF_LCFG_32 0x425 //CF calibration pulse width configuration register.
+#define CF_LCFG_32 0x425 //Reset: 0x00000000 Access: R/W Description: CF calibration pulse width configuration register.
 // Bits: [31:23] BitName: RESERVED Description: Reserved
 // Bits: 22 BitName: CF4_LT Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
 // Bits: 21 BitName: CF3_LT Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
@@ -459,7 +459,7 @@ Bits: [3:0] : CREGION
 // Bits: 19 BitName: CF1_LT Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
 // Bits: [18:0] BitName: CF_LTMR Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
 
-#define PART_ID_32 0x472 //This register identifies the IC. If the ADE9000_ID bit is 0, the IC is an ADE9078
+#define PART_ID_32 0x472 //Reset: 0x00000000 Access: Read only Description: This register identifies the IC. If the ADE9000_ID bit is 0, the IC is an ADE9078
 // Bits: [31:22] BitName: RESERVED Description: Reserved
 // Bits: 21 BitName: Description: This bit is set to identify an ADE73370 IC.
 // Bits: 20 BitName: Description: This bit is set to identify an ADE9000 IC.
@@ -468,9 +468,9 @@ Bits: [3:0] : CREGION
 // Bits: [15:0] BitName: RESERVED Description: Reserved
 
 //16-Bit Registers
-#define RUN_16 0x480 //Write this register to 1 to start the measurements
+#define RUN_16 0x480 //Reset: 0x0000 Access: R/W Description: Write this register to 1 to start the measurements
 
-#define CONFIG1_16 0x481 //Configuration Register 1.
+#define CONFIG1_16 0x481 //Reset: 0x0000 Access: R/W Description: Configuration Register 1.
 // Bits: 15 BitName: EXT_REF Description:
 // Bits: [14:13] BitName: RESERVED Description: Reserved
 // Bits: 12 BitName: IRQ0_ON_IRQ1 Description:
@@ -484,17 +484,17 @@ Bits: [3:0] : CREGION
 // Bits: 1 BitName: CF3_CFG Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
 // Bits: 0 BitName: SWRST Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
 
-#define ANGL_VA_VB_16 0x482 //Time between positive to negative zero crossings on Phase A and Phase B voltages.
-#define ANGL_VB_VC_16 0x483 //Time between positive to negative zero crossings on Phase B and Phase C voltages.
-#define ANGL_VA_VC_16 0x484 //Time between positive to negative zero crossings on Phase A and Phase C voltages.
-#define ANGL_VA_IA_16 0x485 //Time between positive to negative zero crossings on Phase A voltage and current.
-#define ANGL_VB_IB_16 0x486 //Time between positive to negative zero crossings on Phase B voltage and current.
-#define ANGL_VC_IC_16 0x487 //Time between positive to negative zero crossings on Phase C voltage and current.
-#define ANGL_IA_IB_16 0x488 //Time between positive to negative zero crossings on Phase A and Phase B current.
-#define ANGL_IB_IC_16 0x489 //Time between positive to negative zero crossings on Phase B and Phase C current.
-#define ANGL_IA_IC_16 0x48A //Time between positive to negative zero crossings on Phase A and Phase C current
+#define ANGL_VA_VB_16 0x482 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase B voltages.
+#define ANGL_VB_VC_16 0x483 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B and Phase C voltages.
+#define ANGL_VA_VC_16 0x484 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase C voltages.
+#define ANGL_VA_IA_16 0x485 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A voltage and current.
+#define ANGL_VB_IB_16 0x486 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B voltage and current.
+#define ANGL_VC_IC_16 0x487 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase C voltage and current.
+#define ANGL_IA_IB_16 0x488 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase B current.
+#define ANGL_IB_IC_16 0x489 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B and Phase C current.
+#define ANGL_IA_IC_16 0x48A //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase C current
 
-#define CFMODE_16 0x490 //CFx configureation register
+#define CFMODE_16 0x490 //Reset: 0x0000 Access: R/W Description: CFx configureation register
 // Bits: 15 BitName: CF4DIS Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
 // Bits: 14 BitName: CF3DIS Description: CF1 output disable -- see CF4DIS
 // Bits: 13 BitName: CF2DIS Description: CF1 output disable -- see CF4DIS
@@ -504,14 +504,14 @@ Bits: [3:0] : CREGION
 // Bits: [5:3] BitName: CF2SEL Description: Selects type of energy output on CF2 pin --see CF4SEL
 // Bits: [2:0] BitName: CF1SEL Description: Selects type of energy output on CF1 pin --see CF4SEL
 
-#define COMPMODE_16 0x491 //Computation mode register
+#define COMPMODE_16 0x491 //Reset: 0x0000 Access: R/W Description: Computation mode register
 // Bits: [15:12] BitName: RESERVED Description: Reserved
 // Bits: [11:9] BitName: TERMSEL4 Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
 // Bits: [8:6] BitName: TERMSEL3 Description: Phases to include in CF3 pulse output --see TERMSEL4
 // Bits: [5:3] BitName: TERMSEL2 Description: Phases to include in CF2 pulse output --see TERMSEL4
 // Bits: [2:0] BitName: TERMSEL1 Description: Phases to include in CF1 pulse output --see TERMSEL4
 
-#define ACCMODE_16 0x492 //Accumulation mode register
+#define ACCMODE_16 0x492 //Reset: 0x0000 Access: R/W Description: Accumulation mode register
 // Bits: [15:9] BitName: RESERVED Description: Reserved
 // Bits: 8 BitName: Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
 // Bits: 7 BitName: ICONSEL Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
@@ -519,26 +519,26 @@ Bits: [3:0] : CREGION
 // Bits: [3:2] BitName: VARACC Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
 // Bits: [1:0] BitName: WATTACC Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
 
-#define CONFIG3_16 0x493 //Configuraiton Register 3
+#define CONFIG3_16 0x493 //Reset: 0x0000 Access: R/W Description: Configuraiton Register 3
 // Bits: [15:5] BitName: RESERVED Description: Reserved
 // Bits: [4:2] BitName: PEAKSEL Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
 // Bits: [1:0] BitName: RESERVED Description: Reserved
 
-#define CF1DEN_16 0x494 //CF1 denominator register
-#define CF2DEN_16 0x495 //CF2 denominator register
-#define CF3DEN_16 0x496 //CF3 denominator register
-#define CF4DEN_16 0x497 //CF4 denomoinator register
-#define ZXTOUT_16 0x498 //Zero-crossing timeout configuration register.
-#define ZXTHRSH_16 0x499 //Voltage channel zero-crossing threshold register.
+#define CF1DEN_16 0x494 //Reset: 0xFFFF Access: R/W Description: CF1 denominator register
+#define CF2DEN_16 0x495 //Reset: 0xFFFF Access: R/W Description: CF2 denominator register
+#define CF3DEN_16 0x496 //Reset: 0xFFFF Access: R/W Description: CF3 denominator register
+#define CF4DEN_16 0x497 //Reset: 0xFFFF Access: R/W Description: CF4 denomoinator register
+#define ZXTOUT_16 0x498 //Reset: 0xFFFF Access: R/W Description: Zero-crossing timeout configuration register.
+#define ZXTHRSH_16 0x499 //Reset: 0x0009 Access: R/W Description: Voltage channel zero-crossing threshold register.
 
-#define ZX_LP_SEL_16 0x49A //This register selects which zero crossing and which line period measurement are used for other calculations.
+#define ZX_LP_SEL_16 0x49A //Reset: 0x001E Access: R/W Description: This register selects which zero crossing and which line period measurement are used for other calculations.
 // Bits: [15:5] BitName: RESERVED Description: Reserved
 // Bits: [4:3] BitName: LP_SEL Description: Selects line period measurement used for resampling. Setting: 00 APERIOD, line period measurement from Phase A voltage. Setting: 01 for BPERIOD, line period measurement from Phase B voltage. Setting: 10 for CPERIOD, line period measurement from Phase C voltage. Setting: 11 for COM_PERIOD, line period measurement on combined signal from VA, VB, and VC.
 // Bits: [2:1] BitName: ZX_SEL Description: Selects the zero-crossing signal, which can be routed to CF3/ZX output pin and which is used for line cycle energy accumulation. Setting: 00 for ZXVA, Phase A voltage zero-crossing signal. Setting: 01 ZXVB, Phase B voltage zero-crossing signal.  Setting: 10 for ZXVC, Phase C voltage zero-crossing signal. Setting: 11 for ZXCOMB, zero crossing on combined signal from VA,VB and VC.
 // Bits: 0 BitName: RESERVED Description: Reserved
 
-#define SEQ_CYC_16 0x49C //Number of line cycles used for phase sequence detection. It is recommended to set this register to 1.
-#define PHSIGN_16 0x49D //Power sign register
+#define SEQ_CYC_16 0x49C //Reset: 0x00FF Access: R/W Description: Number of line cycles used for phase sequence detection. It is recommended to set this register to 1.
+#define PHSIGN_16 0x49D //Reset: 0x0000 Access: Read only Description: Power sign register
 // Bits: [15:10] Bitname: RESERVED Description: Reserved
 // Bits: 9 BitName: SUM4SIGN Description: Sign of the sum of the powers included in the CF4 datapath. The CF4 energy is positive if this bit is clear and negative if this bit is set.
 // Bits: 8 BitName: SUM3SIGN Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
@@ -550,7 +550,7 @@ Bits: [3:0] : CREGION
 // Bits: 2 BitName: BWSIGN Description: Phase B active power sign bit.
 // Bits: 1 BitName: AVARSIGN Description: Phase A reactive power sign bit.  The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
 // Bits: 0 BitName: AWSIGN Description: Phase A active power sign bit
-#define 0x4A0 WFB_CFG_16 //Waveform buffer configuration register
+#define 0x4A0 WFB_CFG_16 //Reset: 0x0000 Access: R/W Description: Waveform buffer configuration register
 // Bits: [15:13] Bitname: RESERVED Description: Reserved
 // Bits: 12 BitName: WF_IN_EN Description: This setting determines whether the IN waveform samples are read out of the waveform buffer through SPI. 0: IN waveform samples are not read out of waveform buffer through SPI. 1: IN waveform samples are read out of waveform buffer through SPI
 // Bits: [11:10] BitName: RESERVED Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
@@ -559,8 +559,8 @@ Bits: [3:0] : CREGION
 // Bits: 5 BitName: WF_CAP_SEL Description: This bit selects whether the waveform buffer is filled with resampled data or fixed data rate data, selected in the WF_CAP_SEL bits. 0: resampled data. 1: fixed data rate data
 // Bits: 4 BitName: WF_CAP_EN Description: When this bit is set, waveform capture is started. 0: the waveform capture is disabled. the waveform buffer contents are maintained. 1: the waveform capture is started, according to the type of capture in WF_CAP_SEL and the WF_SRC bits when this bit goes from a 0 to a 1.
 // Bits: [3:0] BitName: BURST_CHAN Description: selects which data to read out of the waveform buffer through SPI. 0000: all channels. 0001: IA and VA. 0010: IB and VB. 0011: IC and VC. 1000: IA. 1001: VA. 1010: IB. 1011:VB 1100:IC. 1101:VC. 1110:In if WF_IN_EN =1 in the WFB_CFG registers. 1111: single address read (SPI burst read mode is disabled)
-#define WFB_PG_IRQEN_16 0x4A1 //This register enables interrupts to occur after specific pages of the waveform buffer have been filled.
-#define WFB_TRG_CFG_16 0x4A2 //This register enables events to trigger a capture in the waveform buffer
+#define WFB_PG_IRQEN_16 0x4A1 //Reset: 0x0000 Access: R/W Description: This register enables interrupts to occur after specific pages of the waveform buffer have been filled.
+#define WFB_TRG_CFG_16 0x4A2 //Reset: 0x0000 Access: R/W Description: This register enables events to trigger a capture in the waveform buffer
 // Bits: [15:11] Bitname: RESERVED Description: Reserved
 // Bits: 10 Bitname: TRIG_FORCE Description: Set this bit to trigger an even to stop the waveform buffer filling
 // Bits: 9 Bitname: ZXCOMB Description: Zero crossing on combined signal from VA, VB, and VC
@@ -571,16 +571,16 @@ Bits: [3:0] : CREGION
 // Bits: 4 Bitname: ZXIB Description: Phase B current zero crossing.
 // Bits: 3 Bitname: ZXIA Description: Phase A current zero crossing.
 // Bits: [2:0] Bitname: RESERVED Description: Reserved
-#define 0x4A3 WFB_TRG_STAT_16 //This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
+#define 0x4A3 WFB_TRG_STAT_16 //Reset: 0x0000 Access: R/W Description: This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
 // Bits: [15:12] Bitname: WFB_LAST_PAGE Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
 // Bits: 11 Bitname: RESERVED Description: Reserved
 // Bits: [10:0]  Bitname: UPERIOD_SEL Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
-#define CONFIG5_16 0x4A4 //Configuration Register 5
-#define CRC_RSLT_16 0x4A8 //This register holds the CRC of configuration registers.
-#define CRC_SPI_16 0x4A9 //This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
-#define LAST_DATA_16 0x4AC //This register holds the data read or written during the last 16-bit transaction on the SPI port.
-#define LAST_CMD_16 0x4AE //This register holds the address and read/write operation request (CMD_HDR) for the last transaction on the SPI port.
-#define CONFIG2_16 0x4AF //Configuration Register 2
+#define CONFIG5_16 0x4A4 //Reset: 0x0063 Access: R/W Description: Reset: 0x0063 Access: R/W Description: Configuration Register 5
+#define CRC_RSLT_16 0x4A8 //Reset: 0x0000 Access: R Description: This register holds the CRC of configuration registers.
+#define CRC_SPI_16 0x4A9 //Reset: 0x0000 Access: R Description: This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
+#define LAST_DATA_16 0x4AC //Reset: 0x0000 Access: R Description: This register holds the data read or written during the last 16-bit transaction on the SPI port.
+#define LAST_CMD_16 0x4AE //Reset: 0x0000 Access: R Description: This register holds the address and read/write operation request (CMD_HDR) for the last transaction on the SPI port.
+#define CONFIG2_16 0x4AF //Reset: 0x0C00 Access: R/W Description: Configuration Register 2
 // Bits [15:13] Bitname: RESERVED Description: Reserved
 // Bits 12 Bitname: UPERIOD_SEL Description: Set this bit to use a user configured line period, in USER_PERIOD, for the resampling calculation. If this bit is clear, the phase voltage line period selected by the LP_SEL[1:0] bits in the ZX_LP_SEL register is used.
 // Bits [11:9] Bitname: HPF_CRN Description: High-Pass filter corner (f3dB) enabled when the HPFDIS is bit in the CONFIGO register=0
@@ -593,7 +593,7 @@ Bits: [3:0] : CREGION
 //110 0.625 Hz.
 //111 0.3125 Hz.
 // Bits [8:0] Bitname: RESERVED Description: Reserved.
-#define EP_CFG_16 0x4B0 //Energy and power accumulation configuration
+#define EP_CFG_16 0x4B0 //Reset: 0x0000 Access: R/W Description: Energy and power accumulation configuration
 // Bits [15:13] Bitname: NOLOAD_TMR Description: This register configures how many 4 kSPS samples to evaluate the no load condition convert
 //000 64.
 //001 128.
@@ -615,13 +615,13 @@ Bits: [3:0] : CREGION
         // 1 Accumulate energy based on the zero crossing selected by the ZX_SEL bits in the ZX_LP_SEL register.
 // Bits 0 Bitname: EGY_PWR_EN Description: Set this bit to enable the energy and power accumulator, when the run bit is also set.
 
-#define PWR_TIME_16 0x4B1 //POwer and time configuration
-#define EGY_TIME_16 0x4B2 //Energy accumulation update time configuration
-#define CRC_FORCE_16 0x4B4 //This register forces an update of the CRC of configuration registers.
+#define PWR_TIME_16 0x4B1 //Reset: 0x00FF Access: R/W Description: POwer and time configuration
+#define EGY_TIME_16 0x4B2 //Reset: 0x00FF Access: R/W Description: Energy accumulation update time configuration
+#define CRC_FORCE_16 0x4B4 //Reset: 0x0000 Access: R/W Description: This register forces an update of the CRC of configuration registers.
 // Bits [15:1] Bitname: RESERVED Description: RESERVED
 // Bits 0 Bitname: FORCE_CRC_UPDATE Description: Write this bit to force the configuration register CRC calculation to start. When the calculation is complete, the CRC_DONE bit is set in the STATUS1 register
 
-#define CRC_OPTEN_16 0x4B5 //This register selects which registers are optionally included in the configuration register CRC feature
+#define CRC_OPTEN_16 0x4B5 //Reset: 0x0000 Access: R/W Description: This register selects which registers are optionally included in the configuration register CRC feature
 // Bits: 15 CRC_WFB_TRG_CFG_EN - Set this bit to include the WFB_TRG_CFG register in the configuration register CRC calculation.
 // Bits: 14 CRC_WFB_PG_IRQEN - Set this bit to include the WFB_PG_IRQEN register in the configuration register CRC calculation.
 // Bits: 13 CRC_WFB_CFG_EN - Set this bit to include the WFB_CFG register in the configuration register CRC calculation.
