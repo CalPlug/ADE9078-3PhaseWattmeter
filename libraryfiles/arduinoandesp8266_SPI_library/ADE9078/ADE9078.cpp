@@ -92,20 +92,20 @@ ADE9078/*
 #define CFVAROS_32 0x052 // Reset: 0x00000000 Access: R/W Description: Phase C total reactive power offset correction for CVAR calculations
 
 #define CONFIG0_32 0x060
-// Bits: [31:14] BitName: RESERVED Description: Reserved
-// Bits: 13 BitName: DISRPLPF Description: Set this bit to disable the low-pass filter in the total reactive power datapath.
-// Bits: 12 BitName: DISAPLPF Description: Set this bit to disable the low-pass filter in the total active power datapath.
-// Bits: 11 BitName: ININTEN Description: Set this bit to enable the digital integrator in the Neutral Current channel.
-// Bits: 10 BitName: VNOMC_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase C total apparent power, CVA.
-// Bits: 9 BitName: VNOMB_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase B total apparent power, BVA.
-// Bits: 8 BitName: VNOMA_EN Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase A total apparent power, AVA.
-// Bits: 7 BitName: RESERVED Description: Reserved
-// Bits: 6 BitName: ZX_SRC_SEL Description: This bit selects whether data going into the zero-crossing detection circuit comes before the highpass filter, integrator, and phase compensation or afterwards. Setting: 0 for After the high-pass filter, integrator, and phase compensation. Setting: 1 for Before the high-pass filter, integrator, and phase compensation.
-// Bits: 5 BitName: INTEN Description: Set this bit to enable the integrators in the phase current channels. The neutral current channel integrator is managed byb the ININTEN bit in the CONFIG0 register.
-// Bits: 4 BitName: MTEN Description: Set this bit to enable multipoint phase and gain compensation. If enabled, an additional gain factor, xIGAIN0 through xIGAIN4, is applied to the current channel based on the xIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.
-// Bits: 3 BitName: HPFDIS Description: Set this bit to disable high-pass filters in all the voltage and current channels.
-// Bits: 2 BitName: RESERVED Description: Reserved
-// Bits: [1:0] BitName: ISUM_CFG Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
+// Bits: [31:14] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 13 BitName: DISRPLPF Reset: 0x0 Access: R/W Description: Set this bit to disable the low-pass filter in the total reactive power datapath.
+// Bits: 12 BitName: DISAPLPF Reset: 0x0 Access: R/W Description: Set this bit to disable the low-pass filter in the total active power datapath.
+// Bits: 11 BitName: ININTEN Reset: 0x0 Access: R/W Description: Set this bit to enable the digital integrator in the Neutral Current channel.
+// Bits: 10 BitName: VNOMC_EN Reset: 0x0 Access: R/W Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase C total apparent power, CVA.
+// Bits: 9 BitName: VNOMB_EN Reset: 0x0 Access: R/W Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase B total apparent power, BVA.
+// Bits: 8 BitName: VNOMA_EN Reset: 0x0 Access: R/W Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase A total apparent power, AVA.
+// Bits: 7 BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 6 BitName: ZX_SRC_SEL Reset: 0x0 Access: R/W Description: This bit selects whether data going into the zero-crossing detection circuit comes before the highpass filter, integrator, and phase compensation or afterwards. Setting: 0 for After the high-pass filter, integrator, and phase compensation. Setting: 1 for Before the high-pass filter, integrator, and phase compensation.
+// Bits: 5 BitName: INTEN Reset: 0x0 Access: R/W Description: Set this bit to enable the integrators in the phase current channels. The neutral current channel integrator is managed byb the ININTEN bit in the CONFIG0 register.
+// Bits: 4 BitName: MTEN Reset: 0x0 Access: R/W Description: Set this bit to enable multipoint phase and gain compensation. If enabled, an additional gain factor, xIGAIN0 through xIGAIN4, is applied to the current channel based on the xIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.
+// Bits: 3 BitName: HPFDIS Reset: 0x0 Access: R/W Description: Set this bit to disable high-pass filters in all the voltage and current channels.
+// Bits: 2 BitName: Reset: 0x0 Access: R RESERVED Description: Reserved
+// Bits: [1:0] BitName: ISUM_CFG Reset: 0x0 Access: R/W Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
 
 // Multipoint phase/gain threshold.
 #define MTTHR_L0_32 0x061 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
@@ -143,8 +143,8 @@ ADE9078/*
 
 #define AMTREGION_32 0x21D // Reset: 0x00000000 Access: Read only Description: If multipoint gain and phase compensaion is enabled, with MTEN = 1 in the CONFIG0 register,these bits indicate which AIGAINXx and APHCALx is currently being used
 
-// [31:4] : RESERVED
-// [3:0] : AREGION
+// [31:4] : RESERVED Reset: 0x0 Access: R
+// [3:0] : AREGION Reset: 0xF Access: R
 // If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which AIGAINx and APHCALx currently being used.
 // 0000 AIGAIN0, APHCAL0.
 // 0001 AIGAIN1, APHCAL1.
@@ -167,8 +167,8 @@ ADE9078/*
 
 #define BMTREGION_32 0x23D // Reset: 0x00000000 Access: Read only Description: If multipoint gain and phase.....
 /*
-[31:4] : RESERVED
-[3:0] : BREGION
+[31:4] : RESERVED Reset: 0x0 Access: R
+[3:0] : BREGION Reset: 0xF Access: R
 If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which BIGAINx and BPHCALx currently being used.
 0000 BIGAIN0, BPHCAL0.
 0001 BIGAIN1, BPHCAL1.
@@ -190,8 +190,8 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define CPF_32 0x256 // Reset: 0x00000000 Access: Read only Description: Phase C power factor, updated at 1.024 seconds
 
 #define CMTREGION_32 0X25D // If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx is currently being used.
-// Bits: [31:4] : RESERVED
-// Bits: [3:0] : CREGION - Description: If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx currently being used.
+// Bits: [31:4] : RESERVED Reset: 0x0 Access: R
+// Bits: [3:0] : CREGION Reset: 0xF Access: R - Description: If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx currently being used.
 // Settings
 // 0000 CIGAIN0, CPHCAL0.
 // 0001 CIGAIN1, CPHCAL1.
@@ -249,115 +249,115 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define NVAR_ACC_32 0x3A3 //Reset: 0x00000000 Access: Read only Description: Accumulated Negative Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples
 #define IPEAK_32 0x400 //Reset: 0x00000000 Access: Read only Description: Current peak register.
 
-// Bits: [31:27] RESERVED
-// Bits: [26:24]: IPPHASE- These bits indicate which phases generate IPEAKVAL value. Note that the PEAKSEL[2:0] bits the CONFIG3 register determine which current channel to monitor the peak value on. When IPPHASE, Bit 0 is set to 1, Phase A current generated IPEAKVAL, Bits[23:0] value. Similarly, IPPHASE, Bit 1 indicates Phase B and IPPHASE, Bit 2 indicates Phase C current generated the peak value.
-// Bits: [23:0]: IPEAKVAL- The IPEAK register stores the absolute value of the peak current. IPEAK is equal to xI_PCF/25
+// Bits: [31:27] RESERVED Reset: 0x0 Access: R
+// Bits: [26:24]: IPPHASE Reset: 0x0 Access: R - These bits indicate which phases generate IPEAKVAL value. Note that the PEAKSEL[2:0] bits the CONFIG3 register determine which current channel to monitor the peak value on. When IPPHASE, Bit 0 is set to 1, Phase A current generated IPEAKVAL, Bits[23:0] value. Similarly, IPPHASE, Bit 1 indicates Phase B and IPPHASE, Bit 2 indicates Phase C current generated the peak value.
+// Bits: [23:0]: IPEAKVAL Reset: 0x0 Access: R - The IPEAK register stores the absolute value of the peak current. IPEAK is equal to xI_PCF/25
 
 
 #define VPEAK_32 0x401 //Reset: 0x00000000 Access: Read only Description:  Voltage peak register
-// Bits: [31:27] Reserved
-// Bits: [26:24] VPPHASE- These bits indicate which phases generate VPEAKVAL value. Note that the PEAKSEL[2:0] bits in the CONFIG3 register determine which voltage channels to monitor the peak value on. When VPPHASE[0] is 1, Phase A voltage generated VPEAKVAL[23:0] value. Similarly, VPPHASE[1] indicates Phase B and VPPHASE[2] indicates Phase C voltage generated the peak value.
-// Bits: [23:0] VPEAKVAL- The VPEAK register stores the absolute value of the peak voltage. VPEAK is equal to xV_PCF/25.
+// Bits: [31:27] Reserved Reset: 0x0 Access: R
+// Bits: [26:24] VPPHASE Reset: 0x0 Access: R - These bits indicate which phases generate VPEAKVAL value. Note that the PEAKSEL[2:0] bits in the CONFIG3 register determine which voltage channels to monitor the peak value on. When VPPHASE[0] is 1, Phase A voltage generated VPEAKVAL[23:0] value. Similarly, VPPHASE[1] indicates Phase B and VPPHASE[2] indicates Phase C voltage generated the peak value.
+// Bits: [23:0] VPEAKVAL Reset: 0x0 Access: R - The VPEAK register stores the absolute value of the peak voltage. VPEAK is equal to xV_PCF/25.
 
 #define STATUS0_32 0x402 //Reset: 0x00000000 Access: Read only Description:  Status Register 0
-// Bits: [31:25] RESERVED
-// Bits: 24 MISMTCH - This bit is set to indicate a change in the relationship between ISUMRMS and ISUMLVL
-// Bits: 23 COH_WFB_FULL - This bitis set when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
-// Bits: 22 WFB_TRIG - This bit is set when one of the events configured in WFB_TRIG_CFG occurs
-// Bits: 21 PF_RDY - This bit goes high to indicate when the power factor measurements have been updated, every 1.024 seconds.
-// Bits: [20:19] RESERVED
-// Bits: 18 - PWRRDY - This bit is set when the power values in the xWATT_ACC, xVA_ACC, xVAR_ACC, xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
-// Bits: 17 - PAGE_FULL - This bit is set when a page enabled in the WFB_PG_IRQEN register has been filled with fixed data rate samples, when WF_CAP_SEL bit in the WFB_CFG register = 0.
-// Bits: 16 - WFB_TRIG_IRQ - This bit is set when the waveform buffer has stopped filling after an event configured in WFB_TRIG_CFG occurs. This happens with fixed data rate samples only, when WF_CAP_SEL bit in the WFB_CFG register = 0.
-// Bits: 15 - DREAY - This bit is set when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
-// Bits: 14 - CF4 - This bit is set when a CF4 pulse is issued, when the CF4 pin goes from a high to low state.
-// Bits: 13 - CF3 - This bit is set when a CF3 pulse is issued, when the CF3 pin goes from a high to low state.
-// Bits: 12 - CF2 - This bit is set when a CF2 pulse is issued, when the CF2 pin goes from a high to low state.
-// Bits: 11 - CF1 - This bit is set when a CF1 pulse is issued, when the CF1 pin goes from a high to low state.
-// Bits: 10 - REVPSUM4 - This bit is set to indicate if the CF4 polarity changed sign. For example, if the last CF4 pulse was positive reactive energy and the next CF4 pulse is negative reactive energy, the REVPSUM4 bit is set. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low
-// Bits: 9 - REVPSUM3 - This bit is set to indicate if the CF3 polarity changed sign. See REVPSUM4.
-// Bits: 8 - REVPSUM2 - This bit is set to indicate if the CF2 polarity changed sign. See REVPSUM4.
-// Bits: 7 - REVPSUM1 - This bit is set to indicate if the CF1 polarity changed sign. See REVPSUM4.
-// Bits: 6 - REVRPC - This bit indicates if the Phase C total or fundamental reactive power has changed sign. The PWR_SIGN_SEL bit in the EP_CFG register selects whether total or fundamental reactive power is monitored. This bit is updated when the power values in the xVAR_ACC and xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
-// Bits: 5 - REVRPB - This bit indicates if the Phase B total or fundamental reactive power has changed sign. See REVRPC.
-// Bits: 5 - REVRPA - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
-// Bits: 4 - REVRPA - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
-// Bits: 3 - REVAPC - This bit indicates if the Phase C total active power has changed sign. This bit is updated when the power values in the xWATT_ACC and xWATT_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
-// Bits: 2 - REVAPB - This bit indicates if the Phase B total active power has changed sign. See REVAPC.
-// Bits: 1 - REVAPA - This bit indicates if the Phase A total active power has changed sign. See REVAPC.
-// Bits: 0 - EGYRDY - This bit is set when the power values in the xWATTHR, xVAHR, xVARHR, xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
+// Bits: [31:25] RESERVED Reset: 0x0 Access: R
+// Bits: 24 MISMTCH Reset: 0x0 Access: R/W1 - This bit is set to indicate a change in the relationship between ISUMRMS and ISUMLVL
+// Bits: 23 COH_WFB_FULL Reset: 0x0 Access: R/W1 - This bitis set when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
+// Bits: 22 WFB_TRIG Reset: 0x0 Access: R/W1 - This bit is set when one of the events configured in WFB_TRIG_CFG occurs
+// Bits: 21 PF_RDY Reset: 0x0 Access: R/W1 - This bit goes high to indicate when the power factor measurements have been updated, every 1.024 seconds.
+// Bits: [20:19] RESERVED Reset: 0x0 Access: R
+// Bits: 18 PWRRDY Reset: 0x0 Access: R/W1 - This bit is set when the power values in the xWATT_ACC, xVA_ACC, xVAR_ACC, xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 17 PAGE_FULL Reset: 0x0 Access: R/W1 - This bit is set when a page enabled in the WFB_PG_IRQEN register has been filled with fixed data rate samples, when WF_CAP_SEL bit in the WFB_CFG register = 0.
+// Bits: 16 WFB_TRIG_IRQ Reset: 0x0 Access: R/W1 - This bit is set when the waveform buffer has stopped filling after an event configured in WFB_TRIG_CFG occurs. This happens with fixed data rate samples only, when WF_CAP_SEL bit in the WFB_CFG register = 0.
+// Bits: 15 - DREAY Reset: 0x0 Access: R/W1 - This bit is set when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 14 - CF4 Reset: 0x0 Access: R/W1 - This bit is set when a CF4 pulse is issued, when the CF4 pin goes from a high to low state.
+// Bits: 13 - CF3 Reset: 0x0 Access: R/W1 - This bit is set when a CF3 pulse is issued, when the CF3 pin goes from a high to low state.
+// Bits: 12 - CF2 Reset: 0x0 Access: R/W1 - This bit is set when a CF2 pulse is issued, when the CF2 pin goes from a high to low state.
+// Bits: 11 - CF1 Reset: 0x0 Access: R/W1 - This bit is set when a CF1 pulse is issued, when the CF1 pin goes from a high to low state.
+// Bits: 10 - REVPSUM4 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF4 polarity changed sign. For example, if the last CF4 pulse was positive reactive energy and the next CF4 pulse is negative reactive energy, the REVPSUM4 bit is set. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low
+// Bits: 9 - REVPSUM3 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF3 polarity changed sign. See REVPSUM4.
+// Bits: 8 - REVPSUM2 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF2 polarity changed sign. See REVPSUM4.
+// Bits: 7 - REVPSUM1 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF1 polarity changed sign. See REVPSUM4.
+// Bits: 6 - REVRPC Reset: 0x0 Access: R/W1 - This bit indicates if the Phase C total or fundamental reactive power has changed sign. The PWR_SIGN_SEL bit in the EP_CFG register selects whether total or fundamental reactive power is monitored. This bit is updated when the power values in the xVAR_ACC and xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 5 - REVRPB Reset: 0x0 Access: R/W1 - This bit indicates if the Phase B total or fundamental reactive power has changed sign. See REVRPC.
+// Bits: 5 - REVRPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
+// Bits: 4 - REVRPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
+// Bits: 3 - REVAPC Reset: 0x0 Access: R/W1 - This bit indicates if the Phase C total active power has changed sign. This bit is updated when the power values in the xWATT_ACC and xWATT_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 2 - REVAPB Reset: 0x0 Access: R/W1 - This bit indicates if the Phase B total active power has changed sign. See REVAPC.
+// Bits: 1 - REVAPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total active power has changed sign. See REVAPC.
+// Bits: 0 - EGYRDY Reset: 0x0 Access: R/W1 - This bit is set when the power values in the xWATTHR, xVAHR, xVARHR, xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
 
 #define STATUS1_32 0x403 //Reset: 0x00000000 Access: Read only Description:  Status Register 1.
 
-// Bits: 31- ERROR3 - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
-// Bits: 30 - ERROR2 - This bit indicates that an error was detected and corrected. No action is required.
-// Bits: 29 - ERROR1 - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
-// Bits: 28 - ERROR0 - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
-// Bits: 27 - CRC_DONE - This bit is set to indicate when the configuration register CRC calculation is done, after initiated by writing the FORCE_CRC_UPDATE bit in the CRC_FORCE register.
-// Bits: 26 - CRC_CHG - This bit is set if any of the registers monitored by the configuration register CRC change value. The CRC_RSLT register holds the new configuration register CRC value.
-// Bits: [25:19] - RESERVED - Reserved.
-// Bits: 18 - SEQERR - This bit is set to indicate a phase sequence error on the Phase Voltage zero crossings.
-// Bits: 17 - RESERVED - Reserved.
-// Bits: 16 - RSTDONE - This bit is set to indicate that the IC has finished its power-up sequence after a reset or after changing between PSM2 or PSM3 operating mode to PSM0 or PSM1. This indicates that the user can configure the IC via the SPI port.
-// Bits: 15 - ZXIC - When this bit is set to 1, it indicates a zero crossing has been detected on Phase C current.
-// Bits: 14 - ZXIB - When this bit is set to 1, it indicates a zero crossing has been detected on Phase B current.
-// Bits: 13 - ZXIA - When this bit is set to 1, it indicates a zero crossing has been detected on Phase A current.
-// Bits: 12 - ZXCOMB - When this bit is set, it indicates a zero crossing has been detected on the combined signal from VA, VB, and VC.
-// Bits: 11 - ZXVC - When this bit is set, it indicates a zero crossing has been detected on the Phase C voltage channel.
-// Bits: 10 - ZXVB - When this bit is set, it indicates a zero crossing has been detected on the Phase B voltage channel.
-// Bits: 9 - ZXVA - When this bit is set, it indicates a zero crossing has been detected on the Phase A voltage channel.
-// Bits: 8 - ZXTOVC - This bit is set to indicate a zero crossing timeout on Phase C. This means that a zero crossing on the Phase C voltage is missing.
-// Bits: 7- ZXTOVB - This bit is set to indicate a zero crossing timeout on Phase B. This means that a zero crossing on the Phase B voltage is missing.
-// Bits: 6 ZXTOVA - This bit is set to indicate a zero crossing timeout on Phase A. This means that a zero crossing on the Phase A voltage is missing.
-// Bits: 5 RESERVED - Reserved.
-// Bits: 4 RFNOLOAD - This bit is set when one or more phase fundamental reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
-// Bits: 3 RESERVED - Reserved.
-// Bits: 2 VANLOAD - This bit is set when one or more phase total apparent energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
-// Bits: 1 RNLOAD - This bit is set when one or more phase total reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
-// Bits: 0 - ANLOAD - This bit is set when one or more phase total active energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 31- ERROR3 Reset: 0x0 Access: R/W1 - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
+// Bits: 30 - ERROR2 Reset: 0x0 Access: R/W1 - This bit indicates that an error was detected and corrected. No action is required.
+// Bits: 29 - ERROR1 Reset: 0x0 Access: R - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
+// Bits: 28 - ERROR0 Reset: 0x0 Access: R - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
+// Bits: 27 - CRC_DONE Reset: 0x0 Access: R/W1 - This bit is set to indicate when the configuration register CRC calculation is done, after initiated by writing the FORCE_CRC_UPDATE bit in the CRC_FORCE register.
+// Bits: 26 - CRC_CHG Reset: 0x0 Access: R/W1 - This bit is set if any of the registers monitored by the configuration register CRC change value. The CRC_RSLT register holds the new configuration register CRC value.
+// Bits: [25:19] - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 18 - SEQERR Reset: 0x0 Access: R/W1 - This bit is set to indicate a phase sequence error on the Phase Voltage zero crossings.
+// Bits: 17 - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 16 - RSTDONE Reset: 0x0 Access: R/W1 - This bit is set to indicate that the IC has finished its power-up sequence after a reset or after changing between PSM2 or PSM3 operating mode to PSM0 or PSM1. This indicates that the user can configure the IC via the SPI port.
+// Bits: 15 - ZXIC Reset: 0x0 Access: R/W1 - When this bit is set to 1, it indicates a zero crossing has been detected on Phase C current.
+// Bits: 14 - ZXIB Reset: 0x0 Access: R/W1 - When this bit is set to 1, it indicates a zero crossing has been detected on Phase B current.
+// Bits: 13 - ZXIA Reset: 0x0 Access: R/W1 - When this bit is set to 1, it indicates a zero crossing has been detected on Phase A current.
+// Bits: 12 - ZXCOMB Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the combined signal from VA, VB, and VC.
+// Bits: 11 - ZXVC Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the Phase C voltage channel.
+// Bits: 10 - ZXVB Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the Phase B voltage channel.
+// Bits: 9 - ZXVA Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the Phase A voltage channel.
+// Bits: 8 - ZXTOVC Reset: 0x0 Access: R/W1 - This bit is set to indicate a zero crossing timeout on Phase C. This means that a zero crossing on the Phase C voltage is missing.
+// Bits: 7 - ZXTOVB Reset: 0x0 Access: R/W1 - This bit is set to indicate a zero crossing timeout on Phase B. This means that a zero crossing on the Phase B voltage is missing.
+// Bits: 6 - ZXTOVA Reset: 0x0 Access: R/W1 - This bit is set to indicate a zero crossing timeout on Phase A. This means that a zero crossing on the Phase A voltage is missing.
+// Bits: 5 - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 4 - RFNOLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase fundamental reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 3 - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 2 - VANLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase total apparent energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 1 - RNLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase total reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 0 - ANLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase total active energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
 
 #define EVENT_STATUS32 0x404 //Reset: 0x00000000 Access: Read only Description:  Event Status Register.
-// Bits: [31:17] - RESERVED - Reserved
-// Bits: 16 - DREADY - This bit changes from a one to a zero when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
-// Bits: 15 - RESERED - Reserved
-// Bits: 14 RFNOLOAD - This bit is set when the fundamental reactive energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of fundamental reactive energy accumulation goes into no load.
-// Bits: 13-  RESERVED - Reserved.
-// Bits: 12 - VANLOAD - This bit is set when the total apparent energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total apparent energy accumulation goes into no load.
-// Bits: 11 - RNLOAD - This bit is set when the total reactive energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total reactive energy accumulation goes into no load.
-// Bits: 10 - ANLOAD - This bit is set when the total active energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total active energy accumulation goes into no load.
-// Bits: 9 - REVPSUM4 - This bit indicates the sign of the last CF4 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low.
-// Bits: 8 - REVPSUM3 - This bit indicates the sign of the last CF3 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF3 pulse is output, when the CF3 pin goes from high to low.
-// Bits: 7 - REVPSUM2 - This bit indicates the sign of the last CF2 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF2 pulse is output, when the CF2 pin goes from high to low.
-// Bits: 6 - REVPSUM1 - This bit indicates the sign of the last CF1 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
-// Bits: 5[:0] - Reserved - Reserved
+// Bits: [31:17] - RESERVED Reset: 0x0 Access: R - Reserved
+// Bits: 16 - DREADY Reset: 0x0 Access: R - This bit changes from a one to a zero when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 15 - RESERED Reset: 0x0 Access: R - Reserved
+// Bits: 14 RFNOLOAD Reset: 0x0 Access: R - This bit is set when the fundamental reactive energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of fundamental reactive energy accumulation goes into no load.
+// Bits: 13-  RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 12 - VANLOAD Reset: 0x0 Access: R - This bit is set when the total apparent energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total apparent energy accumulation goes into no load.
+// Bits: 11 - RNLOAD Reset: 0x0 Access: R - This bit is set when the total reactive energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total reactive energy accumulation goes into no load.
+// Bits: 10 - ANLOAD Reset: 0x0 Access: R - This bit is set when the total active energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total active energy accumulation goes into no load.
+// Bits: 9 - REVPSUM4 Reset: 0x0 Access: R - This bit indicates the sign of the last CF4 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low.
+// Bits: 8 - REVPSUM3 Reset: 0x0 Access: R - This bit indicates the sign of the last CF3 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF3 pulse is output, when the CF3 pin goes from high to low.
+// Bits: 7 - REVPSUM2 Reset: 0x0 Access: R - This bit indicates the sign of the last CF2 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF2 pulse is output, when the CF2 pin goes from high to low.
+// Bits: 6 - REVPSUM1 Reset: 0x0 Access: R - This bit indicates the sign of the last CF1 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
+// Bits: 5[:0] - Reserved Reset: 0x0 Access: R - Reserved
 
 
 #define MASK0_32 0x405 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 0.
-// Bits: [31:25] - Reserved
-// Bits: 24 MISMTCH - Set this bit to enable an interrupt when there is a change in the relationship between ISUMRMS and ISUMLVL.
-// Bits: 23 - COH_WFB_FULL - Set this bit to enable an interrupt when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
-// Bits: 22 - WFB_TRIG - Set this bit to enable an interrupt when one of the events configured in WFB_TRIG_CFG occurs.
-// Bits: 21 - PF_RDY - Set this bit to enable an interrupt when the power factor measurements have been updated, every 1.024 seconds
-// Bits: [20:19] - RESERVED - Reserved.
-// Bits: 18 - PWRRDY - Set this bit to enable an interrupt when the power values in the xWATT_ACC, xVA_ACC, xVAR_ACC, xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
-// Bits: 17 - PAGE_FULL - Set this bit to enable an interrupt when a page enabled in the WFB_PG_IRQEN register has been filled.
-// Bits: 16 - WFB_TRIG_IRQ - Set this bit to enable an interrupt when This bit is set when the waveform buffer has stopped filling after an event configured in WFB_TRIG_CFG occurs.
-// Bits: 15 - DREADY - Set this bit to enable an interrupt when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
-// Bits: 14 - CF4 - Set this bit to enable an interrupt when the CF4 pulse is issued, when the CF4 pin goes from a high to low state.
-// Bits: 13 - CF3 - Set this bit to enable an interrupt when the CF3 pulse is issued, when the CF3 pin goes from a high to low state.
-// Bits: 12 - CF2 - Set this bit to enable an interrupt when the CF2 pulse is issued, when the CF2 pin goes from a high to low state.
-// Bits: 11 - CF1 - Set this bit to enable an interrupt when the CF1 pulse is issued, when the CF1 pin goes from a high to low state.
-// Bits: 10 - REVPSUM4 - Set this bit to enable an interrupt when the CF4 polarity changed sign.
-// Bits: 9 - REVPSUM3 - Set this bit to enable an interrupt when the CF3 polarity changed sign.
-// Bits: 8 - REVPSUM2 - Set this bit to enable an interrupt when the CF2 polarity changed sign.
-// Bits: 7 - REVPSUM1 - Set this bit to enable an interrupt when the CF1 polarity changed sign.
-// Bits: 6 - REVRPC - Set this bit to enable an interrupt when the Phase C total or fundamental reactive power has changed sign.
-// Bits: 5 - REVRPB - Set this bit to enable an interrupt when the Phase C total or fundamental reactive power has changed sign.
-// Bits: 4- REVRPA - Set this bit to enable an interrupt when the Phase A total or fundamental reactive power has changed sign.
-// Bits: 3 - REVAPC - Set this bit to enable an interrupt when the Phase C total active power has changed sign.
-// Bits: 2 - REVAPB - Set this bit to enable an interrupt when the Phase B total active power has changed sign.
-// Bits: 1 - REVAPA - Set this bit to enable an interrupt when the Phase A total active power has changed sign.
-// Bits: 0 - EGYRDY - Set this bit to enable an interrupt when the power values in the xWATTHR, xVAHR, xVARHR, and xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
+// Bits: [31:25] RESERVED Reset: 0x0 Access: R - Reserved
+// Bits: 24 - MISMTCH Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when there is a change in the relationship between ISUMRMS and ISUMLVL.
+// Bits: 23 - COH_WFB_FULL Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
+// Bits: 22 - WFB_TRIG Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when one of the events configured in WFB_TRIG_CFG occurs.
+// Bits: 21 - PF_RDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power factor measurements have been updated, every 1.024 seconds
+// Bits: [20:19] - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 18 - PWRRDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power values in the xWATT_ACC, xVA_ACC, xVAR_ACC, xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 17 - PAGE_FULL Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when a page enabled in the WFB_PG_IRQEN register has been filled.
+// Bits: 16 - WFB_TRIG_IRQ Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when This bit is set when the waveform buffer has stopped filling after an event configured in WFB_TRIG_CFG occurs.
+// Bits: 15 - DREADY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 14 - CF4 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF4 pulse is issued, when the CF4 pin goes from a high to low state.
+// Bits: 13 - CF3 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF3 pulse is issued, when the CF3 pin goes from a high to low state.
+// Bits: 12 - CF2 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF2 pulse is issued, when the CF2 pin goes from a high to low state.
+// Bits: 11 - CF1 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF1 pulse is issued, when the CF1 pin goes from a high to low state.
+// Bits: 10 - REVPSUM4 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF4 polarity changed sign.
+// Bits: 9 - REVPSUM3 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF3 polarity changed sign.
+// Bits: 8 - REVPSUM2 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF2 polarity changed sign.
+// Bits: 7 - REVPSUM1 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF1 polarity changed sign.
+// Bits: 6 - REVRPC Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase C total or fundamental reactive power has changed sign.
+// Bits: 5 - REVRPB Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase C total or fundamental reactive power has changed sign.
+// Bits: 4- REVRPA Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase A total or fundamental reactive power has changed sign.
+// Bits: 3 - REVAPC Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase C total active power has changed sign.
+// Bits: 2 - REVAPB Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase B total active power has changed sign.
+// Bits: 1 - REVAPA Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase A total active power has changed sign.
+// Bits: 0 - EGYRDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power values in the xWATTHR, xVAHR, xVARHR, and xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
 
 #define MASK1_32 0x406 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 1.
 // Bits: 31 - ERROR3 - Set this bit to enable an interrupt if ERROR3 occurs. Issue a software reset or hardware reset to clear this error.
