@@ -499,30 +499,30 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 14 BitName: CF3DIS Description: CF1 output disable -- see CF4DIS
 // Bits: 13 BitName: CF2DIS Description: CF1 output disable -- see CF4DIS
 // Bits: 12 BitName: CF1DIS Description: CF1 output disable -- see CF4DIS
-// Bits: [11:9] BitName: CF4SEL Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
-// Bits: [8:6] BitName: CF3SEL Description: Selects type of energy output on CF3 pin --see CF4SEL
-// Bits: [5:3] BitName: CF2SEL Description: Selects type of energy output on CF2 pin --see CF4SEL
-// Bits: [2:0] BitName: CF1SEL Description: Selects type of energy output on CF1 pin --see CF4SEL
+// Bits: [11:9] BitName: CF4SEL Reset: 0x0 Access: R/W Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
+// Bits: [8:6] BitName: CF3SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF3 pin --see CF4SEL
+// Bits: [5:3] BitName: CF2SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF2 pin --see CF4SEL
+// Bits: [2:0] BitName: CF1SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF1 pin --see CF4SEL
 
 #define COMPMODE_16 0x491 //Reset: 0x0000 Access: R/W Description: Computation mode register
-// Bits: [15:12] BitName: RESERVED Description: Reserved
-// Bits: [11:9] BitName: TERMSEL4 Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
-// Bits: [8:6] BitName: TERMSEL3 Description: Phases to include in CF3 pulse output --see TERMSEL4
-// Bits: [5:3] BitName: TERMSEL2 Description: Phases to include in CF2 pulse output --see TERMSEL4
-// Bits: [2:0] BitName: TERMSEL1 Description: Phases to include in CF1 pulse output --see TERMSEL4
+// Bits: [15:12] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [11:9] BitName: TERMSEL4 Reset: 0x0 Access: R/W Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
+// Bits: [8:6] BitName: TERMSEL3 Reset: 0x0 Access: R/W Description: Phases to include in CF3 pulse output --see TERMSEL4
+// Bits: [5:3] BitName: TERMSEL2 Reset: 0x0 Access: R/W Description: Phases to include in CF2 pulse output --see TERMSEL4
+// Bits: [2:0] BitName: TERMSEL1 Reset: 0x0 Access: R/W Description: Phases to include in CF1 pulse output --see TERMSEL4
 
 #define ACCMODE_16 0x492 //Reset: 0x0000 Access: R/W Description: Accumulation mode register
-// Bits: [15:9] BitName: RESERVED Description: Reserved
-// Bits: 8 BitName: Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
-// Bits: 7 BitName: ICONSEL Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
-// Bits: [6:4] BitName: VCONSEL Description: Three-wire and four-wire hardware configuration selection. Setting: 000 for 4-wire wye. Setting: 001 for 3-wire delta. VB' = VA-VC. Setting: 010 for 4-wire delta, non-Blondel compliant. VB' = -VA - VC. Setting: 011 for 4-wire delta non-Blondel compliant. VB' = -VA. Setting: 100 for 3-wire delta. VA'=VA-VB; VB' = VA-VC; VC'=VC-VB.
-// Bits: [3:2] BitName: VARACC Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
-// Bits: [1:0] BitName: WATTACC Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
+// Bits: [15:9] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 8 BitName: SELFREQ Reset: 0x0 Access: R/W Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
+// Bits: 7 BitName: ICONSEL Reset: 0x0 Access: R/W Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
+// Bits: [6:4] BitName: VCONSEL Reset: 0x0 Access: R/W Description: Three-wire and four-wire hardware configuration selection. Setting: 000 for 4-wire wye. Setting: 001 for 3-wire delta. VB' = VA-VC. Setting: 010 for 4-wire delta, non-Blondel compliant. VB' = -VA - VC. Setting: 011 for 4-wire delta non-Blondel compliant. VB' = -VA. Setting: 100 for 3-wire delta. VA'=VA-VB; VB' = VA-VC; VC'=VC-VB.
+// Bits: [3:2] BitName: VARACC Reset: 0x0 Access: R/W Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
+// Bits: [1:0] BitName: WATTACC Reset: 0x0 Access: R/W Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
 
 #define CONFIG3_16 0x493 //Reset: 0x0000 Access: R/W Description: Configuraiton Register 3
-// Bits: [15:5] BitName: RESERVED Description: Reserved
-// Bits: [4:2] BitName: PEAKSEL Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
-// Bits: [1:0] BitName: RESERVED Description: Reserved
+// Bits: [15:5] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [4:2] BitName: PEAKSEL Reset: 0x0 Access: R/W Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
+// Bits: [1:0] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
 
 #define CF1DEN_16 0x494 //Reset: 0xFFFF Access: R/W Description: CF1 denominator register
 #define CF2DEN_16 0x495 //Reset: 0xFFFF Access: R/W Description: CF2 denominator register
@@ -532,58 +532,58 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define ZXTHRSH_16 0x499 //Reset: 0x0009 Access: R/W Description: Voltage channel zero-crossing threshold register.
 
 #define ZX_LP_SEL_16 0x49A //Reset: 0x001E Access: R/W Description: This register selects which zero crossing and which line period measurement are used for other calculations.
-// Bits: [15:5] BitName: RESERVED Description: Reserved
-// Bits: [4:3] BitName: LP_SEL Description: Selects line period measurement used for resampling. Setting: 00 APERIOD, line period measurement from Phase A voltage. Setting: 01 for BPERIOD, line period measurement from Phase B voltage. Setting: 10 for CPERIOD, line period measurement from Phase C voltage. Setting: 11 for COM_PERIOD, line period measurement on combined signal from VA, VB, and VC.
-// Bits: [2:1] BitName: ZX_SEL Description: Selects the zero-crossing signal, which can be routed to CF3/ZX output pin and which is used for line cycle energy accumulation. Setting: 00 for ZXVA, Phase A voltage zero-crossing signal. Setting: 01 ZXVB, Phase B voltage zero-crossing signal.  Setting: 10 for ZXVC, Phase C voltage zero-crossing signal. Setting: 11 for ZXCOMB, zero crossing on combined signal from VA,VB and VC.
-// Bits: 0 BitName: RESERVED Description: Reserved
+// Bits: [15:5] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [4:3] BitName: LP_SEL Reset: 0x3 Access: R/W Description: Selects line period measurement used for resampling. Setting: 00 APERIOD, line period measurement from Phase A voltage. Setting: 01 for BPERIOD, line period measurement from Phase B voltage. Setting: 10 for CPERIOD, line period measurement from Phase C voltage. Setting: 11 for COM_PERIOD, line period measurement on combined signal from VA, VB, and VC.
+// Bits: [2:1] BitName: ZX_SEL Reset: 0x3 Access: R/W Description: Selects the zero-crossing signal, which can be routed to CF3/ZX output pin and which is used for line cycle energy accumulation. Setting: 00 for ZXVA, Phase A voltage zero-crossing signal. Setting: 01 ZXVB, Phase B voltage zero-crossing signal.  Setting: 10 for ZXVC, Phase C voltage zero-crossing signal. Setting: 11 for ZXCOMB, zero crossing on combined signal from VA,VB and VC.
+// Bits: 0 BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
 
 #define SEQ_CYC_16 0x49C //Reset: 0x00FF Access: R/W Description: Number of line cycles used for phase sequence detection. It is recommended to set this register to 1.
 #define PHSIGN_16 0x49D //Reset: 0x0000 Access: Read only Description: Power sign register
-// Bits: [15:10] Bitname: RESERVED Description: Reserved
-// Bits: 9 BitName: SUM4SIGN Description: Sign of the sum of the powers included in the CF4 datapath. The CF4 energy is positive if this bit is clear and negative if this bit is set.
-// Bits: 8 BitName: SUM3SIGN Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
-// Bits: 7 BitName: SUM2SIGN Description: Sign of the sum of the powers included in the CF2 datapath. The CF2 energy is positive if this bit is clear and negative if this bit is set.
-// Bits: 6 BitName: SUM1SIGN Description: Sign of the sum of the powers included in the CF1 datapath. The CF1 energy is positive if this bit is clear and negative if this bit is set.
-// Bits: 5 BitName: CVARSIGN Description: Phase C reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
-// Bits: 4 BitName: CWSIGN Description: Phase C active power sign bit
-// Bits: 3 BitName: BVARSIGN Description: Phase B reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
-// Bits: 2 BitName: BWSIGN Description: Phase B active power sign bit.
-// Bits: 1 BitName: AVARSIGN Description: Phase A reactive power sign bit.  The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
-// Bits: 0 BitName: AWSIGN Description: Phase A active power sign bit
+// Bits: [15:10] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 9 BitName: SUM4SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF4 datapath. The CF4 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 8 BitName: SUM3SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 7 BitName: SUM2SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF2 datapath. The CF2 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 6 BitName: SUM1SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF1 datapath. The CF1 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 5 BitName: CVARSIGN Reset: 0x0 Access: R Description: Phase C reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 4 BitName: CWSIGN Reset: 0x0 Access: R Description: Phase C active power sign bit
+// Bits: 3 BitName: BVARSIGN Reset: 0x0 Access: R Description: Phase B reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 2 BitName: BWSIGN Reset: 0x0 Access: R Description: Phase B active power sign bit.
+// Bits: 1 BitName: AVARSIGN Reset: 0x0 Access: R Description: Phase A reactive power sign bit.  The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 0 BitName: AWSIGN Reset: 0x0 Access: R Description: Phase A active power sign bit
 #define 0x4A0 WFB_CFG_16 //Reset: 0x0000 Access: R/W Description: Waveform buffer configuration register
-// Bits: [15:13] Bitname: RESERVED Description: Reserved
-// Bits: 12 BitName: WF_IN_EN Description: This setting determines whether the IN waveform samples are read out of the waveform buffer through SPI. 0: IN waveform samples are not read out of waveform buffer through SPI. 1: IN waveform samples are read out of waveform buffer through SPI
-// Bits: [11:10] BitName: RESERVED Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
-// Bits: [9:8] BitName: WF_SRC Description: Waveform buffer souce and DREADY, data ready update rate, selection. 00: Sinc4 output, at 16kSPS. 01: Reserved. 10: Sinc4 + IIR LPF output, at 4 kSPS. 11: Current and voltage channel waveform samples, processed by the DSP (xl_PCF, xV_PCF) at 4 kSPS.
-// Bits: [7:6] BitName: WF_MODE Description: fixed data rate waveforms filling and trigger based modes. 00: stop when waveform buffer is full. 01: continuous fill-stop only on enabled trigger events. 10: Continuous filling-center capture around enabled trigger events. 11: continuous fill-save event address of enabled trigger events
-// Bits: 5 BitName: WF_CAP_SEL Description: This bit selects whether the waveform buffer is filled with resampled data or fixed data rate data, selected in the WF_CAP_SEL bits. 0: resampled data. 1: fixed data rate data
-// Bits: 4 BitName: WF_CAP_EN Description: When this bit is set, waveform capture is started. 0: the waveform capture is disabled. the waveform buffer contents are maintained. 1: the waveform capture is started, according to the type of capture in WF_CAP_SEL and the WF_SRC bits when this bit goes from a 0 to a 1.
-// Bits: [3:0] BitName: BURST_CHAN Description: selects which data to read out of the waveform buffer through SPI. 0000: all channels. 0001: IA and VA. 0010: IB and VB. 0011: IC and VC. 1000: IA. 1001: VA. 1010: IB. 1011:VB 1100:IC. 1101:VC. 1110:In if WF_IN_EN =1 in the WFB_CFG registers. 1111: single address read (SPI burst read mode is disabled)
+// Bits: [15:13] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 12 BitName: WF_IN_EN Reset: 0x0 Access: R/W Description: This setting determines whether the IN waveform samples are read out of the waveform buffer through SPI. 0: IN waveform samples are not read out of waveform buffer through SPI. 1: IN waveform samples are read out of waveform buffer through SPI
+// Bits: [11:10] BitName: RESERVED Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: [9:8] BitName: WF_SRC Reset: 0x0 Access: R/W Description: Waveform buffer souce and DREADY, data ready update rate, selection. 00: Sinc4 output, at 16kSPS. 01: Reserved. 10: Sinc4 + IIR LPF output, at 4 kSPS. 11: Current and voltage channel waveform samples, processed by the DSP (xl_PCF, xV_PCF) at 4 kSPS.
+// Bits: [7:6] BitName: WF_MODE Reset: 0x0 Access: R/W Description: fixed data rate waveforms filling and trigger based modes. 00: stop when waveform buffer is full. 01: continuous fill-stop only on enabled trigger events. 10: Continuous filling-center capture around enabled trigger events. 11: continuous fill-save event address of enabled trigger events
+// Bits: 5 BitName: WF_CAP_SEL Reset: 0x0 Access: R/W Description: This bit selects whether the waveform buffer is filled with resampled data or fixed data rate data, selected in the WF_CAP_SEL bits. 0: resampled data. 1: fixed data rate data
+// Bits: 4 BitName: WF_CAP_EN Reset: 0x0 Access: R/W Description: When this bit is set, waveform capture is started. 0: the waveform capture is disabled. the waveform buffer contents are maintained. 1: the waveform capture is started, according to the type of capture in WF_CAP_SEL and the WF_SRC bits when this bit goes from a 0 to a 1.
+// Bits: [3:0] BitName: BURST_CHAN Reset: 0x0 Access: R/W Description: selects which data to read out of the waveform buffer through SPI. 0000: all channels. 0001: IA and VA. 0010: IB and VB. 0011: IC and VC. 1000: IA. 1001: VA. 1010: IB. 1011:VB 1100:IC. 1101:VC. 1110:In if WF_IN_EN =1 in the WFB_CFG registers. 1111: single address read (SPI burst read mode is disabled)
 #define WFB_PG_IRQEN_16 0x4A1 //Reset: 0x0000 Access: R/W Description: This register enables interrupts to occur after specific pages of the waveform buffer have been filled.
 #define WFB_TRG_CFG_16 0x4A2 //Reset: 0x0000 Access: R/W Description: This register enables events to trigger a capture in the waveform buffer
-// Bits: [15:11] Bitname: RESERVED Description: Reserved
-// Bits: 10 Bitname: TRIG_FORCE Description: Set this bit to trigger an even to stop the waveform buffer filling
-// Bits: 9 Bitname: ZXCOMB Description: Zero crossing on combined signal from VA, VB, and VC
-// Bits: 8 Bitname: ZXVC Description: Phase C voltage zero crossing.
-// Bits: 7 Bitname: ZXVB Description: Phase B voltage zero crossing.
-// Bits: 6 Bitname: ZXVA Description: Phase A voltage zero crossing.
-// Bits: 5 Bitname: ZXIC Description: Phase C current zero crossing.
-// Bits: 4 Bitname: ZXIB Description: Phase B current zero crossing.
-// Bits: 3 Bitname: ZXIA Description: Phase A current zero crossing.
-// Bits: [2:0] Bitname: RESERVED Description: Reserved
+// Bits: [15:11] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 10 Bitname: TRIG_FORCE Reset: 0x0 Access: R/W Description: Set this bit to trigger an even to stop the waveform buffer filling
+// Bits: 9 Bitname: ZXCOMB Reset: 0x0 Access: R/W Description: Zero crossing on combined signal from VA, VB, and VC
+// Bits: 8 Bitname: ZXVC Reset: 0x0 Access: R/W Description: Phase C voltage zero crossing.
+// Bits: 7 Bitname: ZXVB Reset: 0x0 Access: R/W Description: Phase B voltage zero crossing.
+// Bits: 6 Bitname: ZXVA Reset: 0x0 Access: R/W Description: Phase A voltage zero crossing.
+// Bits: 5 Bitname: ZXIC Reset: 0x0 Access: R/W Description: Phase C current zero crossing.
+// Bits: 4 Bitname: ZXIB Reset: 0x0 Access: R/W Description: Phase B current zero crossing.
+// Bits: 3 Bitname: ZXIA Reset: 0x0 Access: R/W Description: Phase A current zero crossing.
+// Bits: [2:0] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
 #define 0x4A3 WFB_TRG_STAT_16 //Reset: 0x0000 Access: R/W Description: This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
-// Bits: [15:12] Bitname: WFB_LAST_PAGE Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
-// Bits: 11 Bitname: RESERVED Description: Reserved
-// Bits: [10:0]  Bitname: UPERIOD_SEL Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
+// Bits: [15:12] Bitname: WFB_LAST_PAGE Reset: 0x0 Access: R/W Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
+// Bits: 11 Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [10:0]  Bitname: UPERIOD_SEL Reset: 0x0 Access: R Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
 #define CONFIG5_16 0x4A4 //Reset: 0x0063 Access: R/W Description: Reset: 0x0063 Access: R/W Description: Configuration Register 5
 #define CRC_RSLT_16 0x4A8 //Reset: 0x0000 Access: R Description: This register holds the CRC of configuration registers.
 #define CRC_SPI_16 0x4A9 //Reset: 0x0000 Access: R Description: This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
 #define LAST_DATA_16 0x4AC //Reset: 0x0000 Access: R Description: This register holds the data read or written during the last 16-bit transaction on the SPI port.
 #define LAST_CMD_16 0x4AE //Reset: 0x0000 Access: R Description: This register holds the address and read/write operation request (CMD_HDR) for the last transaction on the SPI port.
 #define CONFIG2_16 0x4AF //Reset: 0x0C00 Access: R/W Description: Configuration Register 2
-// Bits [15:13] Bitname: RESERVED Description: Reserved
-// Bits 12 Bitname: UPERIOD_SEL Description: Set this bit to use a user configured line period, in USER_PERIOD, for the resampling calculation. If this bit is clear, the phase voltage line period selected by the LP_SEL[1:0] bits in the ZX_LP_SEL register is used.
-// Bits [11:9] Bitname: HPF_CRN Description: High-Pass filter corner (f3dB) enabled when the HPFDIS is bit in the CONFIGO register=0
+// Bits [15:13] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits 12 Bitname: UPERIOD_SEL Reset: 0x0 Access: R/W Description: Set this bit to use a user configured line period, in USER_PERIOD, for the resampling calculation. If this bit is clear, the phase voltage line period selected by the LP_SEL[1:0] bits in the ZX_LP_SEL register is used.
+// Bits [11:9] Bitname: HPF_CRN Reset: 0x6 Access: R/W Description: High-Pass filter corner (f3dB) enabled when the HPFDIS is bit in the CONFIGO register=0
 //000 38.695 Hz.
 //001 19.6375 Hz.
 //010 9.895 Hz.
@@ -592,9 +592,9 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 //101 1.2475 Hz.
 //110 0.625 Hz.
 //111 0.3125 Hz.
-// Bits [8:0] Bitname: RESERVED Description: Reserved.
+// Bits [8:0] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved.
 #define EP_CFG_16 0x4B0 //Reset: 0x0000 Access: R/W Description: Energy and power accumulation configuration
-// Bits [15:13] Bitname: NOLOAD_TMR Description: This register configures how many 4 kSPS samples to evaluate the no load condition convert
+// Bits [15:13] Bitname: NOLOAD_TMR Reset: 0x0 Access: R/W Description: This register configures how many 4 kSPS samples to evaluate the no load condition convert
 //000 64.
 //001 128.
 //010 256.
@@ -604,43 +604,43 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 //110 4096.
 //111 Disable no load threshold.
 
-// Bits [12:8] Bitname: RESERVED Description: Reserved
-// Bits 7 Bitname: PWR_SIGN_SEL Description: Selects whether the REVRPx bit follows the sign of the total or fundamental reactive power. 0: Total reactive power. 1: Fundamental reactive power
-// Bits 6 Bitname: RESERVED  Description: Reserved
-// Bits 5 Bitname: RD_RST_EN Description: Set this bit to enable the energy register read with reset feature. If this bit is set, when one of the xWATTHR, xVAHR, xVARHR and xFVARHR register is read, it is reset and begins accumulating energy from zero.
-// Bits 4 Bitname: EGY_LD_ACCUM Description: If this bit = 0, the internal energy register is added to the user accessible energy register. If the bit is set, the internal energy register overwrites the user accessible energy register when the EGYRDY event occurs.
-// Bits [3:2] Bitname: RESERVED Description: Reserved
-// Bits 1 Bitname: EGY_TMR_MODE Description: This bit determines whether energy is accumulated based on the number of 4 kSPS samples or zero crossing events configured in the EGY_TIME register
+// Bits [12:8] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits 7 Bitname: PWR_SIGN_SEL Reset: 0x0 Access: R/W Description: Selects whether the REVRPx bit follows the sign of the total or fundamental reactive power. 0: Total reactive power. 1: Fundamental reactive power
+// Bits 6 Bitname: RESERVED  Reset: 0x0 Access: R Description: Reserved
+// Bits 5 Bitname: RD_RST_EN Reset: 0x0 Access: R/W Description: Set this bit to enable the energy register read with reset feature. If this bit is set, when one of the xWATTHR, xVAHR, xVARHR and xFVARHR register is read, it is reset and begins accumulating energy from zero.
+// Bits 4 Bitname: EGY_LD_ACCUM Reset: 0x0 Access: R/W Description: If this bit = 0, the internal energy register is added to the user accessible energy register. If the bit is set, the internal energy register overwrites the user accessible energy register when the EGYRDY event occurs.
+// Bits [3:2] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits 1 Bitname: EGY_TMR_MODE Reset: 0x0 Access: R/W Description: This bit determines whether energy is accumulated based on the number of 4 kSPS samples or zero crossing events configured in the EGY_TIME register
         // 0 Accumulate energy based on 4 kSPS samples.
         // 1 Accumulate energy based on the zero crossing selected by the ZX_SEL bits in the ZX_LP_SEL register.
-// Bits 0 Bitname: EGY_PWR_EN Description: Set this bit to enable the energy and power accumulator, when the run bit is also set.
+// Bits 0 Bitname: EGY_PWR_EN Reset: 0x0 Access: R/W Description: Set this bit to enable the energy and power accumulator, when the run bit is also set.
 
 #define PWR_TIME_16 0x4B1 //Reset: 0x00FF Access: R/W Description: POwer and time configuration
 #define EGY_TIME_16 0x4B2 //Reset: 0x00FF Access: R/W Description: Energy accumulation update time configuration
 #define CRC_FORCE_16 0x4B4 //Reset: 0x0000 Access: R/W Description: This register forces an update of the CRC of configuration registers.
-// Bits [15:1] Bitname: RESERVED Description: RESERVED
-// Bits 0 Bitname: FORCE_CRC_UPDATE Description: Write this bit to force the configuration register CRC calculation to start. When the calculation is complete, the CRC_DONE bit is set in the STATUS1 register
+// Bits [15:1] Bitname: RESERVED Reset: 0x0 Access: R Description: RESERVED
+// Bits 0 Bitname: FORCE_CRC_UPDATE Reset: 0x0 Access: R/W Description: Write this bit to force the configuration register CRC calculation to start. When the calculation is complete, the CRC_DONE bit is set in the STATUS1 register
 
 #define CRC_OPTEN_16 0x4B5 //Reset: 0x0000 Access: R/W Description: This register selects which registers are optionally included in the configuration register CRC feature
-// Bits: 15 CRC_WFB_TRG_CFG_EN - Set this bit to include the WFB_TRG_CFG register in the configuration register CRC calculation.
-// Bits: 14 CRC_WFB_PG_IRQEN - Set this bit to include the WFB_PG_IRQEN register in the configuration register CRC calculation.
-// Bits: 13 CRC_WFB_CFG_EN - Set this bit to include the WFB_CFG register in the configuration register CRC calculation.
-// Bits: 12 CRC_SEQ_CYC_EN - Set this bit to include the SEQ_CYC register in the configuration register CRC calculation.
-// Bits: 11 CRC_ZXLPSEL_EN - Set this bit to include the ZX_LP_SEL register in the configuration register CRC calculation.
-// Bits: 10 CRC_ZXTOUT_EN - Set this bit to include the CRC_ZXTOUT_EN register in the configuration register CRC calculation.
-// Bits: 9 CRC_APP_NL_LVL_EN - Set this bit to include the APP_NL_LVL register in the configuration register CRC calculation.
-// Bits: 8 CRC_REACT_NL_LVL_EN - Set this bit to include the REACT_NL_LVL register in the configuration register CRC calculation.
-// Bits: 7 CRC_ACT_NL_LVL_EN - Set this bit to include the ACT_NL_LVL register in the configuration register CRC calculation.
-// Bits: [6:3] RESERVED - Reserved.
-// Bits: 2 CRC_EVENT_MASK_EN -Set this bit to include the EVENT_MASK register in the configuration register CRC calculation.
-// Bits: 1 CRC_MASK1_EN - Set this bit to include the MASK1 register in the configuration register CRC calculation.
-// Bits: 0 CRC_MASK0_EN - Set this bit to include the MASK0 register in the configuration register CRC calculation.
+// Bits: 15 CRC_WFB_TRG_CFG_EN Reset: 0x0 Access: R/W Description: Set this bit to include the WFB_TRG_CFG register in the configuration register CRC calculation.
+// Bits: 14 CRC_WFB_PG_IRQEN Reset: 0x0 Access: R/W Description: Set this bit to include the WFB_PG_IRQEN register in the configuration register CRC calculation.
+// Bits: 13 CRC_WFB_CFG_EN Reset: 0x0 Access: R/W Description: Set this bit to include the WFB_CFG register in the configuration register CRC calculation.
+// Bits: 12 CRC_SEQ_CYC_EN Reset: 0x0 Access: R/W Description: Set this bit to include the SEQ_CYC register in the configuration register CRC calculation.
+// Bits: 11 CRC_ZXLPSEL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the ZX_LP_SEL register in the configuration register CRC calculation.
+// Bits: 10 CRC_ZXTOUT_EN Reset: 0x0 Access: R/W Description: Set this bit to include the CRC_ZXTOUT_EN register in the configuration register CRC calculation.
+// Bits: 9 CRC_APP_NL_LVL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the APP_NL_LVL register in the configuration register CRC calculation.
+// Bits: 8 CRC_REACT_NL_LVL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the REACT_NL_LVL register in the configuration register CRC calculation.
+// Bits: 7 CRC_ACT_NL_LVL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the ACT_NL_LVL register in the configuration register CRC calculation.
+// Bits: [6:3] RESERVED Reset: 0x0 Access: R Description: Reserved.
+// Bits: 2 CRC_EVENT_MASK_EN Reset: 0x0 Access: R/W Description: Set this bit to include the EVENT_MASK register in the configuration register CRC calculation.
+// Bits: 1 CRC_MASK1_EN Reset: 0x0 Access: R/W Description: Set this bit to include the MASK1 register in the configuration register CRC calculation.
+// Bits: 0 CRC_MASK0_EN Reset: 0x0 Access: R/W Description: Set this bit to include the MASK0 register in the configuration register CRC calculation.
 
 
 #define PSM2_CFG_16 0x4B8 //Reset: 0x001F Access: R/W
 /* This register configures settings for the low power PSM2 operating mode. This register value is retained in PSM2 and PSM3 but is rewritten to its default value when entering PSM0 and PSM1. */
-// Bits: [15:9] - Reserved
-// Bits: [8:5] - PKDET_LVL //These bits configure the PSM2 low power comparator peak current detection Level, listed as the input signal level with respect to full scale. The register value is retained in PSM2 and PSM3. It returns to its default value if PSM0 is entered.
+// Bits: [15:9] Reset: 0x0 Access: R Description: Reserved
+// Bits: [8:5] Reset: 0x0 Access: R/W Description: PKDET_LVL //These bits configure the PSM2 low power comparator peak current detection Level, listed as the input signal level with respect to full scale. The register value is retained in PSM2 and PSM3. It returns to its default value if PSM0 is entered.
     // 0000 100:1
     // 0001 200:1
     // 0010 300:1
@@ -657,44 +657,44 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
     // 1101 1400:1
     // 1110 1500:1
     // 1111 1600:1
-// [Bits: 4:0] LPLINE - This register determines the time used to detect 0x1F R/W peak currents in the low power comparator in
+// [Bits: 4:0] LPLINE Reset: 0x1F Access: R/W Description: This register determines the time used to detect 0x1F R/W peak currents in the low power comparator in
 //  PSM2 operating mode. Note that this register
 //  retains its value in PSM2 and PSM3 operating
 //  modes but is reset to its default value upon entering PSM0 or PSM1.
 
 #define PGA_GAIN_16 0x4B9 //Reset: 0x0000 Access: R/W
 /*This register configures the PGA gain for each ADC */
-// Bits: [15:14] RESERVED - Reserved.
-// Bits: [13:12] VC_GAIN - PGA gain for Voltage Channel C ADC. 0x0 R/W
+// Bits: [15:14] RESERVED Reset: 0x0 Access: R Description: Reserved.
+// Bits: [13:12] VC_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel C ADC. 0x0 R/W
     //  00 Gain = 1.
     //  01 Gain = 2.
     //  10 Gain = 4.
     //  11 Gain = 4.
-// Bits: [11:10] VB_GAIN - PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
-// Bits: [9:8] VA_GAIN - PGA gain for Voltage Channel A ADC. See 0x0 R/W VC_GAIN.
-// Bits: [7:6] IN_GAIN - PGA gain for neutral current channel ADC. See 0x0 R/W VC_GAIN.
-// Bits: [5:4] IC_GAIN - PGA gain for Current Channel C ADC. See 0x0 R/W VC_GAIN.
-// Bits: [3:2] IB_GAIN - PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
-// Bits: [1:0] IA_GAIN - PGA gain for Current Channel A ADC. See 0x0 R/W VC_GAIN.
+// Bits: [11:10] VB_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
+// Bits: [9:8] VA_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel A ADC. See 0x0 R/W VC_GAIN.
+// Bits: [7:6] IN_GAIN Reset: 0x0 Access: R/W Description: PGA gain for neutral current channel ADC. See 0x0 R/W VC_GAIN.
+// Bits: [5:4] IC_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Current Channel C ADC. See 0x0 R/W VC_GAIN.
+// Bits: [3:2] IB_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
+// Bits: [1:0] IA_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Current Channel A ADC. See 0x0 R/W VC_GAIN.
 
 #define 0x4BA CHNL_DIS_16 //Reset: 0x0000 Access: R/W
 /* This register can be disables the ADCs individually */
-// Bits: [15:7] RESERVED - Reserved.
-// Bits: 6 VC_DISAD - Set this bit to one to disable the ADC.
-// Bits: 5 VB_DISADC - Set this bit to one to disable the ADC.
-// Bits: 4 VA_DISADC - Set this bit to one to disable the ADC.
-// Bits: 3 IN_DISADC  - Set this bit to one to disable the ADC.
-// Bits: 2 IC_DISADC  - Set this bit to one to disable the ADC.
-// Bits: 1 IB_DISADC  - Set this bit to one to disable the ADC.
-// Bits: 0 IA_DISADC - Set this bit to one to disable the ADC.
+// Bits: [15:7] RESERVED Reset: 0x0 Access: R Description: Reserved.
+// Bits: 6 VC_DISAD Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 5 VB_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 4 VA_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 3 IN_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 2 IC_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 1 IB_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 0 IA_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
 
 
 #define WR_LOCK_16 0x4BF //Reset: 0x0000 Access: R/W
 /* This register enables the configuration lock feature */
 #define VAR_DIS_16 0x4E0 //Reset: 0x0000 Access: R/W
 /* Enable/disable total reactive power calculation */
-// [15:1] - Reserved - Reserved.
-// 0 - VARDIS - Set this bit to disable the total VAR calculation. This 0x0 R/W bit must be set before writing the run bit for proper operation.
+// [15:1] - Reserved Reset: 0x0 Access: R Description: Reserved.
+// 0 - VARDIS Reset: 0x0 Access: R/W Description: Set this bit to disable the total VAR calculation. This 0x0 R/W bit must be set before writing the run bit for proper operation.
 
 #define RESERVED1_16 0x4F0 //Reset: 0x0000 Access: R
 /* This register is reserved */
