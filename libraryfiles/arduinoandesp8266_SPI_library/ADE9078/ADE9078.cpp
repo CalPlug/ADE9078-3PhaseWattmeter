@@ -359,53 +359,54 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 1 - REVAPA Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase A total active power has changed sign.
 // Bits: 0 - EGYRDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power values in the xWATTHR, xVAHR, xVARHR, and xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
 
+
 #define MASK1_32 0x406 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 1.
-// Bits: 31 - ERROR3 - Set this bit to enable an interrupt if ERROR3 occurs. Issue a software reset or hardware reset to clear this error.
-// Bits: 30 - ERROR2 - Set this bit to enable an interrupt if ERROR2 occurs.
-// Bits: 29 - ERROR1 - This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
-// Bits: 28 - ERROR0 - This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
-// Bits: 27 - CRC_DONE - Set this bit to enable an interrupt when the configuration register CRC calculation is done, after initiated by writing the FORCE_CRC_UPDATE bit in the CRC_FORCE register.
-// Bits: 26 - CRC_CHG - Set this bit to enable an interrupt if any of the registers monitored by the configuration register CRC change value. The CRC_RSLT register holds the new configuration register CRC value.
-// Bits: [25:19] - RESERVED - Reserved.
-// Bits: 18 - SEQERR - Set this bit to set an interrupt when on a phase sequence error on the phase voltage zero crossings.
-// Bits: [17:16] - RESERVED - Reserved.
-// Bits: 15 - ZXIC - Set this bit to set an interrupt when a zero crossing has been detected on the Phase C current channel.
-// Bits: 14 - ZXIB - Set this bit to set an interrupt when a zero crossing has been detected on the Phase B current channel.
-// Bits: 13 - ZXIA - Set this bit to set an interrupt when a zero crossing has been detected on the Phase A current channel.
-// Bits: 12 - ZXCOMB - Set this bit to set an interrupt when a zero crossing has been detected on the combined signal from VA, VB, and VC.
-// Bits: 11 - ZXVC - Set this bit to set an interrupt when a zero crossing has been detected on the Phase C voltage channel.
-// Bits: 10 - ZXVB - Set this bit to set an interrupt when a zero crossing has been detected on the Phase B voltage channel.
-// Bits: 9 - ZXVA - Set this bit to set an interrupt when a zero crossing has been detected on the Phase A voltage channel.
-// Bits: 8 - ZXTOVC - Set this bit to set an interrupt when there is a zero crossing timeout on Phase C. This means that a zero crossing on the Phase C voltage is missing.
-// Bits: 7 - ZXTOVB - Set this bit to set an interrupt when there is a zero crossing timeout on Phase B. This means that a zero crossing on the Phase B voltage is missing
-// Bits: 6 - ZXTOVA - Set this bit to set an interrupt when there is a zero crossing timeout on Phase A. This means that a zero crossing on the Phase A voltage is missing.
-// Bits: 5 - RESERVED - Reserved.
-// Bits: 4 - RFNOLOAD - Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
-// Bits: 3 - RESERVED - Reserved.
-// Bits: 2 - VANLOAD - Set this bit to set an interrupt when one or more phase total apparent energy enters or exits the no load condition.
-// Bits: 1 - RNLOAD - Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
-// Bits: 0 - ANLOAD - Set this bit to set an interrupt when one or more phase total active energy enters or exits the no load condition.
+// Bits: 31 - ERROR3 - Reset: 0x0 Access: R/W Description: Set this bit to enable an interrupt if ERROR3 occurs. Issue a software reset or hardware reset to clear this error.
+// Bits: 30 - ERROR2 - Reset: 0x0 Access: R/W Description: Set this bit to enable an interrupt if ERROR2 occurs.
+// Bits: 29 - ERROR1 - Reset: 0x0 Access: R/W Description: This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
+// Bits: 28 - ERROR0 - Reset: 0x0 Access: R/W Description: This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
+// Bits: 27 - Reset: 0x0 Access: R/W Description: CRC_DONE - Set this bit to enable an interrupt when the configuration register CRC calculation is done, after initiated by writing the FORCE_CRC_UPDATE bit in the CRC_FORCE register.
+// Bits: 26 - Reset: 0x0 Access: R/W Description: CRC_CHG - Set this bit to enable an interrupt if any of the registers monitored by the configuration register CRC change value. The CRC_RSLT register holds the new configuration register CRC value.
+// Bits: [25:19] - RESERVED Reset: 0x0 Access: Read only Description: Reserved.
+// Bits: 18 - SEQERR - Reset: 0x0 Access: R/W Description: Set this bit to set an interrupt when on a phase sequence error on the phase voltage zero crossings.
+// Bits: [17:16] - RESERVED Reset: 0x0 Access: Read only Description: Reserved.
+// Bits: 15 - ZXIC - Reset: 0x0 Access: R/W Description: Set this bit to set an interrupt when a zero crossing has been detected on the Phase C current channel.
+// Bits: 14 - ZXIB - Reset: 0x0 Access: R/W Description: Set this bit to set an interrupt when a zero crossing has been detected on the Phase B current channel.
+// Bits: 13 - ZXIA - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase A current channel.
+// Bits: 12 - ZXCOMB - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the combined signal from VA, VB, and VC.
+// Bits: 11 - ZXVC - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase C voltage channel.
+// Bits: 10 - ZXVB - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase B voltage channel.
+// Bits: 9 - ZXVA - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase A voltage channel.
+// Bits: 8 - ZXTOVC - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when there is a zero crossing timeout on Phase C. This means that a zero crossing on the Phase C voltage is missing.
+// Bits: 7 - ZXTOVB - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when there is a zero crossing timeout on Phase B. This means that a zero crossing on the Phase B voltage is missing
+// Bits: 6 - ZXTOVA - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when there is a zero crossing timeout on Phase A. This means that a zero crossing on the Phase A voltage is missing.
+// Bits: 5 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 4 - RFNOLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
+// Bits: 3 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 2 - Reset: 0x0 Access: R/W Description:  VANLOAD - Set this bit to set an interrupt when one or more phase total apparent energy enters or exits the no load condition.
+// Bits: 1 - Reset: 0x0 Access: R/W Description:  RNLOAD - Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
+// Bits: 0 - Reset: 0x0 Access: R/W Description:  ANLOAD - Set this bit to set an interrupt when one or more phase total active energy enters or exits the no load condition.
 
 #define EVENT_MASK_32 0x407 //Reset: 0x00000000 Access: Read only Description: Event enable register.
-// [31:17] - RESERVED - Reserved.
-// Bits: 16 - DREADY - Set this bit to enable the EVENT pin to go low when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
-// Bits: 15 - RESERVED - Reserved.
-// Bits: 14 - RFNOLOAD - Set this bit to enable the EVENT pin to go low when one or more phases of fundamental reactive energy accumulation goes into no load.
-// Bits: 13 - RESERVED - Reserved.
-// Bits: 12 - VANLOAD - Set this bit to enable the EVENT pin to go low when one or more phases of total apparent energy accumulation goes into no load.
-// Bits: 11 - RNLOAD - Set this bit to enable the EVENT pin to go low when one or more phases of total reactive energy accumulation goes into no load.
-// Bits: 10 - ANLOAD - Set this bit to enable the EVENT pin to go low when one or more phases of total active energy accumulation goes into no load.
-// Bits: 9 - REVPSUM4 - Set this bit to enable the EVENT pin to go low to indicate if the last CF4 pulse was from negative energy. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low.
-// Bits: 8 - REVPSUM3 - Set this bit to enable the EVENT pin to go low to indicate if the last CF3 pulse was from negative energy. This bit is updated when a CF3 pulse is output, when the CF3 pin goes from high to low.
-// Bits: 7 - REVPSUM2 - Set this bit to enable the EVENT pin to go low to indicate if the last CF2 pulse was from negative energy. This bit is updated when a CF2 pulse is output, when the CF2 pin goes from high to low.
-// Bits: 6 - REVPSUM1 - Set this bit to enable the EVENT pin to go low to indicate if the last CF1 pulse was from negative energy. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
-// Bits: [5:0] - RESERVED - Reserved.
+// [31:17] - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 16 - DREADY - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 15 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 14 - RFNOLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of fundamental reactive energy accumulation goes into no load.
+// Bits: 13 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 12 - VANLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of total apparent energy accumulation goes into no load.
+// Bits: 11 - RNLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of total reactive energy accumulation goes into no load.
+// Bits: 10 - ANLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of total active energy accumulation goes into no load.
+// Bits: 9 - REVPSUM4 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF4 pulse was from negative energy. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low.
+// Bits: 8 - REVPSUM3 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF3 pulse was from negative energy. This bit is updated when a CF3 pulse is output, when the CF3 pin goes from high to low.
+// Bits: 7 - REVPSUM2 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF2 pulse was from negative energy. This bit is updated when a CF2 pulse is output, when the CF2 pin goes from high to low.
+// Bits: 6 - REVPSUM1 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF1 pulse was from negative energy. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
+// Bits: [5:0] - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
 
 #define USER_PERIOD_32 0x40E //Reset: 0x00500000 Access: R/W Description: User configured line period value used for resampling when the UPERIOD_SEL bit in the CONFIG2 register is set.
 
 #define VLEVEL_32 0x40F //Reset: 0x00045D45 Access: R/W Description: Register used in the algorithm that computes the fundamental reactive power
-// Bits: [31:24] BitName: RESERVED Description: Reserved
-// Bits: [23:0] BitName: VLEVEL_VAL Description: Register used in the algorithm that computes the fundamental reactive power.
+// Bits: [31:24] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [23:0] BitName: VLEVEL_VAL - Reset: 0x45D45 Access: R/W Description: Register used in the algorithm that computes the fundamental reactive power.
 
 #define APERIOD_32 0x418 //Reset: 0x00A00000 Access: Read only Description: Line period on Phase A voltage
 #define BPERIOD_32 0x419 //Reset: 0x00A00000 Access: Read only Description: Line period on Phase B voltage
@@ -415,25 +416,27 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define REACT_NL_LVL_32 0x41D //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total and fundamental reactive power datapath.
 #define APP_NL_LVL_32 0x41E //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total apparent power datapath.
 
+
+
 #define PHNOLOAD_32 0x41F //Reset: 0x00000000 Access: Read only Description: Phase no load register.
-// Bits: [31:17] BitName: RESERVED Description: Reserved
-// Bits: 16 BitName: CFVARNL Description: This bit is set if the Phase C fundamental reactive energy is in no load.
-// Bits: 15 BitName: RESERVED Description: Reserved
-// Bits: 14 BitName: CVANL Description: This bit is set if the Phase C total apparent energy is in no load.
-// Bits: 13 BitName: CVARNL Description: This bit is set if the Phase C total reactive energy is in no load.
-// Bits: 12 BitName: CWATTNL Description: This bit is set if the Phase C total active energy is in no load.
-// Bits: 11 BitName: RESERVED Description: Reserved
-// Bits: 10 BitName: BFVARNL Description: This bit is set if the Phase B fundamental reactive energy is in no load.
-// Bits: 9 BitName: RESERVED Description: Reserved
-// Bits: 8 BitName: BVANL Description: This bit is set if the Phase B apparent energy is in no load.
-// Bits: 7 BitName: BVARNL Description: This bit is set if the Phase B total reactive energy is in no load.
-// Bits: 6 BitName: BWATTNL Description: This bit is set if the Phase B total active energy is in no load.
-// Bits: 5 BitName: RESERVED Description: Reserved
-// Bits: 4 BitName: AFVARNL Description: This bit is set if the Phase A fundamental reactive energy is in no load.
-// Bits: 3 BitName: RESERVED Description: Reserved
-// Bits: 2 BitName: AVANL Description: This bit is set if the Phase A total apparent energy is in no load.
-// Bits: 1 BitName: AVARNL Description: This bit is set if the Phase A total reactive energy is in no load.
-// Bits: 0 BitName: AWATTNL Description: This bit is set if the Phase A total active energy is in no load.
+// Bits: [31:17] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 16 BitName: CFVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C fundamental reactive energy is in no load.
+// Bits: 15 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 14 BitName: CVANL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C total apparent energy is in no load.
+// Bits: 13 BitName: CVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C total reactive energy is in no load.
+// Bits: 12 BitName: CWATTNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C total active energy is in no load.
+// Bits: 11 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 10 BitName: BFVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B fundamental reactive energy is in no load.
+// Bits: 9 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 8 BitName: BVANL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B apparent energy is in no load.
+// Bits: 7 BitName: BVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 6 BitName: BWATTNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B total active energy is in no load.
+// Bits: 5 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 4 BitName: AFVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A fundamental reactive energy is in no load.
+// Bits: 3 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 2 BitName: AVANL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A total apparent energy is in no load.
+// Bits: 1 BitName: AVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A total reactive energy is in no load.
+// Bits: 0 BitName: AWATTNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A total active energy is in no load.
 
 #define WTHR_32 0x420 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total active power for the CF calibration pulse output. It is recommended to write WTHR = 0x0010 0000.
 #define VARTHR_32 0x421 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total and fundamental reactive power for the CF calibration pulse output. It is recommended to write VARTHR = 0x0010 0000.
@@ -442,47 +445,47 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define LAST_DATA_32_32 0x423 //Reset: 0x00000000 Access: Read only Description: This register holds the data read or written during the last 32-bittransaction on the SPI port.
 
 #define ADC_REDIRECT_32 0x424 //Reset: 0x001FFFFF Access: R/W Description: This register allows any ADC output to be redirected to any digital datapath.
-// Bits: [31:21] BitName: RESERVED Description: Reserved
-// Bits: [20:18] BitName: VC_DIN Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
-// Bits: [17:15] BitName: VB_DIN Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
-// Bits: [14:12] BitName: VA_DIN Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
-// Bits: [11:9] BitName: IN_DIN Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
-// Bits: [8:6] BitName: IC_DIN Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
-// Bits: [5:3] BitName: IB_DIN Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
-// Bits: [2:0] BitName: IA_DIN Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
+// Bits: [31:21] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [20:18] BitName: VC_DIN - Reset: 0x7 Access: R/W Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
+// Bits: [17:15] BitName: VB_DIN - Reset: 0x7 Access: R/W Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
+// Bits: [14:12] BitName: VA_DIN - Reset: 0x7 Access: R/W Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
+// Bits: [11:9] BitName: IN_DIN - Reset: 0x7 Access: R/W Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
+// Bits: [8:6] BitName: IC_DIN - Reset: 0x7 Access: R/W Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
+// Bits: [5:3] BitName: IB_DIN - Reset: 0x7 Access: R/W Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
+// Bits: [2:0] BitName: IA_DIN - Reset: 0x7 Access: R/W Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
 
 #define CF_LCFG_32 0x425 //Reset: 0x00000000 Access: R/W Description: CF calibration pulse width configuration register.
 // Bits: [31:23] BitName: RESERVED Description: Reserved
-// Bits: 22 BitName: CF4_LT Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: 21 BitName: CF3_LT Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: 20 BitName: CF2_LT Description: If this bit is set, the CF2 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: 19 BitName: CF1_LT Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
-// Bits: [18:0] BitName: CF_LTMR Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
+// Bits: 22 BitName: CF4_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 21 BitName: CF3_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 20 BitName: CF2_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF2 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 19 BitName: CF1_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: [18:0] BitName: CF_LTMR - Reset: 0x0 Access: R/W Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
 
 #define PART_ID_32 0x472 //Reset: 0x00000000 Access: Read only Description: This register identifies the IC. If the ADE9000_ID bit is 0, the IC is an ADE9078
-// Bits: [31:22] BitName: RESERVED Description: Reserved
-// Bits: 21 BitName: Description: This bit is set to identify an ADE73370 IC.
-// Bits: 20 BitName: Description: This bit is set to identify an ADE9000 IC.
-// Bits: [19:17]  BitName: RESERVED Description: Reserved
-// Bits: 16 BitName: Description: This bit is set to identify an ADE9004 IC.
-// Bits: [15:0] BitName: RESERVED Description: Reserved
+// Bits: [31:22] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 21 BitName: AD73370_ID - Reset: 0x0 Access: Read only Description: This bit is set to identify an ADE73370 IC.
+// Bits: 20 BitName: ADE9000_ID - Reset: 0x0 Access: Read only Description: This bit is set to identify an ADE9000 IC.
+// Bits: [19:17]  BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 16 BitName: ADE9004_ID - Reset: 0x0 Access: Read only Description: This bit is set to identify an ADE9004 IC.
+// Bits: [15:0] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
 
 //16-Bit Registers
 #define RUN_16 0x480 //Reset: 0x0000 Access: R/W Description: Write this register to 1 to start the measurements
 
 #define CONFIG1_16 0x481 //Reset: 0x0000 Access: R/W Description: Configuration Register 1.
-// Bits: 15 BitName: EXT_REF Description:
-// Bits: [14:13] BitName: RESERVED Description: Reserved
-// Bits: 12 BitName: IRQ0_ON_IRQ1 Description:
-// Bits: 11 BitName: BURST_EN Description:
-// Bits: 10 BitName: RESERVED Description: Reserved
-// Bits: [9:8] BitName: PWR_SETTLE Description:
-// Bits: [7:6] BitName: RESERVED Description: Reserved
-// Bits: 5 BitName: CF_ACC_CLR Description: Set this bit to clear the acculumation in the digital to frequency converter and CFDEN counter. Note that this bit automatically clears itself.
-// Bits: 4 BitName: RESERVED Description: Reserved
-// Bits: [3:2] BitName: Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
-// Bits: 1 BitName: CF3_CFG Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
-// Bits: 0 BitName: SWRST Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
+// Bits: 15 BitName: EXT_REF - Reset: 0x0 Access: R/W Description:
+// Bits: [14:13] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 12 BitName: IRQ0_ON_IRQ1 - Reset: 0x0 Access: R/W Description:
+// Bits: 11 BitName: BURST_EN - Reset: 0x0 Access: R/W Description:
+// Bits: 10 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [9:8] BitName: PWR_SETTLE - Reset: 0x0 Access: R/W Description:
+// Bits: [7:6] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 5 BitName: CF_ACC_CLR - Reset: 0x0 Access: Write only Description: Set this bit to clear the acculumation in the digital to frequency converter and CFDEN counter. Note that this bit automatically clears itself.
+// Bits: 4 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [3:2] BitName: CF4_CFG - Reset: 0x0 Access: R/W Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
+// Bits: 1 BitName: CF3_CFG - Reset: 0x0 Access: R/W Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
+// Bits: 0 BitName: SWRST - Reset: 0x0 Access: W1 Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
 
 #define ANGL_VA_VB_16 0x482 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase B voltages.
 #define ANGL_VB_VC_16 0x483 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B and Phase C voltages.
@@ -495,10 +498,10 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define ANGL_IA_IC_16 0x48A //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase C current
 
 #define CFMODE_16 0x490 //Reset: 0x0000 Access: R/W Description: CFx configureation register
-// Bits: 15 BitName: CF4DIS Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
-// Bits: 14 BitName: CF3DIS Description: CF1 output disable -- see CF4DIS
-// Bits: 13 BitName: CF2DIS Description: CF1 output disable -- see CF4DIS
-// Bits: 12 BitName: CF1DIS Description: CF1 output disable -- see CF4DIS
+// Bits: 15 BitName: CF4DIS - Reset: 0x0 Access: R/W Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
+// Bits: 14 BitName: CF3DIS - Reset: 0x0 Access: R/W Description: CF1 output disable -- see CF4DIS
+// Bits: 13 BitName: CF2DIS - Reset: 0x0 Access: R/W Description: CF1 output disable -- see CF4DIS
+// Bits: 12 BitName: CF1DIS - Reset: 0x0 Access: R/W Description: CF1 output disable -- see CF4DIS
 // Bits: [11:9] BitName: CF4SEL Reset: 0x0 Access: R/W Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
 // Bits: [8:6] BitName: CF3SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF3 pin --see CF4SEL
 // Bits: [5:3] BitName: CF2SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF2 pin --see CF4SEL
