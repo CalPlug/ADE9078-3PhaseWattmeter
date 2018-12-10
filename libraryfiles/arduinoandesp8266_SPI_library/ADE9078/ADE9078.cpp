@@ -1,5 +1,5 @@
-/*
- ADE7953.cpp - Example library for operating the ADE7953 Single-Phase AC Line measurement IC over SPI for Arduino Uno
+ADE9078/*
+ ADE9078.cpp - Example library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
   Created by Umar Kazmi, Crystal Lai, and Michael J. Klopfer, Ph.D.
   January 23, 2017 - 0.1 (pre-release)
   May 3, 2018 - v6.2 (current version) - by MJK
@@ -9,775 +9,1056 @@
   Released into the public domain with Share-alike licensing.
   Be decent: if our work helped you, then please reference/acknowledge this project and its authors in your work!
 
-  Note: Please refer to the Analog Devices ADE7953 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
+  Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
 */
 
 #include "Arduino.h"
 #include <SPI.h>
-#include "ADE7953.h"
+#include "ADE9078.h"
 //Debug Control:
-//#define ADE7953_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
-
-//******************************************************************************************
+//#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
 
 
-//*****************ADE7953 Register Value Constants*****************//
-//The #define used to save space where functions are not invoked - list of full general commands for ADE7953, not all implemented in current code - put in place as prep for potential extended development.
 
-//8-bit Registers
-#define SAGCYC_8 0x000 //SAGCYC, (R/W) Default: 0x00, Unsigned, Sag lines Cycle
-#define DISNOLOAD_8 0x001 //DISNOLOAD, (R/W) Default: 0x00, Unsigned, No-load detection disable*
-#define LCYCMODE_8 0x004 //LCYCMODE, (R/W) Default: 0x40, Unsigned, Line cycle accumulation mode configuration **
-#define PGA_V_8 0x007 //PGA_V, (R/W) Default: 0x00, Unsigned, Voltage channel gain configuration (Bits[2:0])
-#define PGA_IA_8 0x008 //PGA_IA, (R/W) Default: 0x00, Unsigned, Current Channel A gain configuration (Bits[2:0])
-#define PGA_IB_8 0x009 //PGA_IB, (R/W) Default: 0x00, Unsigned, Current Channel B gain configuration (Bits[2:0])
-#define WRITE_PROTECT_8 0x040 //WRITE_PROTECT, (R/W) Default: 0x00, Unsigned, Write protection bits (Bits[2:0])
-#define LAST_OP_8 0x0FD //LAST_OP, (R/W) Default: 0x00, Unsigned, Contains the type (read or write) of the last successful communication (0x35 read 0xCA = write)
-#define LAST_RWDATA_8 0x0FF //LAST_RWDATA_8, (R/W) Default: 0x00, Unsigned, Contains the data from the last successful 8-bit register communication
-#define Version_8 0x702 //Version, (R/W) Default: N/A, Unsigned, Contains the silicon version number
-#define EX_REF_8 0x800 //EX_REF, (R/W) Default: 0x00, Unsigned, Reference input configuration:0 = internal 1 = external
-
-//*DISNOLOAD register
-//**LCYCMODE register
-
-
-//16-bit Registers
-#define ZXTOUT_16 0x100 //ZXTOUT, (R/W) Default:0xFFFF, Unsigned,Zero-crossing timeout
-#define LINECYC_16 0x101 //LINCYC, (R/W) Default:0x0000, Unsigned,Number of half line cycles for line cycle energy accumulation mode
-#define CONFIG_16 0x102 //CONFIG, (R/W) Default:0x8004, Unsigned,Configuration register***
-#define CF1DEN_16 0x103 //CF1DEN, (R/W) Default:0x003F, Unsigned,CF1 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful.
-#define CF2DEN_16 0x104 //CF2DEN, (R/W) Default:0x003F, Unsigned,CF2 frequency divider denominator. When modifying this register, two sequential write operations must be performed to ensure that the write is successful.
-#define CFMODE_16 0x107 //CFMODE, (R/W) Default:0x0300, Unsigned, CF output selection */
-#define PHCALA_16 0x108 //PHCALA, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel A). This register is in sign magnitude format.
-#define PHCALB_16 0x109 //PHCALB, (R/W) Default:0x0000, Signed,Phase calibration register (Current Channel B). This register is in sign magnitude format.
-#define PFA_16 0x10A //PFA, (R) Default:0x0000, Signed,Power factor (Current Channel A)
-#define PFB_16 0x10B //PFB, (R) Default:0x0000, Signed,Power factor (Current Channel B)
-#define ANGLE_A_16 0x10C //ANGLE_A, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel A input
-#define ANGLE_B_16 0x10D //ANGLE_B, (R) Default:0x0000, Signed,Angle between the voltage input and the Current Channel B input
-#define Period_16 0x11E //Period, (R) Default:0x0000, Unsigned, Period register
-#define ALT_OUTPUT_16 0x110 //ALT_OUTPUT, (R/W) Default:0x0000, Unsigned,Alternative output functions**/
-#define LAST_ADD_16 0x1FE //LAST_ADD, (R) Default:0x0000, Unsigned, Contains the address of the last successful communication
-#define LAST_RWDATA_16 0x1FF //LAST_RWDATA_16, (R) Default:0x0000, Unsigned,Contains the data from the last successful 16-bit register communication
-#define Reserved_16 0x120 //Reserved, (R/W) Default:0x0000, Unsigned,This register should be set to 30h to meet the performance specified in Table 1. To modify this register, it must be unlocked by setting Register Address 0xFE to 0xAD immediately prior. (16 bit)
-
-
-//*** CONFIG register
-//*/ CFMODE register
-//**/ALT_OUTPUT register
-
-
-//24-bit and 32-bit registers
-#define SAGLVL_24 0x200 //SAGLVL, (R/W) Default: 0x000000, Unsigned, Sag Voltage Level (24 bit)
-#define SAGLVL_32 0x300 //SAGLVL, (R/W) Default: 0x000000, Unsigned, Sag Voltage Level (32 bit)
-#define ACCMODE_24 0x201 //ACCMODE, (R/W) Default:0x000000, Unsigned, Accumulation mode(24 bit)
-#define ACCMODE_32 0x301 //ACCMODE, (R/W) Default: 0x000000, Unsigned, Accumulation mode(32 bit)
-#define AP_NOLOAD_24 0x203 //AP_NOLOAD, (R/W) Default: 0x00E419, Unsigned,Active power no-load level(24 bit)
-#define AP_NOLOAD_32 0x303 //AP_NOLOAD, (R/W) Default: 0x00E419, Unsigned,Active power no-load level(32 bit)
-#define VAR_NOLOAD_24 0x204 //VAR_NOLOAD, (R/W) Default: 0x000000, Unsigned,Reactive power no-load level(24 bit)
-#define VAR_NOLOAD_32 0x304 //VAR_NOLOAD, (R/W) Default: 0x000000, Unsigned,Reactive power no-load level(32 bit)
-#define VA_NOLOAD_24 0x205 //VA_NOLOAD, (R/W) Default: 0x000000, Unsigned,Apparent power no-load level(24 bit)
-#define VA_NOLOAD_32 0x305 //VA_NOLOAD, (R/W) Default: 0x000000, Unsigned,Apparent power no-load level(32 bit)
-#define AVA_24 0x210 //AVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel A)(24 bit)
-#define AVA_32 0x310 //AVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel A)(32 bit)
-#define BVA_24 0x211 //BVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel B)(24 bit)
-#define BVA_32 0x311 //BVA, (R) Default: 0x000000, Signed,Instantaneous apparent power (Current Channel B)(32 bit)
-#define AWATT_24 0x212 //AWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel A)(24 bit)
-#define AWATT_32 0x312 //AWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel A)(32 bit)
-#define BWATT_24 0x213 //BWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel B)(24 bit)
-#define BWATT_32 0x313 //BWATT, (R) Default: 0x000000, Signed,Instantaneous active power (Current Channel B)(32 bit)
-#define AVAR_24 0x214 //AVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel A)(24 bit)
-#define AVAR_32 0x314 //AVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel A)(32 bit)
-#define BVAR_24 0x215 //BVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel B)(24 bit)
-#define BVAR_32 0x315 //BVAR, (R) Default: 0x000000, Signed,Instantaneous reactive power (Current Channel B)(32 bit)
-#define IA_24 0x216 //IA, (R) Default: 0x000000, Signed, Instantaneous current (Current Channel A)(24 bit)
-#define IA_32 0x316 //IA, (R) Default: 0x000000, Signed,Instantaneous current (Current Channel A)(32 bit)
-#define IB_24 0x217 //IB, (R) Default: 0x000000, Signed,Instantaneous current (Current Channel B)(24 bit)
-#define IB_32 0x317 //IB, (R) Default: 0x000000, Signed,Instantaneous current (Current Channel B)(32 bit)
-#define V_24 0x218 //V, (R) Default: 0x000000, Signed,Instantaneous voltage (voltage channel)(24 bit)
-#define V_32 0x318 //V, (R) Default: 0x000000, Signed,Instantaneous voltage (voltage channel)(32 bit)
-#define IRMSA_24 0x21A //IRMSA, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel A)(24 bit)
-#define IRMSA_32 0x31A //IRMSA, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel A)(32 bit)
-#define IRMSB_24 0x21B //IRMSB, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel B)(24 bit)
-#define IRMSB_32 0x31B //IRMSB, (R) Default: 0x000000, Unsigned,IRMS register (Current Channel B)(32 bit)
-#define VRMS_24 0x21C //VRMS, (R) Default: 0x000000, Unsigned, VRMS register (24 bit)
-#define VRMS_32 0x31C //VRMS, (R) Default: 0x000000, Unsigned, VRMS register (32 bit)
-
-#define AENERGYA_24 0x21E //AENERYGA, (R) Default: 0x000000, Signed,Active energy (Current Channel A) (24 bit)
-#define AENERGYA_32 0x31E //AENERYGA, (R) Default: 0x000000, Signed,Active energy (Current Channel A)(32 bit)
-#define AENERGYB_24 0x21F //AENERYGB, (R) Default: 0x000000, Signed,Active energy (Current Channel B)(24 bit)
-#define AENERGYB_32 0x31F //AENERYGB, (R) Default: 0x000000, Signed,Active energy (Current Channel B)(32 bit)
-#define RENERGYA_24 0x220 //RENERGYA, (R) Default: 0x000000, Signed,Reactive energy (Current Channel A) (24 bit)
-#define RENERGYA_32 0x320 //RENERGYA, (R) Default: 0x000000, Signed,Reactive energy (Current Channel A)(32 bit)
-#define RENERGYB_24 0x221 //RENERGYB, (R) Default: 0x000000, Signed,Reactive energy (Current Channel B) (24 bit)
-#define RENERGYB_32 0x321 //RENERGYB, (R) Default: 0x000000, Signed,Reactive energy (Current Channel B)(32 bit)
-#define APENERGYA_24 0x222 //APENERGYA, (R) Default: 0x000000, Signed,Apparent energy (Current Channel A) (24 bit)
-#define APENERGYA_32 0x322 //APENERGYA, (R) Default: 0x000000, Signed,Apparent energy (Current Channel A)(32 bit)
-#define APENERGYB_24 0x223 //APENERGYB, (R) Default: 0x000000, Signed,Apparent energy (Current Channel B)(24 bit)
-#define APENERGYB_32 0x323 //APENERGYB, (R) Default: 0x000000, Signed,Apparent energy (Current Channel B)(32 bit)
-#define OVLVL_24 0x224 //OVLVL, (R/W) Default: 0xFFFFFF, Unsigned, Overvoltage level(24 bit)
-#define OVLVL_32 0x324 //OVLVL, (R/W) Default: 0xFFFFFF, Unsigned,Overvoltage level(32 bit)
-
-#define OILVL_24 0x225 //OILVL, (R/W) Default: 0xFFFFFF,Unsigned, Overcurrent level (24 bit)
-#define OILVL_32 0x325 //OILVL, (R/W) Default: 0xFFFFFF, Unsigned,Overcurrent level (32 bit)
-
-#define VPEAK_24 0x226 //VPEAK, (R) Default: 0x000000, Unsigned, Voltage channel peak(24 bit)
-#define VPEAK_32 0x326 //VPEAK, (R) Default: 0x000000, Unsigned,Voltage channel peak(32 bit)
-#define RSTVPEAK_24 0x227 //RSTVPEAK, (R) Default: 0x000000, Unsigned,Read voltage peak with reset (24 bit)
-#define RSTVPEAK_32 0x327 //RSTVPEAK, (R) Default: 0x000000, Unsigned,Read voltage peak with reset(32 bit)
-#define IAPEAK_24 0x228 //IAPEAK, (R) Default: 0x000000, Unsigned,Current Channel A peak(24 bit)
-#define IAPEAK_32 0x328 //IAPEAK, (R) Default: 0x000000, Unsigned,Current Channel A peak(32 bit)
-#define RSTIAPEAK_24 0x229 //RSTIAPEAK, (R) Default: 0x000000, Unsigned, Read Current Channel A peak with reset(24 bit)
-#define RSTIAPEAK_32 0x329 //RSTIAPEAK, (R) Default: 0x000000, Unsigned,Read Current Channel A peak with reset(32 bit)
-#define IBPEAK_24 0x22A //IBPEAK, (R) Default: 0x000000, Unsigned, Current Channel B peak(24 bit)
-#define IBPEAK_32 0x32A //IBPEAK, (R) Default: 0x000000, Unsigned,Current Channel B peak(32 bit)
-#define RSTIBPEAK_24 0x22B //RSTIBPEAK, (R) Default: 0x000000, Unsigned, Read Current Channel B peak with reset(24 bit)
-#define RSTIBPEAK_32 0x32B //RSTIBPEAK, (R) Default: 0x000000, Unsigned,Read Current Channel B peak with reset(32 bit)
-#define IRQENA_24 0x22C //IRQENA, (R/W) Default: 0x100000, Unsigned,Interrupt enable (Current Channel A (24 bit)
-#define IRQENA_32 0x32C //IRQENA, (R/W) Default: 0x100000, Unsigned,Interrupt enable (Current Channel A(32 bit)
-#define IRQSTATA_24 0x22D //IRQSTATA, (R) Default: 0x000000, Unsigned, Interrupt status (Current Channel A(24 bit)
-#define IRQSTATA_32 0x32D //IRQSTATA, (R) Default: 0x000000, Unsigned,Interrupt status (Current Channel A(32 bit)
-#define RSTIRQSTATA_24 0x22E //RSTIRQSTATA, (R) Default: 0x000000, Unsigned, Reset interrupt status (Current Channel A) (24 bit)
-#define RSTIRQSTATA_32 0x32E //RSTIRQSTATA, (R) Default: 0x000000, Unsigned,Reset interrupt status (Current Channel A)(32 bit)
-#define IRQENB_24 0x22F //IRQENB, (R/W) Default: 0x000000, Unsigned,Interrupt enable (Current Channel B (24 bit)
-#define IRQENB_32 0x32F //IRQENB, (R/W) Default: 0x000000, Unsigned,Interrupt enable (Current Channel B (32 bit)
-#define IRQSTATB_24 0x230 //IRQSTATB, (R) Default: 0x000000, Unsigned, Interrupt status (Current Channel B(24 bit)
-#define IRQSTATB_32 0x330 //IRQSTATB, (R) Default: 0x000000, Unsigned,Interrupt status (Current Channel B(32 bit)
-#define RSTIRQSTATB_24 0x231 //RSTIRQSTATB, (R) Default: 0x000000, Unsigned,Reset interrupt status (Current Channel B) (24 bit)
-#define RSTIRQSTATB_32 0x331 //RSTIRQSTATB, (R) Default: 0x000000, Unsigned, Reset interrupt status (Current Channel B)(32 bit)
-#define CRC_24 0x000 //CRC, (R) Default: 0x000000, Unsigned, Checksum(24 bit)
-#define CRC_32 0x37F //CRC, (R) Default: 0xFFFFFF, Unsigned,Checksum(32 bit)
-#define AIGAIN_24 0x280 //AIGAIN, (R/W) Default: 0x400000, Unsigned, Current channel gain (Current Channel A)(24 bit)
-#define AIGAIN_32 0x380 //AIGAIN, (R/W) Default: 0x400000, Unsigned,Current channel gain (Current Channel A)(32 bit)
-#define AVGAIN_24 0x281 //AVGAIN, (R/W) Default: 0x400000, Unsigned, Voltage channel gain(24 bit)
-#define AVGAIN_32 0x381 //AVGAIN, (R/W) Default: 0x400000, Unsigned,Voltage channel gain(32 bit)
-#define AWGAIN_24 0x282 //AWGAIN, (R/W) Default: 0x400000, Unsigned,Active power gain (Current Channel A)(24 bit)
-#define AWGAIN_32 0x382 //AWGAIN, (R/W) Default: 0x400000, Unsigned,Active power gain (Current Channel A)(32 bit)
-#define AVARGAIN_24 0x283 //AVARGAIN, (R/W) Default: 0x400000, Unsigned, Reactive power gain (Current Channel A)(24 bit)
-#define AVARGAIN_32 0x383 //AVARGAIN, (R/W) Default: 0x400000, Unsigned, Reactive power gain (Current Channel A)(32 bit)
-#define AVAGAIN_24 0x284 //AVAGAIN, (R/W) Default: 0x400000, Unsigned, Apparent power gain (Current Channel A) (24 bit)
-#define AVAGAIN_32 0x384 //AVAGAIN, (R/W) Default: 0x400000, Unsigned,Apparent power gain (Current Channel A)(32 bit)
-#define Reserved_24 0x285 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved_32 0x385 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-
-#define AIRMSOS_24 0x286 //AIRMSOS, (R/W) Default: 0x000000, Signed,IRMS offset (Current Channel A) (24 bit)
-#define AIRMSOS_32 0x386 //AIRMSOS, (R/W) Default: 0x000000, Signed,IRMS offset (Current Channel A)(32 bit)
-#define Reserved1_24 0x287 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved1_32 0x387 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-#define VRMSOS_24 0x288 //VRMSOS, (R/W) Default: 0x000000, Signed, VRMS offset(24 bit)
-#define VRMSOS_32 0x388 //VRMSOS, (R/W) Default: 0x000000, Signed,VRMS offset(32 bit)
-#define AWATTOS_24 0x289 //AWATTOS, (R/W) Default: 0x000000, Signed, Active power offset correction (Current Channel A)(24 bit)
-#define AWATTOS_32 0x389 //AWATTOS, (R/W) Default: 0x000000, Signed,Active power offset correction (Current Channel A)(32 bit)
-#define AVAROS_24 0x28A //AVAROS, (R/W) Default: 0x000000, Signed, Reactive power offset correction (Current Channel A)(24 bit)
-#define AVAROS_32 0x38A //AVAROS, (R/W) Default: 0x000000, Signed, Reactive power offset correction (Current Channel A)(32 bit)
-#define AVAOS_24 0x28B //AVAOS, (R/W) Default: 0x000000, Signed, Apparent power offset correction (Current Channel A(24 bit)
-#define AVAOS_32 0x38B //AVAOS, (R/W) Default: 0x000000, Signed,Apparent power offset correction (Current Channel A(32 bit)
-#define BIGAIN_24 0x28C //BIGAIN, (R/W) Default: 0x400000, Unsigned,Current channel gain (Current Channel B) (24 bit)
-#define BIGAIN_32 0x38C //BIGAIN, (R/W) Default: 0x400000, Unsigned,Current channel gain (Current Channel B)(32 bit)
-#define BVGAIN_24 0x28D //BVGAIN, (R/W) Default: 0x400000, Unsigned, This register should not be modified(24 bit)
-#define BVGAIN_32 0x38D //BVGAIN, (R/W) Default: 0x400000, Unsigned,This register should not be modified(32 bit)
-#define BWGAIN_24 0x28E //BWGAIN, (R/W) Default: 0x400000, Unsigned, Active power gain (Current Channel B)(24 bit)
-#define BWGAIN_32 0x38E //BWGAIN, (R/W) Default: 0x400000, Unsigned,Active power gain (Current Channel B)(32 bit)
-#define BVARGAIN_24 0x28F //BVARGAIN, (R/W) Default: 0x400000, Unsigned, Reactive power gain (Current Channel B)(24 bit)
-#define BVARGAIN_32 0x38F //BVARGAIN, (R/W) Default: 0x400000, Unsigned,Reactive power gain (Current Channel B)(32 bit)
-#define BVAGAIN_24 0x290 //BVAGAIN, (R/W) Default: 0x400000, Unsigned, Apparent power gain (Current Channel B)(24 bit)
-#define BVAGAIN_32 0x390 //BVAGAIN, (R/W) Default: 0x400000, Unsigned,Apparent power gain (Current Channel B)(32 bit)
-
-#define Reserved2_24 0x291 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved2_32 0x391 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-#define BIRMSOS_24 0x292 //BIRMSOS, (R/W) Default: 0x000000, Unsigned, IRMS offset (Current Channel B)(24 bit)
-#define BIRMSOS_32 0x392 //BIRMSOS, (R/W) Default: 0x000000, Unsigned,IRMS offset (Current Channel B)(32 bit)
-
-#define Reserved3_24 0x293 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved3_32 0x393 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-#define Reserved4_24 0x294 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified (24 bit)
-#define Reserved4_32 0x394 //Reserved, (R/W) Default: 0x000000, Signed,This register should not be modified(32 bit)
-
-#define BWATTOS_24 0x295 //BWATTOS, (R/W) Default: 0x000000, Unsigned, Active power offset correction (Current Channel B)(24 bit)
-#define BWATTOS_32 0x395 //BWATTOS, (R/W) Default: 0x000000, Unsigned,Active power offset correction (Current Channel B)(32 bit)
-#define BVAROS_24 0x296 //BVAROS, (R/W) Default: 0x000000, Unsigned,Reactive power offset correction (Current Channel B)(24 bit)
-#define BVAROS_32 0x396 //BVAROS, (R/W) Default: 0x000000, Unsigned,Reactive power offset correction (Current Channel B)(32 bit)
-#define BVAOS_24 0x297 //BVAOS, (R/W) Default: 0x000000, Unsigned, Apparent power offset correction (Current Channel B)(24 bit)
-#define BVAOS_32 0x397 //BVAOS, (R/W) Default: 0x000000, Unsigned,Apparent power offset correction (Current Channel B)(32 bit)
-#define LAST_RWDATA_24 0x2FF //LAST_RWDATA, (R) Default: 0x000000, Unsigned, Contains the data from the last successful 24-bit/32-bit register communication(24 bit)
-#define LAST_RWDATA_32 0x3FF //LAST_RWDATA, (R) Default: 0x000000, Unsigned, Contains the data from the last successful 24-bit/32-bit register communication(32 bit)
-
-
-//*********************
-/*
-ADE7953 REGISTER DESCRIPTIONS
-
-DISNOLOAD Register (Address 0x001)
-Bits Bit Name Default Description
-0 DIS_APNLOAD 0 1 = disable the active power no-load feature on Current Channel A and Current Channel B
-1 DIS_VARNLOAD 0 1 = disable the reactive power no-load feature on Current Channel A and Current Channel B
-2 DIS_VANLOAD 0 1 = disable the apparent power no-load feature on Current Channel A and Current Channel B
-
-LCYCMODE Register (Address 0x004)
-Bits Bit Name Default Description
-0 ALWATT 0 0 = disable active energy line cycle accumulation mode on Current Channel A
-1 = enable active energy line cycle accumulation mode on Current Channel A
-1 BLWATT 0 0 = disable active energy line cycle accumulation mode on Current Channel B
-1 = enable active energy line cycle accumulation mode on Current Channel B
-2 ALVAR 0 0 = disable reactive energy line cycle accumulation mode on Current Channel A
-1 = enable reactive energy line cycle accumulation mode on Current Channel A
-3 BLVAR 0 0 = disable reactive energy line cycle accumulation mode on Current Channel B
-1 = enable reactive energy line cycle accumulation mode on Current Channel B
-4 ALVA 0 0 = disable apparent energy line cycle accumulation mode on Current Channel A
-1 = enable apparent energy line cycle accumulation mode on Current Channel A
-5 BLVA 0 0 = disable apparent energy line cycle accumulation mode on Current Channel B
-1 = enable apparent energy line cycle accumulation mode on Current Channel B
-6 RSTREAD 1 0 = disable read with reset for all registers
-1 = enable read with reset for all registers
-
-CONFIG Register (Address 0x102)
-Bits Bit Name Default Description
-0 INTENA 0 1 = integrator enable (Current Channel A)
-1 INTENB 0 1 = integrator enable (Current Channel B)
-2 HPFEN 1 1 = HPF enable (all channels)
-3 PFMODE 0 0 = power factor is based on instantaneous powers, 1 = power factor is based on line cycle accumulation mode energies
-4 REVP_CF 0 0 = REVP is updated on CF1, 1 = REVP is updated on CF2
-5 REVP_PULSE 0 0 = REVP is high when reverse polarity is true, low when reverse polarity is false, 1 = REVP outputs a 1 Hz pulse when reverse polarity is true and is low when reverse polarity is false
-6 ZXLPF 0 0 = ZX LPF is enabled, 1 = ZX LPF is disabled
-7 SWRST 0 Setting this bit enables a software reset
-8 CRC_ENABLE 0 0 = CRC is disabled, 1 = CRC is enabled
-[10:9] Reserved 00 Reserved
-11 ZX_I 0 0 = ZX_I is based on Current Channel A, 1 = ZX_I is based on Current Channel B
-[13:12] ZX_EDGE 00 Zero-crossing interrupt edge selection
-Setting               Edge Selection
-00                    Interrupt is issued on both positive-going and negative-going zero crossing
-01                    Interrupt is issued on negative-going zero crossing
-10                    Interrupt is issued on positive-going zero crossing
-11                    Interrupt is issued on both positive-going and negative-going zero crossing
-14                    Reserved 0 Reserved
-15                    COMM_LOCK 1 0 = communication locking feature is enabled, 1 = communication locking feature is disabled
-
-CFMODE Register (Address 0x107)
-Bits Bit Name Default Description
-[3:0] CF1SEL 0000 Configuration of output signal on CF1 pin
-Setting CF1 Output Signal Configuration
-0000 CF1 is proportional to active power (Current Channel A)
-0001 CF1 is proportional to reactive power (Current Channel A)
-0010 CF1 is proportional to apparent power (Current Channel A)
-0011 CF1 is proportional to IRMS (Current Channel A)
-0100 CF1 is proportional to active power (Current Channel B)
-0101 CF1 is proportional to reactive power (Current Channel B)
-0110 CF1 is proportional to apparent power (Current Channel B)
-0111 CF1 is proportional to IRMS (Current Channel B)
-1000 CF1 is proportional to IRMS (Current Channel A) + IRMS (Current Channel B)
-1001 CF1 is proportional to active power (Current Channel A) + active power (Current Channel B)
-[7:4] CF2SEL 0000 Configuration of output signal on CF2 pin 
-Setting              CF2 Output Signal Configuration
-0000                 CF2 is proportional to active power (Current Channel A)
-0001                 CF2 is proportional to reactive power (Current Channel A)
-0010                 CF2 is proportional to apparent power (Current Channel A)
-0011                 CF2 is proportional to IRMS (Current Channel A)
-0100                 CF2 is proportional to active power (Current Channel B)
-0101                 CF2 is proportional to reactive power (Current Channel B)
-0110                 CF2 is proportional to apparent power (Current Channel B)
-0111                 CF2 is proportional to IRMS (Current Channel B)
-1000                 CF2 is proportional to IRMS (Current Channel A) + IRMS (Current Channel B)
-1001                 CF2 is proportional to active power (Current Channel A) + active power(Current Channel B)
-8 CF1DIS 1     0 = CF1 output is enabled, 1 = CF1 output is disabled
-9 CF2DIS 1     0 = CF2 output is enabled, 1 = CF2 output is disabled
-
-ALT_OUTPUT Register (Address 0x110)
-Bits Bit Name Default Description
-[3:0] ZX_ALT 0000 Configuration of ZX pin (Pin 1)
-Setting 		ZX Pin Configuration
-0000 			ZX detection is output on Pin 1 (default)
-0001 			Sag detection is output on Pin 1
-0010 			Reserved
-0011 			Reserved
-0100 			Reserved
-0101 			Active power no-load detection (Current Channel A) is output on Pin 1
-0110 			Active power no-load detection (Current Channel B) is output on Pin 1
-0111 			Reactive power no-load detection (Current Channel A) is output on Pin 1
-1000 			Reactive power no-load detection (Current Channel B) is output on Pin 1
-1001 			Unlatched waveform sampling signal is output on Pin 1
-1010 			IRQ signal is output on Pin 1
-1011 			ZX_I detection is output on Pin 1
-1100 			REVP detection is output on Pin 1
-1101 			Reserved (set to default value)
-111x 			Reserved (set to default value)
-[7:4] ZXI_ALT 0000 Configuration of ZX_I pin (Pin 21)
-Setting 		ZX_I Pin Configuration
-0000 			ZX_I detection is output on Pin 21 (default)
-0001 			Sag detection is output on Pin 21
-0010 			Reserved
-0011 			Reserved
-0100 			Reserved
-0101 			Active power no-load detection (Current Channel A) is output on Pin 21
-0110 			Active power no-load detection (Current Channel B) is output on Pin 21
-0111 			Reactive power no-load detection (Current Channel A) is output on Pin 21
-1000 			Reactive power no-load detection (Current Channel B) is output on Pin 21
-1001 			Unlatched waveform sampling signal is output on Pin 21
-1010 			IRQ signal is output on Pin 21
-1011 			ZX detection is output on Pin 21
-1100 			REVP detection is output on Pin 21
-1101 			Reserved (set to default value)
-111x 			Reserved (set to default value)
-
-[11:8] REVP_ALT 0000 Configuration of REVP pin (Pin 20)
-Setting			REVP Pin Configuration
-0000 			REVP detection is output on Pin 20 (default)
-0001 			Sag detection is output on Pin 20
-0010 			Reserved
-0011 			Reserved
-0100 			Reserved
-0101 			Active power no-load detection (Current Channel A) is output on Pin 20
-0110 			Active power no-load detection (Current Channel B) is output on Pin 20
-0111 			Reactive power no-load detection (Current Channel A) is output on Pin 20
-1000 			Reactive power no-load detection (Current Channel B) is output on Pin 20
-1001 			Unlatched waveform sampling signal is output on Pin 20
-1010 			IRQ signal is output on Pin 20
-1011 			ZX detection is output on Pin 20
-1100 			ZX_I detection is output on Pin 20
-1101 			Reserved (set to default value)
-111x 			Reserved (set to default value)
-
-ACCMODE Register (Address 0x201 and Address 0x301)
-Bits Bit Name Default Description
-[1:0] AWATTACC 00 Current Channel A active energy accumulation mode
-Setting Active Energy Accumulation Mode (Current Channel A)
-	00 Normal mode
-	01 Positive-only accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-[3:2] BWATTACC 00 Current Channel B active energy accumulation mode
-Setting Active Energy Accumulation Mode (Current Channel B)
-	00 Normal mode
-	01 Positive-only accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-[5:4] AVARACC 00 Current Channel A reactive energy accumulation mode
-Setting Reactive Energy Accumulation Mode (Current Channel A)
-	00 Normal mode
-	01 Antitamper accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-[7:6] BVARACC 00 Current Channel B reactive energy accumulation mode
-Setting Reactive Energy Accumulation Mode (Current Channel B)
-	00 Normal mode
-	01 Antitamper accumulation mode
-	10 Absolute accumulation mode
-	11 Reserved
-8 AVAACC 0 0 = Current Channel A apparent energy accumulation is in normal mode, 1 = Current Channel A apparent energy accumulation is based on IRMSA
-9 BVAACC 0 0 = Current Channel B apparent energy accumulation is in normal mode, 1 = Current Channel B apparent energy accumulation is based on IRMSB
-10 APSIGN_A 0 0 = active power on Current Channel A is positive, 1 = active power on Current Channel A is negative
-11 APSIGN_B 0 0 = active power on Current Channel B is positive, 1 = active power on Current Channel B is negative
-12 VARSIGN_A 0 0 = reactive power on Current Channel A is positive, 1 = reactive power on Current Channel A is negative
-13 VARSIGN_B 0 0 = reactive power on Current Channel B is positive, 1 = reactive power on Current Channel B is negative
-[15:14] Reserved 00 Reserved
-16 ACTNLOAD_A 0 0 = Current Channel A active energy is out of no-load condition, 1 = Current Channel A active energy is in no-load condition
-17 VANLOAD_A 0 0 = Current Channel A apparent energy is out of no-load condition, 1 = Current Channel A apparent energy is in no-load condition
-18 VARNLOAD_A 0 0 = Current Channel A reactive energy is out of no-load condition, 1 = Current Channel A reactive energy is in no-load condition
-19 ACTNLOAD_B 0 0 = Current Channel B active energy is out of no-load condition, 1 = Current Channel B active energy is in no-load condition
-20 VANLOAD_B 0 0 = Current Channel B apparent energy is out of no-load condition, 1 = Current Channel B apparent energy is in no-load condition
-21 VARNLOAD_B 0 0 = Current Channel B reactive energy is out of no-load condition, 1 = Current Channel B reactive energy is in no-load condition
-
-*/
-
-//Interrupt Configuration
-//Note: For IRQENA Register (Address 0x22C and Address 0x32C)), each binary position of the 16- bit response has the following configuration options
-//Bits Bit Name Description
-//0 AEHFA Set to 1 to enable an interrupt when the active energy is half full (Current Channel A)
-//1 VAREHFA Set to 1 to enable an interrupt when the reactive energy is half full (Current Channel A)
-//2 VAEHFA Set to 1 to enable an interrupt when the apparent energy is half full (Current Channel A)
-//3 AEOFA Set to 1 to enable an interrupt when the active energy has overflowed or underflowed (Current Channel A)
-//4 VAREOFA Set to 1 to enable an interrupt when the reactive energy has overflowed or underflowed (Current Channel A)
-//5 VAEOFA Set to 1 to enable an interrupt when the apparent energy has overflowed or underflowed (Current Channel A)
-//6 AP_NOLOADA Set to 1 to enable an interrupt when the active power no-load condition is detected on Current Channel A
-//7 VAR_NOLOADA Set to 1 to enable an interrupt when the reactive power no-load condition is detected on Current Channel A
-//8 VA_NOLOADA Set to 1 to enable an interrupt when the apparent power no-load condition is detected on Current Channel A
-//9 APSIGN_A Set to 1 to enable an interrupt when the sign of active energy has changed (Current Channel A)
-//10 VARSIGN_A Set to 1 to enable an interrupt when the sign of reactive energy has changed (Current Channel A)
-//11 ZXTO_IA Set to 1 to enable an interrupt when the zero crossing has been missing on Current Channel A for the length of time specified in the ZXTOUT register
-//12 ZXIA Set to 1 to enable an interrupt when the current Channel A zero crossing occurs
-//13 OIA Set to 1 to enable an interrupt when the current Channel A peak has exceeded the overcurrent threshold set in the OILVL register
-//14 ZXTO Set to 1 to enable an interrupt when a zero crossing has been missing on the voltage channel for the length of time specified in the ZXTOUT register
-//15 ZXV Set to 1 to enable an interrupt when the voltage channel zero crossing occurs
-//16 OV Set to 1 to enable an interrupt when the voltage peak has exceeded the overvoltage threshold set in the OVLVL register
-//17 WSMP Set to 1 to enable an interrupt when new waveform data is acquired
-//18 CYCEND Set to 1 to enable an interrupt when it is the end of a line cycle accumulation period
-//19 Sag Set to 1 to enable an interrupt when a sag event has occurred
-//20 Reset This interrupt is always enabled and cannot be disabled
-//21 CRC Set to 1 to enable an interrupt when the checksum has changed
-
-//IRQSTATA Register (Address 0x22D and Address 0x32D) and RSTIRQSTATA Register (Address 0x22E and Address 0x32E)
-//Bits Bit Name Description
-//0 AEHFA Set to 1 when the active energy register is half full (Current Channel A)
-//1 VAREHFA Set to 1 when the reactive energy register is half full (Current Channel A)
-//2 VAEHFA Set to 1 when the apparent energy register is half full (Current Channel A)
-//3 AEOFA Set to 1 when the active energy register has overflowed or underflowed (Current Channel A)
-//4 VAREOFA Set to 1 when the reactive energy register has overflowed or underflowed (Current Channel A)
-//5 VAEOFA Set to 1 when the apparent energy register has overflowed or underflowed (Current Channel A)
-//6 AP_NOLOADA Set to 1 when the active power no-load condition is detected Current Channel A
-//7 VAR_NOLOADA Set to 1 when the reactive power no-load condition is detected Current Channel A
-//8 VA_NOLOADA Set to 1 when the apparent power no-load condition is detected Current Channel A
-//9 APSIGN_A Set to 1 when the sign of active energy has changed (Current Channel A)
-//10 VARSIGN_A Set to 1 when the sign of reactive energy has changed (Current Channel A)
-//11 ZXTO_IA Set to 1 when a zero crossing has been missing on Current Channel A for the length of time specified in the ZXTOUT register
-//12 ZXIA Set to 1 when a current Channel A zero crossing is detected
-//13 OIA Set to 1 when the current Channel A peak has exceeded the overcurrent threshold set in the OILVL register
-//14 ZXTO Set to 1 when a zero crossing has been missing on the voltage channel for the length of time specified in the ZXTOUT register
-//15 ZXV Set to 1 when the voltage channel zero crossing is detected
-//16 OV Set to 1 when the voltage peak has exceeded the overvoltage threshold set in the OVLVL register
-//17 WSMP Set to 1 when new waveform data is acquired
-//18 CYCEND Set to 1 at the end of a line cycle accumulation period
-//19 Sag Set to 1 when a sag event has occurred
-//20 Reset Set to 1 at the end of a software or hardware reset
-//21 CRC Set to 1 when the checksum has changed
-
-//IRQENB Register (Address 0x22F and Address 0x32F)
-//Bits Bit Name Description
-//0 AEHFB Set to 1 to enable an interrupt when the active energy is half full (Current Channel B)
-//1 VAREHFB Set to 1 to enable an interrupt when the reactive energy is half full (Current Channel B)
-//2 VAEHFB Set to 1 to enable an interrupt when the apparent energy is half full (Current Channel B)
-//3 AEOFB Set to 1 to enable an interrupt when the active energy has overflowed or underflowed (Current Channel B)
-//4 VAREOFB Set to 1 to enable an interrupt when the reactive energy has overflowed or underflowed (Current Channel B)
-//5 VAEOFB Set to 1 to enable an interrupt when the apparent energy has overflowed or underflowed (Current Channel B)
-//6 AP_NOLOADB Set to 1 to enable an interrupt when the active power no-load detection on Current Channel B occurs
-//7 VAR_NOLOADB Set to 1 to enable an interrupt when the reactive power no-load detection on Current Channel B occurs
-//8 VA_NOLOADB Set to 1 to enable an interrupt when the apparent power no-load detection on Current Channel B occurs
-//9 APSIGN_B Set to 1 to enable an interrupt when the sign of active energy has changed (Current Channel B)
-//10 VARSIGN_B Set to 1 to enable an interrupt when the sign of reactive energy has changed (Current Channel B)
-//11 ZXTO_IB Set to 1 to enable an interrupt when a zero crossing has been missing on Current Channel B for the length of time specified in the ZXTOUT register
-//12 ZXIB Set to 1 to enable an interrupt when the current Channel B zero crossing occurs
-//13 OIB Set to 1 to enable an interrupt when the current Channel B peak has exceeded the overcurrent threshold set in the OILVL register
-
-//IRQSTATB Register (Address 0x230 and Address 0x330) and RSTIRQSTATB Register (Address 0x231 and Address 0x331)
-//Bits Bit Name Description
-//0 AEHFB Set to 1 when the active energy register is half full (Current Channel B)
-//1 VAREHFB Set to 1 when the reactive energy register is half full (Current Channel B)
-//2 VAEHFB Set to 1 when the apparent energy register is half full (Current Channel B)
-//3 AEOFB Set to 1 when the active energy register has overflowed or underflowed (Current Channel B)
-//4 VAREOFB Set to 1 when the reactive energy register has overflowed or underflowed (Current Channel B)
-//5 VAEOFB Set to 1 when the apparent energy register has overflowed or underflowed (Current Channel B)
-//6 AP_NOLOADB Set to 1 when the active power no-load condition is detected on Current Channel B
-//7 VAR_NOLOADB Set to 1 when the reactive power no-load condition is detected on Current Channel B
-//8 VA_NOLOADB Set to 1 when the apparent power no-load condition is detected on Current Channel B
-//9 APSIGN_B Set to 1 when the sign of active energy has changed (Current Channel B)
-//10 VARSIGN_B Set to 1 when the sign of reactive energy has changed (Current Channel B)
-//11 ZXTO_IB Set to 1 when a zero crossing has been missing on Current Channel B for the length of time specified in the ZXTOUT register
-//12 ZXIB Set to 1 when a current Channel B zero crossing is obtained
-//13 OIB Set to 1 when current Channel B peak has exceeded the overcurrent threshold set in the OILVL register
 
 //*******************************************************************************************
-
 //****************ADE 9078 REGISTERS *****************************************************
-#define 0X000 AIGAIN_32 // Phase A current gain adjust
+#define PFA_16 0x10A //PFA, (R/W) Reset:0x0000,
 
-// The following registers: // Phase A multipoint gain correction factor
-#define 0x001 AIGAIN0_32
-#define 0x003 AIGAIN1_32
-#define 0x004 AIGAIN2_32
-#define 0x005 AIGAIN3_32
+#define 0X000 AIGAIN_32 // Reset: 0x00000000 Access: R/W Description: Phase A current gain adjust
 
-#define 0x006 APHCAL0_32
-#define 0x007 APHCAL1_32
-#define 0x008 APHCAL2_32
-#define 0x009 APHCAL3_32
-#define 0x00A APHCAL4_32
+#define AIGAIN0_32 0x001 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN1_32 0x002 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN2_32 0x003 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN3_32 0x004 /* Reset: 0x00000000 Access: R/W Description:  Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
+#define AIGAIN4_32 0x005 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
 
-#define 0x00B AVGAIN_32 // Phase A voltage gain adjust
-#define 0X00C AIRMSOS_32 // Phase A voltage rms offset for filter based AIRMS calculation
-#define 0X00D AVRMSOS_32 // Phase A current RMS offset for filter based AIRMS calucation
-#define 0X00E APGAIN_32 // Phase A power gain adjust for AWATT, AVA, avar, and AFVAR calculation
-#define 0X00F AWATTOS_32 // Phase A total active power offset correction for AWATT calculation.
-#define 0X010 AVAROS_32 // Phase A total active power offset correction for AVAR calculation.
-#define 0x012 AFVAROS_32 // Phase A fundamental reactive power offset correction for AFVAR calculation
+#define APHCAL0_32 0x006 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL1_32 0x007 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL2_32 0x008 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL3_32 0x009 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define APHCAL4_32 0x00A /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in CONFIG0 register, the APHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, then the APHCAL0 through APHCAL4 value is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
-#define 0x020 BIGAIN_32 // Phrase B current gain adjust
-#define 0x021 BIGAIN0_32 // Phase B multipoint gain correction factors
-#define 0x022 BIGAIN1_32 // ...
-#define 0x023 BIGAIN2_32 // ...
-#define 0x024 BIGAIN3_32 // ...
-#define 0x025 BIGAIN4_32 // ...
+#define AVGAIN_32 0x00B // Reset: 0x00000000 Access: R/W Description: Phase A voltage gain adjust
+#define AIRMSOS_32 0X00C // Reset: 0x00000000 Access: R/W Description: Phase A voltage rms offset for filter based AIRMS calculation
+#define AVRMSOS_32 0X00D // Reset: 0x00000000 Access: R/W Description: Phase A current RMS offset for filter based AIRMS calucation
+#define APGAIN_32 0X00E // Reset: 0x00000000 Access: R/W Description: Phase A power gain adjust for AWATT, AVA, avar, and AFVAR calculation
+#define AWATTOS_32 0X00F // Reset: 0x00000000 Access: R/W Description: Phase A total active power offset correction for AWATT calculation.
+#define AVAROS_32 0X010 // Reset: 0x00000000 Access: R/W Description: Phase A total active power offset correction for AVAR calculation.
+#define AFVAROS_32 0x012 // Reset: 0x00000000 Access: R/W Description: Phase A fundamental reactive power offset correction for AFVAR calculation
 
-// Phase B multipoint phase correction factor
-#define 0x026 BPHCAL0_32
-#define 0x027 BPHCAL1_32
-#define 0x028 BPHCAL2_32
-#define 0x029 BPHCAL3_32
-#define 0x02A BPHCAL4_32
+#define BIGAIN_32 0x020 // Reset: 0x00000000 Access: R/W Description: Phrase B current gain adjust
+#define BIGAIN0_32 0x021 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN1_32 0x022 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN2_32 0x023 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN3_32 0x024 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BIGAIN4_32 0x025 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint gain correction factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, BIGAIN0 through BIGAIN4, is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
-#define 0x02B BVGAIN_32 // Phase B voltage gai nadjust
-#define 0x02C BIRMSOS_32 // Phase B current RMS offset for BIRMS calculation
-#define 0x02D BVRMSOS_32 // Phase B voltage RMS offset for BVRMS calculation
-#define 0X02E BPGAIN_32 // Phase B power gain adjust for BWATT, BVA, BVAR, and BFVAR calculations
-#define 0X02F BWATTOS_32 // Phase B total active power offset correction for BWATT calculation
-#define 0x030 BVAROS_32 // Phase B total active offset correction for BVAR calculation
-#define 0x032 BFVAROS_32 // Phase B fundamental reactive power offset correction for BFVAR calculation
+#define BPHCAL0_32 0x026 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL1_32 0x027 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL2_32 0x028 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL3_32 0x029 /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
+#define BPHCAL4_32 0x02A /* Reset: 0x00000000 Access: R/W Description: Phase B multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the BPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the BPHCAL0 through BPHCAL4 value is applied based on the BIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.*/
 
-#define 0x040 CIGAIN_32 // Phase C current gain nadjust
+#define BVGAIN_32 0x02B // Reset: 0x00000000 Access: R/W Description: Phase B voltage gai nadjust
+#define BIRMSOS_32 0x02C // Reset: 0x00000000 Access: R/W Description: Phase B current RMS offset for BIRMS calculation
+#define BVRMSOS_32 0x02D // Reset: 0x00000000 Access: R/W Description: Phase B voltage RMS offset for BVRMS calculation
+#define BPGAIN_32 0X02E // Reset: 0x00000000 Access: R/W Description: Phase B power gain adjust for BWATT, BVA, BVAR, and BFVAR calculations
+#define BWATTOS_32 0X02F // Reset: 0x00000000 Access: R/W Description: Phase B total active power offset correction for BWATT calculation
+#define BVAROS_32 0x030 // Reset: 0x00000000 Access: R/W Description: Phase B total active offset correction for BVAR calculation
+#define BFVAROS_32 0x032 // Reset: 0x00000000 Access: R/W Description: Phase B fundamental reactive power offset correction for BFVAR calculation
+
+#define CIGAIN_32 0x040 // Reset: 0x00000000 Access: R/W Description: Phase C current gain nadjust
 
 // Phase C multipoint gain correction factor
-#define 0x041 CIGAIN0_32
-#define 0x042 CIGAIN1_32
-#define 0x043 CIGAIN2_32
-#define 0x044 CIGAIN3_32
-#define 0x045 CIGAIN4_32
+#define CIGAIN0_32 0x041 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN1_32 0x042 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN2_32 0x043 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN3_32 0x044 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
+#define CIGAIN4_32 0x045 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint gain correctin factor. If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, CIGAIN0 through CIGAIN4, is applied based on the CIRMS current rms amplitude and MTTHR_Lx and MTTHR_Hx register values. */
 
-#define 0X046 CPHCAL0_32
-#define 0X047 CPHCAL1_32
-#define 0X048 CPHCAL2_32
-#define 0X049 CPHCAL3_32
-#define 0X04A CPHCAL4_32
+#define CPHCAL0_32 0X046 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL1_32 0X047 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL2_32 0X048 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL3_32 0X049 /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
+#define CPHCAL4_32 0X04A /* Reset: 0x00000000 Access: R/W Description: Phase C multipoint phase correction factor. If multipoint phase and gain calibration is disabled, with MTEN = 0 in the CONFIG0 register, the CPHCAL0 phase compensation is applied. If multipoint phase and gain correction is enabled, with MTEN = 1, the CPHCAL0 through CPHCAL4 value is applied, based on the CIRMS current rms amplitude and the MTHR_Lx and MTTHR_Hx register values. */
 
-#define 0x04B CVGAIN_32 // Phase C voltage gain adjust
-#define 0x04C CIRMSOS_32 // Phase C current RMS offset for CIRMS calculation
-#define 0x04D CVRMSOS_32 // Phase C voltage RMS offset for CVRMS calcuation
-#define 0x04E CPGAIN_32 // Phase C power gain adjust for CWATT, CVA, CVAR, and CFVAR calculations
-#define 0x04F CWATTOS_32 // Phase C total active power offset correction for CWATT calculations
-#define 0x050 CVAROS_32 // Phase C total reactive power offset correction for CVAR calculation
-#define 0x052 CFVAROS_32 // Phase C total reactive power offset correction for CVAR calculations
+#define CVGAIN_32 0x04B // Reset: 0x00000000 Access: R/W Description: Phase C voltage gain adjust
+#define CIRMSOS_32 0x04C // Reset: 0x00000000 Access: R/W Description: Phase C current RMS offset for CIRMS calculation
+#define CVRMSOS_32 0x04D // Reset: 0x00000000 Access: R/W Description: Phase C voltage RMS offset for CVRMS calcuation
+#define CPGAIN_32 0x04E // Reset: 0x00000000 Access: R/W Description: Phase C power gain adjust for CWATT, CVA, CVAR, and CFVAR calculations
+#define CWATTOS_32 0x04F // Reset: 0x00000000 Access: R/W Description: Phase C total active power offset correction for CWATT calculations
+#define CVAROS_32 0x050 // Reset: 0x00000000 Access: R/W Description: Phase C total reactive power offset correction for CVAR calculation
+#define CFVAROS_32 0x052 // Reset: 0x00000000 Access: R/W Description: Phase C total reactive power offset correction for CVAR calculations
 
-#define 0x060 CONFIG0_32 // Configuration register 0
+#define CONFIG0_32 0x060
+// Bits: [31:14] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 13 BitName: DISRPLPF Reset: 0x0 Access: R/W Description: Set this bit to disable the low-pass filter in the total reactive power datapath.
+// Bits: 12 BitName: DISAPLPF Reset: 0x0 Access: R/W Description: Set this bit to disable the low-pass filter in the total active power datapath.
+// Bits: 11 BitName: ININTEN Reset: 0x0 Access: R/W Description: Set this bit to enable the digital integrator in the Neutral Current channel.
+// Bits: 10 BitName: VNOMC_EN Reset: 0x0 Access: R/W Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase C total apparent power, CVA.
+// Bits: 9 BitName: VNOMB_EN Reset: 0x0 Access: R/W Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase B total apparent power, BVA.
+// Bits: 8 BitName: VNOMA_EN Reset: 0x0 Access: R/W Description: Set this bit to use the nominal phase voltage rms, VNOM, in the computation of Phase A total apparent power, AVA.
+// Bits: 7 BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 6 BitName: ZX_SRC_SEL Reset: 0x0 Access: R/W Description: This bit selects whether data going into the zero-crossing detection circuit comes before the highpass filter, integrator, and phase compensation or afterwards. Setting: 0 for After the high-pass filter, integrator, and phase compensation. Setting: 1 for Before the high-pass filter, integrator, and phase compensation.
+// Bits: 5 BitName: INTEN Reset: 0x0 Access: R/W Description: Set this bit to enable the integrators in the phase current channels. The neutral current channel integrator is managed byb the ININTEN bit in the CONFIG0 register.
+// Bits: 4 BitName: MTEN Reset: 0x0 Access: R/W Description: Set this bit to enable multipoint phase and gain compensation. If enabled, an additional gain factor, xIGAIN0 through xIGAIN4, is applied to the current channel based on the xIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values.
+// Bits: 3 BitName: HPFDIS Reset: 0x0 Access: R/W Description: Set this bit to disable high-pass filters in all the voltage and current channels.
+// Bits: 2 BitName: Reset: 0x0 Access: R RESERVED Description: Reserved
+// Bits: [1:0] BitName: ISUM_CFG Reset: 0x0 Access: R/W Description: ISUM Calculation configuration. Setting: 00 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation) Setting: 01 for ISUM = AI_PCF + BI_PCF + CI_PCF+ NI_PCF(to determine mismatch between neutral and phase currents). Setting: 10 for ISUM = AI_PCF + BI_PCF + CI_PCF - NI_PCF(to determine mismatch between neutral and phase currents). Setting: 11 for ISUM = AI_PCF + BI_PCF + CI_PCF (for approximated neutral current rms calculation).
 
 // Multipoint phase/gain threshold.
-#define 0x061 MTTHR_L0_32
-#define 0x062 MTTHR_L1_32
-#define 0x063 MTTHR_L2_32
-#define 0x064 MTTHR_L3_32
-#define 0x065 MTTHR_L4_32
+#define MTTHR_L0_32 0x061 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L1_32 0x062 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L2_32 0x063 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L3_32 0x064 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_L4_32 0x065 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
 
-#define 0x066 MTTHR_H0_32
-#define 0x067 MTTHR_H1_32
-#define 0x068 MTTHR_H2_32
-#define 0x069 MTTHR_H3_32
-#define 0x06A MTTHR_H4_32
+#define MTTHR_H0_32 0x066 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H1_32 0x067 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H2_32 0x068 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H3_32 0x069 /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
+#define MTTHR_H4_32 0x06A /* Reset: 0x00000000 Access: R/W Description: Multipoint phase/gain threshold--see MTTHR_L0 for more information.*/
 
-#define 0x06B NIRMSOS_32 // Neutral current RMS offset for NIRMS calculations
-#define 0x06C ISUMRMSOS_32 // Offset correction for ISUMRMS calculation based on the sume of IA + IB + IC +- IN.
-#define 0X06D NIGAIN_32 // Neutral current again adjust
-#define 0x06E NPHCAL_32 // Neutral current-phase compensation
-#define 0x071 VNOM_32 // Nominal phase voltage RMS used in the computation of apparent power, xVA, when VNOMx_EN bit is set in the CONFIG0 register
-#define 0x072 DICOEFF_32 // Value used in the digital integrator algorithm
-#define 0x073 ISUMLVL_32 // Threshold to compare ISUMRMS against
+#define NIRMSOS_32 0x06B // Reset: 0x00000000 Access: R/W Description: Neutral current RMS offset for NIRMS calculations
+#define ISUMRMSOS_32 0x06C // Reset: 0x00000000 Access: R/W Description: Offset correction for ISUMRMS calculation based on the sume of IA + IB + IC +- IN.
+#define NIGAIN_32 0X06D // Reset: 0x00000000 Access: R/W Description: Neutral current again adjust
+#define NPHCAL_32 0x06E // Reset: 0x00000000 Access: R/W Description: Neutral current-phase compensation
+#define VNOM_32 0x071 // Reset: 0x00000000 Access: R/W Description: Nominal phase voltage RMS used in the computation of apparent power, xVA, when VNOMx_EN bit is set in the CONFIG0 register
+#define DICOEFF_32 0x072 // Reset: 0x00000000 Access: R/W Description: Value used in the digital integrator algorithm
+#define ISUMLVL_32 0x073 // Reset: 0x00000000 Access: R/W Description: Threshold to compare ISUMRMS against
 
-#define 0x20A AI_PCF_32 // Instantaneous Phase A current channel waveform processed by the DSP, at 4 kSPS.
-#define 0x20B AV_PCF_32 // Instantaneous Phase A voltage channel waveform processed by the DSP, at 4 kSPS.
-#define 0x20C AIRMS_32 // Phase A filter based current RMS value, updates at 4kSPS
-#define 0x20D AVRMS_32 // Phase A filter based voltage RMS value, updates at 4kSPS
+// Access changes to read only here
 
-#define 0x210 AWATT_32 // Phase A low-pass filtere total active power, updated at 4 4kSPS
-#define 0x211 AVAR_32 // Phase A low pass filtered total reactive power, updated at 4kSPS
-#define 0x212 AVA_32 // Phase A total apparent power, updated at 4kSPS
-#define 0x214 AFVAR_32 // Phase A fundamental reactive power, updated at 4kSPS
-#define 0x216 APF_32 // Phase A power factor, updated at 1.024 second
+#define AI_PCF_32 0x20A // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase A current channel waveform processed by the DSP, at 4 kSPS.
+#define AV_PCF_32 0x20B // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase A voltage channel waveform processed by the DSP, at 4 kSPS.
+#define AIRMS_32 0x20C // Reset: 0x00000000 Access: Read only Description: Phase A filter based current RMS value, updates at 4kSPS
+#define AVRMS_32 0x20D // Reset: 0x00000000 Access: Read only Description: Phase A filter based voltage RMS value, updates at 4kSPS
 
-#define 0x21D AMTREGION_32 // If multipoint gain and phase compensaion is enabled, with MTEN = 1 in the CONFIG0 register,these bits indicate which AIGAINXx and APHCALx is currently being used
+#define AWATT_32 0x210 // Reset: 0x00000000 Access: Read only Description: Phase A low-pass filtere total active power, updated at 4 4kSPS
+#define AVAR_32 0x211 // Reset: 0x00000000 Access: Read only Description: Phase A low pass filtered total reactive power, updated at 4kSPS
+#define AVA_32 0x212 // Reset: 0x00000000 Access: Read only Description: Phase A total apparent power, updated at 4kSPS
+#define AFVAR_32 0x214 // Reset: 0x00000000 Access: Read only Description: Phase A fundamental reactive power, updated at 4kSPS
+#define APF_32 0x216 // Reset: 0x00000000 Access: Read only Description: Phase A power factor, updated at 1.024 second
 
-#define 0x22A BI_PCF_32 // Instantaneous Phase B current channel waveform processed by the DSP, 4kSPS
-#define 0x22B BV_PCF_32 // Instantaneous Phase B votage channel waveform processed by the DSP, 4kSPS
-#define 0x22C BIRMS_32 // Phase B filter based current RMS value, updates at 4kSPS
-#define 0x22D BVRMS_32 // Phase B filter based voltage RMS value, updates at 4kSPS
-#define 0x230 BWATT_32 // Phase B low-pass filtered total active power, updated at 4kSPS
-#define 0x231 BVAR_32 // Phase B low pass filtered total reactive power, updated at 4kSPS.
-#define 0x232 BVA_32 // Phase B total apparent power, updated at 4kSPS
-#define 0x234 BFVAR_32 // Phase B fundamental reactive power, updated at 4kSPS
-#define 0x236 BPF_32 // Phase B power factor, updated at 1.024 sec.
+#define AMTREGION_32 0x21D // Reset: 0x00000000 Access: Read only Description: If multipoint gain and phase compensaion is enabled, with MTEN = 1 in the CONFIG0 register,these bits indicate which AIGAINXx and APHCALx is currently being used
 
-#define 0x23D BMTREGION_32 // If multipoint gain and phase.....
-
-#define 0x24A CI_PCF_32 // Instantaneous Phase C current channel waveform proccessed by the DSP, at 4kSPS
-#define 0x24B CV_PCF_32 // Instantaneous Phase C voltage channel waveform proccessed by the DSP, at 4kSPS
-#define 0X24C CIRMS_32 // Phase C filter based current RMS value, updates at 4kSPS
-#define 0x24D CVRMS_32 // Phase C filter based voltage RMS value, updates at 4kSPS
-#define 0x250 CWATT_32 // Phase C low-pass filtered total active power, updated at 4kSPS
-#define 0x251 CVAR_32  // Phase C low pass filtered total reactive power, updated at 4kSPS.
-#define 0x252 CVA_32 // Phase C total apparent power, updated at 4kSPS
-#define 0x254 CFVAR_32 // Phase C fundamental reactive power, udpated at 4kSPS
-#define 0x256 CPF_32 // Phase C power factor, updated at 1.024 seconds
-
-#define 0X25D CMTREGION_32 // If multipoint gian and phase...
-#define 0x265 NI_PCF_32 // Instantaneous neutral current channel waveform processed by the DSP, at 4kSPS.
-#define 0x266 NIRMS_32 // Neutral current filter based RMS value
-#define 0x269 ISUMRMS_32 // Filter based RMS based on the sum of IA + IB + IC += IN.
-#define 0x26A VERSION2_32 // Indicates the version of the metrology algorithms after the user writes run = 1 to start the measuremnets.
-
-#define 0x2E5 AWATT_ACC_32 // Phase A accumulated total active power, updated after PWR_TIME 4 ksps samples
-#define 0x2E6 AWATTHR_LO_32 // Phase A accumulated total active energy, LSB's. Updated according to settings in EP_CFG and EGY_TIME Registers
-#define 0x2E7 AWATTHR_HI_32 // Phase A accumulated total active energy, MSB's....
-#define 0x2EF AVAR_ACC_32  // Phase A accumulated total reactive power, updated after PWR_TIME 4 kSPS samples.
-#define 0X2F0 AVARHR_LO_32 // Phase A accumulated total reactive energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
-#define 0x2F1 AVARHR_HI_32 // Phase A accumulated total reactive energy, MSB's...
-#define 0x2F9 AVA_ACC_32 // Phase A accumulated total apparent power, updated after PWR_TIME 4 kSPS samples
-#define 0x2FA AVAHR_LO_32 // Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME registers.
-#define 0x2FB AVAHR_HI_32 // Phase A accumulated total apparent energy, MSB's.
-
-#define 0x30D AFVAR_ACC_32 // Phase A accumulated fundamental reactive power, updated after PWR_TIME 4kSPS samples
-#define 0x30E AFVARHR_LO_32 // Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
-#define 0x30F AFVARHR_HI_32 // Phase A accumulated total apparent energy, MSB's...
-#define 0x321 BWATT_ACC_32 // Phase B accumulated total active power, updated after PWR_TIME 4 kSPS samples
-#define 0x322 BWATTHR_LO_32 // Phase B accumulated total active energy, LSB's, updated according to the settings in EP_CFG and EGY_TIME registers.
-#define 0x323 BWATTHR_HI_32 // Phase B accumulated total active energy, MSB's...
-#define 0x32B BVAR_ACC_32  // Phase B accumulated total reactive power, updated after PWR_TIME 4 ksSPS samples.
+// [31:4] : RESERVED Reset: 0x0 Access: R
+// [3:0] : AREGION Reset: 0xF Access: R
+// If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which AIGAINx and APHCALx currently being used.
+// 0000 AIGAIN0, APHCAL0.
+// 0001 AIGAIN1, APHCAL1.
+// 0010 AIGAIN2, APHCAL2.
+// 0011 AIGAIN3, APHCAL3.
+// 0100 AIGAIN4, APHCAL4.
+// 1111 This feature is disabled because MTEN = 0 in the CONFIG0 register.
 
 
 
+#define BI_PCF_32 0x22A // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase B current channel waveform processed by the DSP, 4kSPS
+#define BV_PCF_32 0x22B //Reset: 0x00000000 Access: Read only Description:  Instantaneous Phase B votage channel waveform processed by the DSP, 4kSPS
+#define BIRMS_32 0x22C // Reset: 0x00000000 Access: Read only Description: Phase B filter based current RMS value, updates at 4kSPS
+#define BVRMS_32 0x22D // Reset: 0x00000000 Access: Read only Description: Phase B filter based voltage RMS value, updates at 4kSPS
+#define BWATT_32 0x230 // Reset: 0x00000000 Access: Read only Description: Phase B low-pass filtered total active power, updated at 4kSPS
+#define BVAR_32 0x231 //Reset: 0x00000000 Access: Read only Description:  Phase B low pass filtered total reactive power, updated at 4kSPS.
+#define BVA_32 0x232 // Reset: 0x00000000 Access: Read only Description: Phase B total apparent power, updated at 4kSPS
+#define BFVAR_32 0x234 // Reset: 0x00000000 Access: Read only Description: Phase B fundamental reactive power, updated at 4kSPS
+#define BPF_32 0x236 // Reset: 0x00000000 Access: Read only Description: Phase B power factor, updated at 1.024 sec.
 
-#define 0X60A AVRMS_1
-#define 0X60B BVRMS_1
-#define 0X60C CVRMS_1
-#define 0X60D NIRMS_1
-#define 0X60E AWATT_1
-#define 0X60F BWATT_1
-#define 0X610 CWATT_1
-#define 0X611 AVA_1
-#define 0X612 BVA_1
-#define 0X613 CVA_1
-#define 0X614 AVAR_1
-#define 0X615 BVAR_1
-#define 0X616 CVAR_1
-#define 0X617 AFVAR_1
-#define 0X618 BFVAR_1
-#define 0X619 CFVAR_1
-#define 0X61A APF_1
-#define 0X61B BPF_1
-#define 0X61C CPF_1
-#define 0X680 AV_PCF_2
-#define 0X681 AI_PCF_2
-#define 0X682 AIRMS_2
-#define 0X683 AVRMS_2
-#define 0X684 AWATT_2
-#define 0X685 AVA_2
-#define 0X686 AVAR_2
-#define 0X687 AFVAR_2
-#define 0X688 APF_2
-#define 0X693 BV_PCF_2
-#define 0X694 BI_PCF_2
-#define 0X695 BIRMS_2
-#define 0X696 BVRMS_2
-#define 0X697 BWATT_2
-#define 0X698 BVA_2
-#define 0X699 BVAR_2
-#define 0X69A BFVAR_2
-#define 0X69B BPF_2
-#define 0X6A6 CV_PCF_2
-#define 0X6A7 CI_PCF_2
-#define 0X6A8 CIRMS_2
-#define 0X6A9 CVRMS_2
-#define 0X6AA CWATT_2
-#define 0X6AB CVA_2
-#define 0X6AC CVAR_2
-#define 0X6AD CFVAR_2
-#define 0X6AE CPF_2
-#define 0X6B9 NI_PCF_2
-#define 0X6BA NIRMS_2
+#define BMTREGION_32 0x23D // Reset: 0x00000000 Access: Read only Description: If multipoint gain and phase.....
+/*
+[31:4] : RESERVED Reset: 0x0 Access: R
+[3:0] : BREGION Reset: 0xF Access: R
+If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which BIGAINx and BPHCALx currently being used.
+0000 BIGAIN0, BPHCAL0.
+0001 BIGAIN1, BPHCAL1.
+0010 BIGAIN2, BPHCAL2.
+0011 BIGAIN3, BPHCAL3.
+0100 BIGAIN4, BPHCAL4.
+1111 This feature is disabled because MTEN = 0 in the CONFIG0 register.
+*/
+
+
+#define CI_PCF_32 0x24A //Reset: 0x00000000 Access: Read only Description:  Instantaneous Phase C current channel waveform proccessed by the DSP, at 4kSPS
+#define CV_PCF_32 0x24B // Reset: 0x00000000 Access: Read only Description: Instantaneous Phase C voltage channel waveform proccessed by the DSP, at 4kSPS
+#define CIRMS_32 0X24C // Reset: 0x00000000 Access: Read only Description: Phase C filter based current RMS value, updates at 4kSPS
+#define CVRMS_32 0x24D //Reset: 0x00000000 Access: Read only Description: Phase C filter based voltage RMS value, updates at 4kSPS
+#define CWATT_32 0x250 // Reset: 0x00000000 Access: Read only Description: Phase C low-pass filtered total active power, updated at 4kSPS
+#define CVAR_32 0x251  // Reset: 0x00000000 Access: Read only Description: Phase C low pass filtered total reactive power, updated at 4kSPS.
+#define CVA_32 0x252 // Reset: 0x00000000 Access: Read only Description: Phase C total apparent power, updated at 4kSPS
+#define CFVAR_32 0x254 // Reset: 0x00000000 Access: Read only Description: Phase C fundamental reactive power, udpated at 4kSPS
+#define CPF_32 0x256 // Reset: 0x00000000 Access: Read only Description: Phase C power factor, updated at 1.024 seconds
+
+#define CMTREGION_32 0X25D // If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx is currently being used.
+// Bits: [31:4] : RESERVED Reset: 0x0 Access: R
+// Bits: [3:0] : CREGION Reset: 0xF Access: R - Description: If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFIG0 register, these bits indicate which CIGAINx and CPHCALx currently being used.
+// Settings
+// 0000 CIGAIN0, CPHCAL0.
+// 0001 CIGAIN1, CPHCAL1.
+// 0010 CIGAIN2, CPHCAL2.
+// 0011 CIGAIN3, CPHCAL3.
+// 0100 CIGAIN4, CPHCAL4.
+// 1111 This feature is disabled because MTEN = 0 in the CONFIG0 register.
+
+#define NI_PCF_32 0x265 // Reset: 0x00000000 Access: Read only Description: Instantaneous neutral current channel waveform processed by the DSP, at 4kSPS.
+#define NIRMS_32 0x266 // Reset: 0x00000000 Access: Read only Description: Neutral current filter based RMS value
+#define ISUMRMS_32 0x269 // Reset: 0x00000000 Access: Read only Description: Filter based RMS based on the sum of IA + IB + IC += IN.
+#define VERSION2_32 0x26A // Reset: 0x00000000 Access: Read only Description: Indicates the version of the metrology algorithms after the user writes run = 1 to start the measuremnets.
+
+#define AWATT_ACC_32 0x2E5 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total active power, updated after PWR_TIME 4 ksps samples
+#define AWATTHR_LO_32 0x2E6 //Reset: 0x00000000 Access: Read only Description:  Phase A accumulated total active energy, LSB's. Updated according to settings in EP_CFG and EGY_TIME Registers
+#define AWATTHR_HI_32 0x2E7 //Reset: 0x00000000 Access: Read only Description:  Phase A accumulated total active energy, MSB's....
+#define AVAR_ACC_32 0x2EF  // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total reactive power, updated after PWR_TIME 4 kSPS samples.
+#define AVARHR_LO_32 0X2F0 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total reactive energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
+#define AVARHR_HI_32 0x2F1 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total reactive energy, MSB's...
+#define AVA_ACC_32 0x2F9 // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent power, updated after PWR_TIME 4 kSPS samples
+#define AVAHR_LO_32 0x2FA // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define AVAHR_HI_32 0x2FB // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, MSB's.
+
+#define AFVAR_ACC_32 0x30D // Reset: 0x00000000 Access: Read only Description: Phase A accumulated fundamental reactive power, updated after PWR_TIME 4kSPS samples
+#define AFVARHR_LO_32 0x30E // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, LSB's. Updated according to the settings in EP_CFG and EGY_TIME Registers
+#define AFVARHR_HI_32 0x30F // Reset: 0x00000000 Access: Read only Description: Phase A accumulated total apparent energy, MSB's...
+#define BWATT_ACC_32 0x321 // Reset: 0x00000000 Access: Read only Description: Phase B accumulated total active power, updated after PWR_TIME 4 kSPS samples
+#define BWATTHR_LO_32 0x322 //Reset: 0x00000000 Access: Read only Description:  Phase B accumulated total active energy, LSB's, updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BWATTHR_HI_32 0x323 //Reset: 0x00000000 Access: Read only Description:  Phase B accumulated total active energy, MSB's...
+#define BVAR_ACC_32 0x32B  // Reset: 0x00000000 Access: Read only Description: Phase B accumulated total reactive power, updated after PWR_TIME 4 ksSPS samples.
+
+#define BVARHR_LO_32 0x32C //Reset: 0x00000000 Access: Read only Description: Phase B accumulate total ractive energy,LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BVARHR_HI_32 0x32D // Reset: 0x00000000 Access: Read only Description: Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BVA_ACC_32 0x335 //Reset: 0x00000000 Access: Read only Description: Phase B accumulated total apparent power, updated after PWR_TIME 4kSPS samples.
+#define BVAHR_LO_32 0x336 //Reset: 0x00000000 Access: Read only Description: Phase B accumulatecd total apparent energy, LSbs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BVAHR_HI_32 0x337 //Reset: 0x00000000 Access: Read only Description: Phase B accumulate total ractive energy,MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BFVAR_ACC_32 0x349 //Reset: 0x00000000 Access: Read only Description: Phase B accumulated fundamental ractive power, updated after PWR_TIME 4 kSPS samples.
+#define BFVARHR_LO_32 0x34A //Reset: 0x00000000 Access: Read only Description: Phase B accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define BFVARHR_HI_32 0x34B //Reset: 0x00000000 Access: Read only Description: Phase B accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CWATT_ACC_32 0x35D // Reset: 0x00000000 Access: Read only Description: Phase C accumulated total active power, updated after PWR_TIME 4 kSPS samples
+#define CWARRHR_LO_32 0x35E //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CWATTHR_HI_32 0x35F //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total active energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVAR_ACC_32 0x367 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total reactive power, updated after PWR_TIME 4kSPS samples.
+#define CVARHR_LO_32 0x368 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVARHR_HI_32 0x369 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total ractive energy, LSBs. UPdated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVA_ACC_32 0x371 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total apparent powerm updated after PWR_TIME 4 kSPS samples.
+#define CVAHR_LO_32 0x372 //Reset: 0x00000000 Access: Read only Description: Phase C  accumulated total apparent energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CVAHR_HI_32 0x373 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated total apparent energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CFVAR_ACC_32 0x385 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated fundamental reactive power, updated after PWR_TIME 4 kSPS samples.
+#define CFVARHR_LO_32 0x386 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated fundamental reactive energy, LSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define CFVVARHR_HI_32 0x387 //Reset: 0x00000000 Access: Read only Description: Phase C accumulated fundamental reactive energy, MSBs. Updated according to the settings in EP_CFG and EGY_TIME registers.
+#define PWATT_ACC_32 0x397 //Reset: 0x00000000 Access: Read only Description: Accumulated Positive Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
+#define NWATT_ACC_32 0x39B //Reset: 0x00000000 Access: Read only Description: Accumulated Negative Total Active Power, MSBs, from AWATT, BWATT and CWATT registers, updated after PWR_TIME 4 kSPS samples.
+#define PVAR_ACC_32 0x39F //Reset: 0x00000000 Access: Read only Description: Accumulated Positive Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples.
+#define NVAR_ACC_32 0x3A3 //Reset: 0x00000000 Access: Read only Description: Accumulated Negative Total Reactive Power, MSBs, from AVAR, BVAR and CVAR registers, updated after PWR_TIME 4 kSPS samples
+#define IPEAK_32 0x400 //Reset: 0x00000000 Access: Read only Description: Current peak register.
+
+// Bits: [31:27] RESERVED Reset: 0x0 Access: R
+// Bits: [26:24]: IPPHASE Reset: 0x0 Access: R - These bits indicate which phases generate IPEAKVAL value. Note that the PEAKSEL[2:0] bits the CONFIG3 register determine which current channel to monitor the peak value on. When IPPHASE, Bit 0 is set to 1, Phase A current generated IPEAKVAL, Bits[23:0] value. Similarly, IPPHASE, Bit 1 indicates Phase B and IPPHASE, Bit 2 indicates Phase C current generated the peak value.
+// Bits: [23:0]: IPEAKVAL Reset: 0x0 Access: R - The IPEAK register stores the absolute value of the peak current. IPEAK is equal to xI_PCF/25
+
+
+#define VPEAK_32 0x401 //Reset: 0x00000000 Access: Read only Description:  Voltage peak register
+// Bits: [31:27] Reserved Reset: 0x0 Access: R
+// Bits: [26:24] VPPHASE Reset: 0x0 Access: R - These bits indicate which phases generate VPEAKVAL value. Note that the PEAKSEL[2:0] bits in the CONFIG3 register determine which voltage channels to monitor the peak value on. When VPPHASE[0] is 1, Phase A voltage generated VPEAKVAL[23:0] value. Similarly, VPPHASE[1] indicates Phase B and VPPHASE[2] indicates Phase C voltage generated the peak value.
+// Bits: [23:0] VPEAKVAL Reset: 0x0 Access: R - The VPEAK register stores the absolute value of the peak voltage. VPEAK is equal to xV_PCF/25.
+
+#define STATUS0_32 0x402 //Reset: 0x00000000 Access: Read only Description:  Status Register 0
+// Bits: [31:25] RESERVED Reset: 0x0 Access: R
+// Bits: 24 MISMTCH Reset: 0x0 Access: R/W1 - This bit is set to indicate a change in the relationship between ISUMRMS and ISUMLVL
+// Bits: 23 COH_WFB_FULL Reset: 0x0 Access: R/W1 - This bitis set when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
+// Bits: 22 WFB_TRIG Reset: 0x0 Access: R/W1 - This bit is set when one of the events configured in WFB_TRIG_CFG occurs
+// Bits: 21 PF_RDY Reset: 0x0 Access: R/W1 - This bit goes high to indicate when the power factor measurements have been updated, every 1.024 seconds.
+// Bits: [20:19] RESERVED Reset: 0x0 Access: R
+// Bits: 18 PWRRDY Reset: 0x0 Access: R/W1 - This bit is set when the power values in the xWATT_ACC, xVA_ACC, xVAR_ACC, xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 17 PAGE_FULL Reset: 0x0 Access: R/W1 - This bit is set when a page enabled in the WFB_PG_IRQEN register has been filled with fixed data rate samples, when WF_CAP_SEL bit in the WFB_CFG register = 0.
+// Bits: 16 WFB_TRIG_IRQ Reset: 0x0 Access: R/W1 - This bit is set when the waveform buffer has stopped filling after an event configured in WFB_TRIG_CFG occurs. This happens with fixed data rate samples only, when WF_CAP_SEL bit in the WFB_CFG register = 0.
+// Bits: 15 - DREAY Reset: 0x0 Access: R/W1 - This bit is set when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 14 - CF4 Reset: 0x0 Access: R/W1 - This bit is set when a CF4 pulse is issued, when the CF4 pin goes from a high to low state.
+// Bits: 13 - CF3 Reset: 0x0 Access: R/W1 - This bit is set when a CF3 pulse is issued, when the CF3 pin goes from a high to low state.
+// Bits: 12 - CF2 Reset: 0x0 Access: R/W1 - This bit is set when a CF2 pulse is issued, when the CF2 pin goes from a high to low state.
+// Bits: 11 - CF1 Reset: 0x0 Access: R/W1 - This bit is set when a CF1 pulse is issued, when the CF1 pin goes from a high to low state.
+// Bits: 10 - REVPSUM4 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF4 polarity changed sign. For example, if the last CF4 pulse was positive reactive energy and the next CF4 pulse is negative reactive energy, the REVPSUM4 bit is set. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low
+// Bits: 9 - REVPSUM3 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF3 polarity changed sign. See REVPSUM4.
+// Bits: 8 - REVPSUM2 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF2 polarity changed sign. See REVPSUM4.
+// Bits: 7 - REVPSUM1 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF1 polarity changed sign. See REVPSUM4.
+// Bits: 6 - REVRPC Reset: 0x0 Access: R/W1 - This bit indicates if the Phase C total or fundamental reactive power has changed sign. The PWR_SIGN_SEL bit in the EP_CFG register selects whether total or fundamental reactive power is monitored. This bit is updated when the power values in the xVAR_ACC and xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 5 - REVRPB Reset: 0x0 Access: R/W1 - This bit indicates if the Phase B total or fundamental reactive power has changed sign. See REVRPC.
+// Bits: 5 - REVRPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
+// Bits: 4 - REVRPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
+// Bits: 3 - REVAPC Reset: 0x0 Access: R/W1 - This bit indicates if the Phase C total active power has changed sign. This bit is updated when the power values in the xWATT_ACC and xWATT_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 2 - REVAPB Reset: 0x0 Access: R/W1 - This bit indicates if the Phase B total active power has changed sign. See REVAPC.
+// Bits: 1 - REVAPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total active power has changed sign. See REVAPC.
+// Bits: 0 - EGYRDY Reset: 0x0 Access: R/W1 - This bit is set when the power values in the xWATTHR, xVAHR, xVARHR, xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
+
+#define STATUS1_32 0x403 //Reset: 0x00000000 Access: Read only Description:  Status Register 1.
+
+// Bits: 31- ERROR3 Reset: 0x0 Access: R/W1 - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
+// Bits: 30 - ERROR2 Reset: 0x0 Access: R/W1 - This bit indicates that an error was detected and corrected. No action is required.
+// Bits: 29 - ERROR1 Reset: 0x0 Access: R - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
+// Bits: 28 - ERROR0 Reset: 0x0 Access: R - This bit indicates an error and generates a non- maskable interrupt. Issue a software or hardware reset to clear this error.
+// Bits: 27 - CRC_DONE Reset: 0x0 Access: R/W1 - This bit is set to indicate when the configuration register CRC calculation is done, after initiated by writing the FORCE_CRC_UPDATE bit in the CRC_FORCE register.
+// Bits: 26 - CRC_CHG Reset: 0x0 Access: R/W1 - This bit is set if any of the registers monitored by the configuration register CRC change value. The CRC_RSLT register holds the new configuration register CRC value.
+// Bits: [25:19] - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 18 - SEQERR Reset: 0x0 Access: R/W1 - This bit is set to indicate a phase sequence error on the Phase Voltage zero crossings.
+// Bits: 17 - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 16 - RSTDONE Reset: 0x0 Access: R/W1 - This bit is set to indicate that the IC has finished its power-up sequence after a reset or after changing between PSM2 or PSM3 operating mode to PSM0 or PSM1. This indicates that the user can configure the IC via the SPI port.
+// Bits: 15 - ZXIC Reset: 0x0 Access: R/W1 - When this bit is set to 1, it indicates a zero crossing has been detected on Phase C current.
+// Bits: 14 - ZXIB Reset: 0x0 Access: R/W1 - When this bit is set to 1, it indicates a zero crossing has been detected on Phase B current.
+// Bits: 13 - ZXIA Reset: 0x0 Access: R/W1 - When this bit is set to 1, it indicates a zero crossing has been detected on Phase A current.
+// Bits: 12 - ZXCOMB Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the combined signal from VA, VB, and VC.
+// Bits: 11 - ZXVC Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the Phase C voltage channel.
+// Bits: 10 - ZXVB Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the Phase B voltage channel.
+// Bits: 9 - ZXVA Reset: 0x0 Access: R/W1 - When this bit is set, it indicates a zero crossing has been detected on the Phase A voltage channel.
+// Bits: 8 - ZXTOVC Reset: 0x0 Access: R/W1 - This bit is set to indicate a zero crossing timeout on Phase C. This means that a zero crossing on the Phase C voltage is missing.
+// Bits: 7 - ZXTOVB Reset: 0x0 Access: R/W1 - This bit is set to indicate a zero crossing timeout on Phase B. This means that a zero crossing on the Phase B voltage is missing.
+// Bits: 6 - ZXTOVA Reset: 0x0 Access: R/W1 - This bit is set to indicate a zero crossing timeout on Phase A. This means that a zero crossing on the Phase A voltage is missing.
+// Bits: 5 - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 4 - RFNOLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase fundamental reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 3 - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 2 - VANLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase total apparent energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 1 - RNLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase total reactive energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+// Bits: 0 - ANLOAD Reset: 0x0 Access: R/W1 - This bit is set when one or more phase total active energy enters or exits the no load condition. The phase is indicated in the PHNOLOAD register.
+
+#define EVENT_STATUS32 0x404 //Reset: 0x00000000 Access: Read only Description:  Event Status Register.
+// Bits: [31:17] - RESERVED Reset: 0x0 Access: R - Reserved
+// Bits: 16 - DREADY Reset: 0x0 Access: R - This bit changes from a one to a zero when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 15 - RESERED Reset: 0x0 Access: R - Reserved
+// Bits: 14 RFNOLOAD Reset: 0x0 Access: R - This bit is set when the fundamental reactive energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of fundamental reactive energy accumulation goes into no load.
+// Bits: 13-  RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 12 - VANLOAD Reset: 0x0 Access: R - This bit is set when the total apparent energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total apparent energy accumulation goes into no load.
+// Bits: 11 - RNLOAD Reset: 0x0 Access: R - This bit is set when the total reactive energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total reactive energy accumulation goes into no load.
+// Bits: 10 - ANLOAD Reset: 0x0 Access: R - This bit is set when the total active energy accumulations in all phases are out of no load. This bit goes to zero when one or more phases of total active energy accumulation goes into no load.
+// Bits: 9 - REVPSUM4 Reset: 0x0 Access: R - This bit indicates the sign of the last CF4 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low.
+// Bits: 8 - REVPSUM3 Reset: 0x0 Access: R - This bit indicates the sign of the last CF3 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF3 pulse is output, when the CF3 pin goes from high to low.
+// Bits: 7 - REVPSUM2 Reset: 0x0 Access: R - This bit indicates the sign of the last CF2 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF2 pulse is output, when the CF2 pin goes from high to low.
+// Bits: 6 - REVPSUM1 Reset: 0x0 Access: R - This bit indicates the sign of the last CF1 pulse. A zero indicates that the pulse was from negative energy and a one indicates that the energy was positive. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
+// Bits: 5[:0] - Reserved Reset: 0x0 Access: R - Reserved
+
+
+#define MASK0_32 0x405 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 0.
+// Bits: [31:25] RESERVED Reset: 0x0 Access: R - Reserved
+// Bits: 24 - MISMTCH Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when there is a change in the relationship between ISUMRMS and ISUMLVL.
+// Bits: 23 - COH_WFB_FULL Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
+// Bits: 22 - WFB_TRIG Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when one of the events configured in WFB_TRIG_CFG occurs.
+// Bits: 21 - PF_RDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power factor measurements have been updated, every 1.024 seconds
+// Bits: [20:19] - RESERVED Reset: 0x0 Access: R - Reserved.
+// Bits: 18 - PWRRDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power values in the xWATT_ACC, xVA_ACC, xVAR_ACC, xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
+// Bits: 17 - PAGE_FULL Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when a page enabled in the WFB_PG_IRQEN register has been filled.
+// Bits: 16 - WFB_TRIG_IRQ Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when This bit is set when the waveform buffer has stopped filling after an event configured in WFB_TRIG_CFG occurs.
+// Bits: 15 - DREADY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 14 - CF4 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF4 pulse is issued, when the CF4 pin goes from a high to low state.
+// Bits: 13 - CF3 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF3 pulse is issued, when the CF3 pin goes from a high to low state.
+// Bits: 12 - CF2 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF2 pulse is issued, when the CF2 pin goes from a high to low state.
+// Bits: 11 - CF1 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF1 pulse is issued, when the CF1 pin goes from a high to low state.
+// Bits: 10 - REVPSUM4 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF4 polarity changed sign.
+// Bits: 9 - REVPSUM3 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF3 polarity changed sign.
+// Bits: 8 - REVPSUM2 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF2 polarity changed sign.
+// Bits: 7 - REVPSUM1 Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the CF1 polarity changed sign.
+// Bits: 6 - REVRPC Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase C total or fundamental reactive power has changed sign.
+// Bits: 5 - REVRPB Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase C total or fundamental reactive power has changed sign.
+// Bits: 4- REVRPA Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase A total or fundamental reactive power has changed sign.
+// Bits: 3 - REVAPC Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase C total active power has changed sign.
+// Bits: 2 - REVAPB Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase B total active power has changed sign.
+// Bits: 1 - REVAPA Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the Phase A total active power has changed sign.
+// Bits: 0 - EGYRDY Reset: 0x0 Access: R/W - Set this bit to enable an interrupt when the power values in the xWATTHR, xVAHR, xVARHR, and xFVARHR registers have been updated, after EGY_TIME 4 kSPS samples or line cycles, depending on the EGY_TMR_MODE bit in the EP_CFG register.
+
+
+#define MASK1_32 0x406 //Reset: 0x00000000 Access: Read only Description:  Interrupt Enable Register 1.
+// Bits: 31 - ERROR3 - Reset: 0x0 Access: R/W Description: Set this bit to enable an interrupt if ERROR3 occurs. Issue a software reset or hardware reset to clear this error.
+// Bits: 30 - ERROR2 - Reset: 0x0 Access: R/W Description: Set this bit to enable an interrupt if ERROR2 occurs.
+// Bits: 29 - ERROR1 - Reset: 0x0 Access: R/W Description: This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
+// Bits: 28 - ERROR0 - Reset: 0x0 Access: R/W Description: This interrupt is not maskable. Issue a software reset or hardware reset to clear this error.
+// Bits: 27 - Reset: 0x0 Access: R/W Description: CRC_DONE - Set this bit to enable an interrupt when the configuration register CRC calculation is done, after initiated by writing the FORCE_CRC_UPDATE bit in the CRC_FORCE register.
+// Bits: 26 - Reset: 0x0 Access: R/W Description: CRC_CHG - Set this bit to enable an interrupt if any of the registers monitored by the configuration register CRC change value. The CRC_RSLT register holds the new configuration register CRC value.
+// Bits: [25:19] - RESERVED Reset: 0x0 Access: Read only Description: Reserved.
+// Bits: 18 - SEQERR - Reset: 0x0 Access: R/W Description: Set this bit to set an interrupt when on a phase sequence error on the phase voltage zero crossings.
+// Bits: [17:16] - RESERVED Reset: 0x0 Access: Read only Description: Reserved.
+// Bits: 15 - ZXIC - Reset: 0x0 Access: R/W Description: Set this bit to set an interrupt when a zero crossing has been detected on the Phase C current channel.
+// Bits: 14 - ZXIB - Reset: 0x0 Access: R/W Description: Set this bit to set an interrupt when a zero crossing has been detected on the Phase B current channel.
+// Bits: 13 - ZXIA - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase A current channel.
+// Bits: 12 - ZXCOMB - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the combined signal from VA, VB, and VC.
+// Bits: 11 - ZXVC - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase C voltage channel.
+// Bits: 10 - ZXVB - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase B voltage channel.
+// Bits: 9 - ZXVA - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when a zero crossing has been detected on the Phase A voltage channel.
+// Bits: 8 - ZXTOVC - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when there is a zero crossing timeout on Phase C. This means that a zero crossing on the Phase C voltage is missing.
+// Bits: 7 - ZXTOVB - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when there is a zero crossing timeout on Phase B. This means that a zero crossing on the Phase B voltage is missing
+// Bits: 6 - ZXTOVA - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when there is a zero crossing timeout on Phase A. This means that a zero crossing on the Phase A voltage is missing.
+// Bits: 5 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 4 - RFNOLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
+// Bits: 3 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 2 - Reset: 0x0 Access: R/W Description:  VANLOAD - Set this bit to set an interrupt when one or more phase total apparent energy enters or exits the no load condition.
+// Bits: 1 - Reset: 0x0 Access: R/W Description:  RNLOAD - Set this bit to set an interrupt when one or more phase total reactive energy enters or exits the no load condition.
+// Bits: 0 - Reset: 0x0 Access: R/W Description:  ANLOAD - Set this bit to set an interrupt when one or more phase total active energy enters or exits the no load condition.
+
+#define EVENT_MASK_32 0x407 //Reset: 0x00000000 Access: Read only Description: Event enable register.
+// [31:17] - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 16 - DREADY - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when new waveform samples are ready. The update rate depends on the data selected in the WF_SRC bits in the WFB_CFG register.
+// Bits: 15 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 14 - RFNOLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of fundamental reactive energy accumulation goes into no load.
+// Bits: 13 - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+// Bits: 12 - VANLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of total apparent energy accumulation goes into no load.
+// Bits: 11 - RNLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of total reactive energy accumulation goes into no load.
+// Bits: 10 - ANLOAD - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low when one or more phases of total active energy accumulation goes into no load.
+// Bits: 9 - REVPSUM4 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF4 pulse was from negative energy. This bit is updated when a CF4 pulse is output, when the CF4 pin goes from high to low.
+// Bits: 8 - REVPSUM3 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF3 pulse was from negative energy. This bit is updated when a CF3 pulse is output, when the CF3 pin goes from high to low.
+// Bits: 7 - REVPSUM2 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF2 pulse was from negative energy. This bit is updated when a CF2 pulse is output, when the CF2 pin goes from high to low.
+// Bits: 6 - REVPSUM1 - Reset: 0x0 Access: R/W Description:  Set this bit to enable the EVENT pin to go low to indicate if the last CF1 pulse was from negative energy. This bit is updated when a CF1 pulse is output, when the CF1 pin goes from high to low.
+// Bits: [5:0] - RESERVED - Reset: 0x0 Access: Read only Description:  Reserved.
+
+#define USER_PERIOD_32 0x40E //Reset: 0x00500000 Access: R/W Description: User configured line period value used for resampling when the UPERIOD_SEL bit in the CONFIG2 register is set.
+
+#define VLEVEL_32 0x40F //Reset: 0x00045D45 Access: R/W Description: Register used in the algorithm that computes the fundamental reactive power
+// Bits: [31:24] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [23:0] BitName: VLEVEL_VAL - Reset: 0x45D45 Access: R/W Description: Register used in the algorithm that computes the fundamental reactive power.
+
+#define APERIOD_32 0x418 //Reset: 0x00A00000 Access: Read only Description: Line period on Phase A voltage
+#define BPERIOD_32 0x419 //Reset: 0x00A00000 Access: Read only Description: Line period on Phase B voltage
+#define CPERIOD_32 0x41A //Reset: 0x00A00000 Access: Read only Description: Line period on Phase C voltage
+#define COM_PERIOD_32 0x41B //Reset: 0x00A00000 Access: Read only Description: Line period measurement on combined signal from Phase A, Phase B, and Phase C voltages
+#define ACT_NL_LVL_32 0x41C //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total active power datapath
+#define REACT_NL_LVL_32 0x41D //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total and fundamental reactive power datapath.
+#define APP_NL_LVL_32 0x41E //Reset: 0x0000FFFF Access: R/W Description: No load threshold in the total apparent power datapath.
+
+
+
+#define PHNOLOAD_32 0x41F //Reset: 0x00000000 Access: Read only Description: Phase no load register.
+// Bits: [31:17] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 16 BitName: CFVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C fundamental reactive energy is in no load.
+// Bits: 15 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 14 BitName: CVANL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C total apparent energy is in no load.
+// Bits: 13 BitName: CVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C total reactive energy is in no load.
+// Bits: 12 BitName: CWATTNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase C total active energy is in no load.
+// Bits: 11 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 10 BitName: BFVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B fundamental reactive energy is in no load.
+// Bits: 9 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 8 BitName: BVANL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B apparent energy is in no load.
+// Bits: 7 BitName: BVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B total reactive energy is in no load.
+// Bits: 6 BitName: BWATTNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase B total active energy is in no load.
+// Bits: 5 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 4 BitName: AFVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A fundamental reactive energy is in no load.
+// Bits: 3 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 2 BitName: AVANL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A total apparent energy is in no load.
+// Bits: 1 BitName: AVARNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A total reactive energy is in no load.
+// Bits: 0 BitName: AWATTNL - Reset: 0x0 Access: Read only Description: This bit is set if the Phase A total active energy is in no load.
+
+#define WTHR_32 0x420 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total active power for the CF calibration pulse output. It is recommended to write WTHR = 0x0010 0000.
+#define VARTHR_32 0x421 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total and fundamental reactive power for the CF calibration pulse output. It is recommended to write VARTHR = 0x0010 0000.
+#define VATHR_32 0x422 //Reset: 0x0000FFFF Access: R/W Description: Sets the maximum output rate from the digital to frequency converter for the total apparent power for the CF calibration pulse output. It is recommended to write VATHR = 0x0010 0000.
+
+#define LAST_DATA_32_32 0x423 //Reset: 0x00000000 Access: Read only Description: This register holds the data read or written during the last 32-bittransaction on the SPI port.
+
+#define ADC_REDIRECT_32 0x424 //Reset: 0x001FFFFF Access: R/W Description: This register allows any ADC output to be redirected to any digital datapath.
+// Bits: [31:21] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [20:18] BitName: VC_DIN - Reset: 0x7 Access: R/W Description: Voltage C channel data can be selected from: Setting: 000 for IA ADC data. Setting: 001 for IB ADC data. Setting: 010 for IC ADC data. Setting: 011 for IN ADC data. Setting: 100 for VA ADC data. Setting: 101 for VB ADC data. Setting: 110 for VC ADC data. Setting: 111 for VC ADC data.
+// Bits: [17:15] BitName: VB_DIN - Reset: 0x7 Access: R/W Description: VB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VB ADC data.
+// Bits: [14:12] BitName: VA_DIN - Reset: 0x7 Access: R/W Description: VA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for VA ADC data.
+// Bits: [11:9] BitName: IN_DIN - Reset: 0x7 Access: R/W Description: IN channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IN ADC data.
+// Bits: [8:6] BitName: IC_DIN - Reset: 0x7 Access: R/W Description: IC channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IC ADC data.
+// Bits: [5:3] BitName: IB_DIN - Reset: 0x7 Access: R/W Description: IB channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IB ADC data.
+// Bits: [2:0] BitName: IA_DIN - Reset: 0x7 Access: R/W Description: IA channel data can be selected from all channels. The bit descriptions for 000b through 110b match VC_DIN. When the value is equal to 111b then: Setting: 111 for IA ADC data.
+
+#define CF_LCFG_32 0x425 //Reset: 0x00000000 Access: R/W Description: CF calibration pulse width configuration register.
+// Bits: [31:23] BitName: RESERVED Description: Reserved
+// Bits: 22 BitName: CF4_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF4 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 21 BitName: CF3_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF3 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 20 BitName: CF2_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF2 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: 19 BitName: CF1_LT - Reset: 0x0 Access: R/W Description: If this bit is set, the CF1 pulse width is determined by the CF_LTMR register value. If this bit = 0, the active low pulse width is set at 80 ms for frequencies lower than 6.25 Hz.
+// Bits: [18:0] BitName: CF_LTMR - Reset: 0x0 Access: R/W Description: If the CFx_LT bit in CF_LCFG register is set, this value determines the active low pulse width of the CFx pulse.
+
+#define PART_ID_32 0x472 //Reset: 0x00000000 Access: Read only Description: This register identifies the IC. If the ADE9000_ID bit is 0, the IC is an ADE9078
+// Bits: [31:22] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 21 BitName: AD73370_ID - Reset: 0x0 Access: Read only Description: This bit is set to identify an ADE73370 IC.
+// Bits: 20 BitName: ADE9000_ID - Reset: 0x0 Access: Read only Description: This bit is set to identify an ADE9000 IC.
+// Bits: [19:17]  BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 16 BitName: ADE9004_ID - Reset: 0x0 Access: Read only Description: This bit is set to identify an ADE9004 IC.
+// Bits: [15:0] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+
+//16-Bit Registers
+#define RUN_16 0x480 //Reset: 0x0000 Access: R/W Description: Write this register to 1 to start the measurements
+
+#define CONFIG1_16 0x481 //Reset: 0x0000 Access: R/W Description: Configuration Register 1.
+// Bits: 15 BitName: EXT_REF - Reset: 0x0 Access: R/W Description:
+// Bits: [14:13] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 12 BitName: IRQ0_ON_IRQ1 - Reset: 0x0 Access: R/W Description:
+// Bits: 11 BitName: BURST_EN - Reset: 0x0 Access: R/W Description:
+// Bits: 10 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [9:8] BitName: PWR_SETTLE - Reset: 0x0 Access: R/W Description:
+// Bits: [7:6] BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: 5 BitName: CF_ACC_CLR - Reset: 0x0 Access: Write only Description: Set this bit to clear the acculumation in the digital to frequency converter and CFDEN counter. Note that this bit automatically clears itself.
+// Bits: 4 BitName: RESERVED - Reset: 0x0 Access: Read only Description: Reserved
+// Bits: [3:2] BitName: CF4_CFG - Reset: 0x0 Access: R/W Description: These bits select which function to output on the CF4 pin. Setting: 00 for CF4, from digital to frequency converter. Setting: 01 for CF4, from digital to frequency converter. Setting: 10 for EVENT. Setting: 11 for DREADY.
+// Bits: 1 BitName: CF3_CFG - Reset: 0x0 Access: R/W Description: This bit selects which function to output on the CF3 pin. Setting: 0 for CF3, from digital to freqency converter. Setting: 1 for Zero Crossing output selected by the ZX_SEL bits in the ZX_LP_SEL register.
+// Bits: 0 BitName: SWRST - Reset: 0x0 Access: W1 Description: Set this bit to initiate a software reset. Note that this bit is self clearing.
+
+#define ANGL_VA_VB_16 0x482 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase B voltages.
+#define ANGL_VB_VC_16 0x483 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B and Phase C voltages.
+#define ANGL_VA_VC_16 0x484 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase C voltages.
+#define ANGL_VA_IA_16 0x485 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A voltage and current.
+#define ANGL_VB_IB_16 0x486 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B voltage and current.
+#define ANGL_VC_IC_16 0x487 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase C voltage and current.
+#define ANGL_IA_IB_16 0x488 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase B current.
+#define ANGL_IB_IC_16 0x489 //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase B and Phase C current.
+#define ANGL_IA_IC_16 0x48A //Reset: 0x0000 Access: Read only Description: Time between positive to negative zero crossings on Phase A and Phase C current
+
+#define CFMODE_16 0x490 //Reset: 0x0000 Access: R/W Description: CFx configureation register
+// Bits: 15 BitName: CF4DIS - Reset: 0x0 Access: R/W Description: CF4 output disable. Set this bit to disable the CF4 output and bring the pin high. Note that when this bit is set, the CFx bit in STATUS0 is not set when a CF pulse is accumulated in the digital to frequency converter.
+// Bits: 14 BitName: CF3DIS - Reset: 0x0 Access: R/W Description: CF1 output disable -- see CF4DIS
+// Bits: 13 BitName: CF2DIS - Reset: 0x0 Access: R/W Description: CF1 output disable -- see CF4DIS
+// Bits: 12 BitName: CF1DIS - Reset: 0x0 Access: R/W Description: CF1 output disable -- see CF4DIS
+// Bits: [11:9] BitName: CF4SEL Reset: 0x0 Access: R/W Description: Type of energy output on the CF4 pin. Configure TERMSEL4 in the COMPMODE register to select which phases are included. Setting: 000 for Total Active Power. Setting: 001 for Total Reactive Power. Setting: 010 for Total Apparent Power. Setting: 100 for Fundamental reactive power. Setting: 110 for Total Active Power. Setting: 111 for Total Active Power.
+// Bits: [8:6] BitName: CF3SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF3 pin --see CF4SEL
+// Bits: [5:3] BitName: CF2SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF2 pin --see CF4SEL
+// Bits: [2:0] BitName: CF1SEL Reset: 0x0 Access: R/W Description: Selects type of energy output on CF1 pin --see CF4SEL
+
+#define COMPMODE_16 0x491 //Reset: 0x0000 Access: R/W Description: Computation mode register
+// Bits: [15:12] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [11:9] BitName: TERMSEL4 Reset: 0x0 Access: R/W Description: Phases to include in CF4 pulse output. Set the TERMSEL4[2] bit to one to include Phase C in the CF4 pulse output. Similarly, set TERMSEL4[1] to include Phase B and TERMSEL4[0] for Phase A.
+// Bits: [8:6] BitName: TERMSEL3 Reset: 0x0 Access: R/W Description: Phases to include in CF3 pulse output --see TERMSEL4
+// Bits: [5:3] BitName: TERMSEL2 Reset: 0x0 Access: R/W Description: Phases to include in CF2 pulse output --see TERMSEL4
+// Bits: [2:0] BitName: TERMSEL1 Reset: 0x0 Access: R/W Description: Phases to include in CF1 pulse output --see TERMSEL4
+
+#define ACCMODE_16 0x492 //Reset: 0x0000 Access: R/W Description: Accumulation mode register
+// Bits: [15:9] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 8 BitName: SELFREQ Reset: 0x0 Access: R/W Description:This bit is used to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental reactive power measurement and to set the default line period used for resampling calculations if a zero crossing is not present. Setting: 0 for 50 Hz. Setting: 1 for 60 Hz.
+// Bits: 7 BitName: ICONSEL Reset: 0x0 Access: R/W Description: Set this bit to calculate the current flowing through IB from the IA and IC measurements. if this bit is set, IB = -IA - IC.
+// Bits: [6:4] BitName: VCONSEL Reset: 0x0 Access: R/W Description: Three-wire and four-wire hardware configuration selection. Setting: 000 for 4-wire wye. Setting: 001 for 3-wire delta. VB' = VA-VC. Setting: 010 for 4-wire delta, non-Blondel compliant. VB' = -VA - VC. Setting: 011 for 4-wire delta non-Blondel compliant. VB' = -VA. Setting: 100 for 3-wire delta. VA'=VA-VB; VB' = VA-VC; VC'=VC-VB.
+// Bits: [3:2] BitName: VARACC Reset: 0x0 Access: R/W Description: Total and fundamental reactive power accumulation mode for energy registers and CFx pulses. Setting: 00 for Signed accumulation mode. Setting: 01 for Absolute Value accumulation mode. Setting: 10 for Positve accumulation mode. Setting: 11 for Negative accumulation mode.
+// Bits: [1:0] BitName: WATTACC Reset: 0x0 Access: R/W Description: Total and fundamental active power accumulation mode for energy registers and CFx pulses--see VARACC.
+
+#define CONFIG3_16 0x493 //Reset: 0x0000 Access: R/W Description: Configuraiton Register 3
+// Bits: [15:5] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [4:2] BitName: PEAKSEL Reset: 0x0 Access: R/W Description: Set this bit to select which phase(s) to monitor peak voltages and currents on. Write PEAKSEL[0] to one to enable Phase A peak detection. Similarly, PEAKSEL[1] enables Phase B peak detection and PEAKSEL[2] enables Phase C peak detection.
+// Bits: [1:0] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+
+#define CF1DEN_16 0x494 //Reset: 0xFFFF Access: R/W Description: CF1 denominator register
+#define CF2DEN_16 0x495 //Reset: 0xFFFF Access: R/W Description: CF2 denominator register
+#define CF3DEN_16 0x496 //Reset: 0xFFFF Access: R/W Description: CF3 denominator register
+#define CF4DEN_16 0x497 //Reset: 0xFFFF Access: R/W Description: CF4 denomoinator register
+#define ZXTOUT_16 0x498 //Reset: 0xFFFF Access: R/W Description: Zero-crossing timeout configuration register.
+#define ZXTHRSH_16 0x499 //Reset: 0x0009 Access: R/W Description: Voltage channel zero-crossing threshold register.
+
+#define ZX_LP_SEL_16 0x49A //Reset: 0x001E Access: R/W Description: This register selects which zero crossing and which line period measurement are used for other calculations.
+// Bits: [15:5] BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [4:3] BitName: LP_SEL Reset: 0x3 Access: R/W Description: Selects line period measurement used for resampling. Setting: 00 APERIOD, line period measurement from Phase A voltage. Setting: 01 for BPERIOD, line period measurement from Phase B voltage. Setting: 10 for CPERIOD, line period measurement from Phase C voltage. Setting: 11 for COM_PERIOD, line period measurement on combined signal from VA, VB, and VC.
+// Bits: [2:1] BitName: ZX_SEL Reset: 0x3 Access: R/W Description: Selects the zero-crossing signal, which can be routed to CF3/ZX output pin and which is used for line cycle energy accumulation. Setting: 00 for ZXVA, Phase A voltage zero-crossing signal. Setting: 01 ZXVB, Phase B voltage zero-crossing signal.  Setting: 10 for ZXVC, Phase C voltage zero-crossing signal. Setting: 11 for ZXCOMB, zero crossing on combined signal from VA,VB and VC.
+// Bits: 0 BitName: RESERVED Reset: 0x0 Access: R Description: Reserved
+
+#define SEQ_CYC_16 0x49C //Reset: 0x00FF Access: R/W Description: Number of line cycles used for phase sequence detection. It is recommended to set this register to 1.
+#define PHSIGN_16 0x49D //Reset: 0x0000 Access: Read only Description: Power sign register
+// Bits: [15:10] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 9 BitName: SUM4SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF4 datapath. The CF4 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 8 BitName: SUM3SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 7 BitName: SUM2SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF2 datapath. The CF2 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 6 BitName: SUM1SIGN Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF1 datapath. The CF1 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: 5 BitName: CVARSIGN Reset: 0x0 Access: R Description: Phase C reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 4 BitName: CWSIGN Reset: 0x0 Access: R Description: Phase C active power sign bit
+// Bits: 3 BitName: BVARSIGN Reset: 0x0 Access: R Description: Phase B reactive power sign bit. The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 2 BitName: BWSIGN Reset: 0x0 Access: R Description: Phase B active power sign bit.
+// Bits: 1 BitName: AVARSIGN Reset: 0x0 Access: R Description: Phase A reactive power sign bit.  The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
+// Bits: 0 BitName: AWSIGN Reset: 0x0 Access: R Description: Phase A active power sign bit
+#define 0x4A0 WFB_CFG_16 //Reset: 0x0000 Access: R/W Description: Waveform buffer configuration register
+// Bits: [15:13] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 12 BitName: WF_IN_EN Reset: 0x0 Access: R/W Description: This setting determines whether the IN waveform samples are read out of the waveform buffer through SPI. 0: IN waveform samples are not read out of waveform buffer through SPI. 1: IN waveform samples are read out of waveform buffer through SPI
+// Bits: [11:10] BitName: RESERVED Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
+// Bits: [9:8] BitName: WF_SRC Reset: 0x0 Access: R/W Description: Waveform buffer souce and DREADY, data ready update rate, selection. 00: Sinc4 output, at 16kSPS. 01: Reserved. 10: Sinc4 + IIR LPF output, at 4 kSPS. 11: Current and voltage channel waveform samples, processed by the DSP (xl_PCF, xV_PCF) at 4 kSPS.
+// Bits: [7:6] BitName: WF_MODE Reset: 0x0 Access: R/W Description: fixed data rate waveforms filling and trigger based modes. 00: stop when waveform buffer is full. 01: continuous fill-stop only on enabled trigger events. 10: Continuous filling-center capture around enabled trigger events. 11: continuous fill-save event address of enabled trigger events
+// Bits: 5 BitName: WF_CAP_SEL Reset: 0x0 Access: R/W Description: This bit selects whether the waveform buffer is filled with resampled data or fixed data rate data, selected in the WF_CAP_SEL bits. 0: resampled data. 1: fixed data rate data
+// Bits: 4 BitName: WF_CAP_EN Reset: 0x0 Access: R/W Description: When this bit is set, waveform capture is started. 0: the waveform capture is disabled. the waveform buffer contents are maintained. 1: the waveform capture is started, according to the type of capture in WF_CAP_SEL and the WF_SRC bits when this bit goes from a 0 to a 1.
+// Bits: [3:0] BitName: BURST_CHAN Reset: 0x0 Access: R/W Description: selects which data to read out of the waveform buffer through SPI. 0000: all channels. 0001: IA and VA. 0010: IB and VB. 0011: IC and VC. 1000: IA. 1001: VA. 1010: IB. 1011:VB 1100:IC. 1101:VC. 1110:In if WF_IN_EN =1 in the WFB_CFG registers. 1111: single address read (SPI burst read mode is disabled)
+#define WFB_PG_IRQEN_16 0x4A1 //Reset: 0x0000 Access: R/W Description: This register enables interrupts to occur after specific pages of the waveform buffer have been filled.
+#define WFB_TRG_CFG_16 0x4A2 //Reset: 0x0000 Access: R/W Description: This register enables events to trigger a capture in the waveform buffer
+// Bits: [15:11] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: 10 Bitname: TRIG_FORCE Reset: 0x0 Access: R/W Description: Set this bit to trigger an even to stop the waveform buffer filling
+// Bits: 9 Bitname: ZXCOMB Reset: 0x0 Access: R/W Description: Zero crossing on combined signal from VA, VB, and VC
+// Bits: 8 Bitname: ZXVC Reset: 0x0 Access: R/W Description: Phase C voltage zero crossing.
+// Bits: 7 Bitname: ZXVB Reset: 0x0 Access: R/W Description: Phase B voltage zero crossing.
+// Bits: 6 Bitname: ZXVA Reset: 0x0 Access: R/W Description: Phase A voltage zero crossing.
+// Bits: 5 Bitname: ZXIC Reset: 0x0 Access: R/W Description: Phase C current zero crossing.
+// Bits: 4 Bitname: ZXIB Reset: 0x0 Access: R/W Description: Phase B current zero crossing.
+// Bits: 3 Bitname: ZXIA Reset: 0x0 Access: R/W Description: Phase A current zero crossing.
+// Bits: [2:0] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+#define 0x4A3 WFB_TRG_STAT_16 //Reset: 0x0000 Access: R/W Description: This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
+// Bits: [15:12] Bitname: WFB_LAST_PAGE Reset: 0x0 Access: R/W Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
+// Bits: 11 Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits: [10:0]  Bitname: UPERIOD_SEL Reset: 0x0 Access: R Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
+#define CONFIG5_16 0x4A4 //Reset: 0x0063 Access: R/W Description: Reset: 0x0063 Access: R/W Description: Configuration Register 5
+#define CRC_RSLT_16 0x4A8 //Reset: 0x0000 Access: R Description: This register holds the CRC of configuration registers.
+#define CRC_SPI_16 0x4A9 //Reset: 0x0000 Access: R Description: This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
+#define LAST_DATA_16 0x4AC //Reset: 0x0000 Access: R Description: This register holds the data read or written during the last 16-bit transaction on the SPI port.
+#define LAST_CMD_16 0x4AE //Reset: 0x0000 Access: R Description: This register holds the address and read/write operation request (CMD_HDR) for the last transaction on the SPI port.
+#define CONFIG2_16 0x4AF //Reset: 0x0C00 Access: R/W Description: Configuration Register 2
+// Bits [15:13] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits 12 Bitname: UPERIOD_SEL Reset: 0x0 Access: R/W Description: Set this bit to use a user configured line period, in USER_PERIOD, for the resampling calculation. If this bit is clear, the phase voltage line period selected by the LP_SEL[1:0] bits in the ZX_LP_SEL register is used.
+// Bits [11:9] Bitname: HPF_CRN Reset: 0x6 Access: R/W Description: High-Pass filter corner (f3dB) enabled when the HPFDIS is bit in the CONFIGO register=0
+//000 38.695 Hz.
+//001 19.6375 Hz.
+//010 9.895 Hz.
+//011 4.9675 Hz.
+//100 2.49 Hz.
+//101 1.2475 Hz.
+//110 0.625 Hz.
+//111 0.3125 Hz.
+// Bits [8:0] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved.
+#define EP_CFG_16 0x4B0 //Reset: 0x0000 Access: R/W Description: Energy and power accumulation configuration
+// Bits [15:13] Bitname: NOLOAD_TMR Reset: 0x0 Access: R/W Description: This register configures how many 4 kSPS samples to evaluate the no load condition convert
+//000 64.
+//001 128.
+//010 256.
+//011 512.
+//100 1024.
+//101 2048.
+//110 4096.
+//111 Disable no load threshold.
+
+// Bits [12:8] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits 7 Bitname: PWR_SIGN_SEL Reset: 0x0 Access: R/W Description: Selects whether the REVRPx bit follows the sign of the total or fundamental reactive power. 0: Total reactive power. 1: Fundamental reactive power
+// Bits 6 Bitname: RESERVED  Reset: 0x0 Access: R Description: Reserved
+// Bits 5 Bitname: RD_RST_EN Reset: 0x0 Access: R/W Description: Set this bit to enable the energy register read with reset feature. If this bit is set, when one of the xWATTHR, xVAHR, xVARHR and xFVARHR register is read, it is reset and begins accumulating energy from zero.
+// Bits 4 Bitname: EGY_LD_ACCUM Reset: 0x0 Access: R/W Description: If this bit = 0, the internal energy register is added to the user accessible energy register. If the bit is set, the internal energy register overwrites the user accessible energy register when the EGYRDY event occurs.
+// Bits [3:2] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
+// Bits 1 Bitname: EGY_TMR_MODE Reset: 0x0 Access: R/W Description: This bit determines whether energy is accumulated based on the number of 4 kSPS samples or zero crossing events configured in the EGY_TIME register
+        // 0 Accumulate energy based on 4 kSPS samples.
+        // 1 Accumulate energy based on the zero crossing selected by the ZX_SEL bits in the ZX_LP_SEL register.
+// Bits 0 Bitname: EGY_PWR_EN Reset: 0x0 Access: R/W Description: Set this bit to enable the energy and power accumulator, when the run bit is also set.
+
+#define PWR_TIME_16 0x4B1 //Reset: 0x00FF Access: R/W Description: POwer and time configuration
+#define EGY_TIME_16 0x4B2 //Reset: 0x00FF Access: R/W Description: Energy accumulation update time configuration
+#define CRC_FORCE_16 0x4B4 //Reset: 0x0000 Access: R/W Description: This register forces an update of the CRC of configuration registers.
+// Bits [15:1] Bitname: RESERVED Reset: 0x0 Access: R Description: RESERVED
+// Bits 0 Bitname: FORCE_CRC_UPDATE Reset: 0x0 Access: R/W Description: Write this bit to force the configuration register CRC calculation to start. When the calculation is complete, the CRC_DONE bit is set in the STATUS1 register
+
+#define CRC_OPTEN_16 0x4B5 //Reset: 0x0000 Access: R/W Description: This register selects which registers are optionally included in the configuration register CRC feature
+// Bits: 15 CRC_WFB_TRG_CFG_EN Reset: 0x0 Access: R/W Description: Set this bit to include the WFB_TRG_CFG register in the configuration register CRC calculation.
+// Bits: 14 CRC_WFB_PG_IRQEN Reset: 0x0 Access: R/W Description: Set this bit to include the WFB_PG_IRQEN register in the configuration register CRC calculation.
+// Bits: 13 CRC_WFB_CFG_EN Reset: 0x0 Access: R/W Description: Set this bit to include the WFB_CFG register in the configuration register CRC calculation.
+// Bits: 12 CRC_SEQ_CYC_EN Reset: 0x0 Access: R/W Description: Set this bit to include the SEQ_CYC register in the configuration register CRC calculation.
+// Bits: 11 CRC_ZXLPSEL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the ZX_LP_SEL register in the configuration register CRC calculation.
+// Bits: 10 CRC_ZXTOUT_EN Reset: 0x0 Access: R/W Description: Set this bit to include the CRC_ZXTOUT_EN register in the configuration register CRC calculation.
+// Bits: 9 CRC_APP_NL_LVL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the APP_NL_LVL register in the configuration register CRC calculation.
+// Bits: 8 CRC_REACT_NL_LVL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the REACT_NL_LVL register in the configuration register CRC calculation.
+// Bits: 7 CRC_ACT_NL_LVL_EN Reset: 0x0 Access: R/W Description: Set this bit to include the ACT_NL_LVL register in the configuration register CRC calculation.
+// Bits: [6:3] RESERVED Reset: 0x0 Access: R Description: Reserved.
+// Bits: 2 CRC_EVENT_MASK_EN Reset: 0x0 Access: R/W Description: Set this bit to include the EVENT_MASK register in the configuration register CRC calculation.
+// Bits: 1 CRC_MASK1_EN Reset: 0x0 Access: R/W Description: Set this bit to include the MASK1 register in the configuration register CRC calculation.
+// Bits: 0 CRC_MASK0_EN Reset: 0x0 Access: R/W Description: Set this bit to include the MASK0 register in the configuration register CRC calculation.
+
+
+#define PSM2_CFG_16 0x4B8 //Reset: 0x001F Access: R/W
+/* This register configures settings for the low power PSM2 operating mode. This register value is retained in PSM2 and PSM3 but is rewritten to its default value when entering PSM0 and PSM1. */
+// Bits: [15:9] Reset: 0x0 Access: R Description: Reserved
+// Bits: [8:5] Reset: 0x0 Access: R/W Description: PKDET_LVL //These bits configure the PSM2 low power comparator peak current detection Level, listed as the input signal level with respect to full scale. The register value is retained in PSM2 and PSM3. It returns to its default value if PSM0 is entered.
+    // 0000 100:1
+    // 0001 200:1
+    // 0010 300:1
+    // 0011 400:1
+    // 0100 500:1
+    // 0101 600:1
+    // 0110 700:1
+    // 0111 800:1
+    // 1000 900:1
+    // 1001 1000:1
+    // 1010 1100:1
+    // 1011 1200:1
+    // 1100 1300:1
+    // 1101 1400:1
+    // 1110 1500:1
+    // 1111 1600:1
+// [Bits: 4:0] LPLINE Reset: 0x1F Access: R/W Description: This register determines the time used to detect 0x1F R/W peak currents in the low power comparator in
+//  PSM2 operating mode. Note that this register
+//  retains its value in PSM2 and PSM3 operating
+//  modes but is reset to its default value upon entering PSM0 or PSM1.
+
+#define PGA_GAIN_16 0x4B9 //Reset: 0x0000 Access: R/W
+/*This register configures the PGA gain for each ADC */
+// Bits: [15:14] RESERVED Reset: 0x0 Access: R Description: Reserved.
+// Bits: [13:12] VC_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel C ADC. 0x0 R/W
+    //  00 Gain = 1.
+    //  01 Gain = 2.
+    //  10 Gain = 4.
+    //  11 Gain = 4.
+// Bits: [11:10] VB_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
+// Bits: [9:8] VA_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel A ADC. See 0x0 R/W VC_GAIN.
+// Bits: [7:6] IN_GAIN Reset: 0x0 Access: R/W Description: PGA gain for neutral current channel ADC. See 0x0 R/W VC_GAIN.
+// Bits: [5:4] IC_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Current Channel C ADC. See 0x0 R/W VC_GAIN.
+// Bits: [3:2] IB_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
+// Bits: [1:0] IA_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Current Channel A ADC. See 0x0 R/W VC_GAIN.
+
+#define 0x4BA CHNL_DIS_16 //Reset: 0x0000 Access: R/W
+/* This register can be disables the ADCs individually */
+// Bits: [15:7] RESERVED Reset: 0x0 Access: R Description: Reserved.
+// Bits: 6 VC_DISAD Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 5 VB_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 4 VA_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 3 IN_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 2 IC_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 1 IB_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+// Bits: 0 IA_DISADC Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
+
+
+#define WR_LOCK_16 0x4BF //Reset: 0x0000 Access: R/W
+/* This register enables the configuration lock feature */
+#define VAR_DIS_16 0x4E0 //Reset: 0x0000 Access: R/W
+/* Enable/disable total reactive power calculation */
+// [15:1] - Reserved Reset: 0x0 Access: R Description: Reserved.
+// 0 - VARDIS Reset: 0x0 Access: R/W Description: Set this bit to disable the total VAR calculation. This 0x0 R/W bit must be set before writing the run bit for proper operation.
+
+#define RESERVED1_16 0x4F0 //Reset: 0x0000 Access: R
+/* This register is reserved */
+#define VERSION_16 0x4FE //Reset: 0x0040 Access: R
+/* Version of the ADE9078 IC */
+#define AI_SINC_DAT_32 0x500 //Reset: 0x00000000 Access: R
+/* Current Channel A ADC waveforms from sinc4 output, at 16 kSPS */
+#define AV_SINC_DAT_32 0x501 //Reset: 0x00000000 Access: R
+/* Voltage Channel A ADC waveforms from sinc4 output, at 16 kSPS */
+#define BI_SINC_DAT_32 0x502 //Reset: 0x00000000 Access: R
+/* Current Channel B ADC waveforms from sinc4 output, at 16 kSPS */
+#define BV_SINC_DAT_32 0x503 //Reset: 0x00000000 Access: R
+/* Voltage Channel B ADC waveforms from sinc4 output, at 16 kSPS */
+#define CI_SINC_DAT_32 0x504 //Reset: 0x00000000 Access: R
+/* Current Channel C ADC waveforms from sinc4 output, at 16 kSPS */
+#define CV_SINC_DAT_32 0x505 //Reset: 0x00000000 Access: R
+/* Voltage Channel C ADC waveforms from sinc4 output, at 16 kSPS */
+#define NI_SINC_DAT_32 0x506 //Reset: 0x00000000 Access: R
+/* Neutral current channel ADC waveforms from sinc4 output, at 16 kSPS */
+#define AI_LPF_DAT_32 0x510 //Reset: 0x00000000 Access: R
+/* Current Channel A ADC waveforms from sinc4 + IIR LPF and decimator output, at 4 kSPS */
+#define AV_LPF_DAT_32 0x511 //Reset: 0x00000000 Access: R
+/* Voltage Channel A ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define BI_LPF_DAT_32 0x512 //Reset: 0x00000000 Access: R
+/* Current Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define BV_LPF_DAT_32 0x513 //Reset: 0x00000000 Access: R
+/* Voltage Channel B ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define CI_LPF_DAT_32 0x514 //Reset: 0x00000000 Access: R
+/* Current Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define CV_LPF_DAT_32 0x515 //Reset: 0x00000000 Access: R
+/* Voltage Channel C ADC waveforms from sinc4 + IIR LPF output, at 4 kSPS */
+#define NI_LPF_DAT_32 0x516 //Reset: 0x00000000 Access: R
+/* Neutral current channel ADC waveforms from since4 + IIR LPF output, at 4 kSPS*/
+#define AV_PCF_1_32 0x600 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
+#define BV_PCF_1_32 0x601 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
+#define CV_PCF_1_32 0x602 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
+#define NI_PCF 0x603-1_32 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
+#define AI_PCF_1_32 0x604 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
+#define BI_PCF_1_32 0x605 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
+#define CI_PCF_1_32 0x606 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
+#define AIRMS_1_32 0x607 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
+#define BIRMS_1_32 0x608 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
+#define CIRMS_1_32 0x609 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
+#define AVRMS_1_32 0x60A //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
+#define BVRMS_1_32 0x60B //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
+#define CVRMS_1_32 0x60C //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
+#define NIRMS_1_32 0x60D //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
+#define AWATT_1_32 0x60E //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
+#define BWATT_1_32 0x60F //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
+#define CWATT_1_32 0x610 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
+#define AVA_1_32 0x611 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
+#define BVA_1_32 0x612 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
+#define CVA_1_32 0x613 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
+#define AVAR_1_32 0x614 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
+#define BVAR_1_32 0x615 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
+#define CVAR_1_32 0x616 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
+#define AFVAR_1_32 0x617 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
+#define BFVAR_1_32 0x618 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
+#define CFVAR_1_32 0x619 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
+#define APF_1_32 0x61A //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
+#define BPF_1_32 0x61B //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
+#define CPF_1_32 0x61C //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
+#define AV_PCF_2_32 0x680 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AV_PCF in Table 31*/
+#define AI_PCF_2_32 0x681 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AI_PCF in Table 31*/
+#define AIRMS_2_32 0x682 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AIRMS in Table 31*/
+#define AVRMS_2_32 0x683 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVRMS in Table 31*/
+#define AWATT_2_32 0x684 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AWATT in Table 31*/
+#define AVA_2_32 0x685 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVA in Table 31*/
+#define AVAR_2_32 0x686 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AVAR in Table 31*/
+#define AFVAR_2_32 0x687 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See AFVAR in Table 31*/
+#define APF_2_32 0x688 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See APF in Table 31*/
+#define BV_PCF_2_32 0x693 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BV_PCF in Table 31*/
+#define BI_PCF_2_32 0x694 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BI_PCF in Table 31*/
+#define BIRMS_2_32 0x695 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BIRMS in Table 31*/
+#define BVRMS_2_32 0x696//Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVRMS in Table 31*/
+#define BWATT_2_32 0x697 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BWATT in Table 31*/
+#define BVA_2_32 0x698 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVA in Table 31*/
+#define BVAR_2_32 0x699 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BVAR in Table 31*/
+#define BFVAR_2_32 0x69A //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BFVAR in Table 31*/
+#define BPF_2_32 0x69B //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See BPF in Table 31*/
+#define CV_PCF_2_32 0x6A6 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CV_PCF in Table 31*/
+#define CI_PCF_2_32 0x6A7 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CI_PCF in Table 31*/
+#define CIRMS_2_32 0x6A8 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CIRMS in Table 31*/
+#define CVRMS_2_32 0x6A9 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVRMS in Table 31*/
+#define CWATT_2_32 0x6AA //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CWATT in Table 31*/
+#define CVA_2_32 0x6AB //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVA in Table 31*/
+#define CVAR_2_32 0x6AC //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CVAR in Table 31*/
+#define CFVAR_2_32 0x6AD //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CFVAR in Table 31*/
+#define CPF_2_32 0x6AE //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See CPF in Table 31*/
+#define NI_PCF_2_32 0x6B9 //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NI_PCF in Table 31*/
+#define NIRMS_2_32 0x6BA //Reset: 0x00000000 Access: R/W
+/* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
+
+
+
+
 
 
 //****************User Program Functions*****************
 
-uint8_t ADE7953::getVersion(){
-  return spiAlgorithm8_read(functionBitVal(Version_8,1), functionBitVal(Version_8,0));  //An example of the address lookup - the spiAlgorithm8_read((functionBitVal(addr,1), functionBitVal(addr,1)) would return the eqivenet to spiAlgorithm8_read(0x07,0x02) when working properly
+uint8_t ADE9078::getVersion(){
+  return spiAlgorithm8_read(functionBitVal(Version_16,1), functionBitVal(Version_16,0));  //An example of the address lookup - the spiAlgorithm8_read((functionBitVal(addr,1), functionBitVal(addr,1)) would return the eqivenet to spiAlgorithm8_read(0x07,0x02) when working properly
 }
 
-float ADE7953::getPowerFactorA(){
+float ADE9078::getPowerFactorA(){
 	int16_t value=0;
 	value=spiAlgorithm16_read((functionBitVal(PFA_16,1)),(functionBitVal(PFA_16,0)));
 	float decimal = decimalize(value, 327.67, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
-int16_t ADE7953::getPhaseCalibA(){
-	int16_t value=0;
-	value=spiAlgorithm16_read((functionBitVal(PHCALA_16,1)),(functionBitVal(PHCALA_16,0)));
+// TODO: float ADE9078::getPowerFactorB(){
+
+// TODO: float ADE9078::getPowerFactorB(){
+
+// which APHCAL should we use? There are 4
+int32_t ADE9078::getPhaseCalibA(){
+	int32_t value=0;
+	value=spiAlgorithm32_read((functionBitVal(APHCAL0_32,1)),(functionBitVal(APHCAL0_32,0)));
 return value;
   }
 
-float ADE7953::getPeriod(){
-	uint16_t value=0;
-	value=spiAlgorithm16_read((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0)));
-	float decimal = decimalize(value, 1, 0); //convert to float with calibration factors specified
-return decimal;
-  }
+// No period register?
+// float ADE9078::getPeriod(){
+// 	uint16_t value=0;
+// 	value=spiAlgorithm16_read((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0)));
+// 	float decimal = decimalize(value, 1, 0); //convert to float with calibration factors specified
+// return decimal;
+//   }
 
-unsigned long ADE7953::getAPNOLOAD(){  //use signed long for signed registers, and unsigned long for unsigned registers
+// might need to edit to access bits for a/b/c
+unsigned long ADE9078::getPHNOLOAD(){  //use signed long for signed registers, and unsigned long for unsigned registers
 	unsigned long value=0;  //use signed long for signed registers, and unsigned long for unsigned registers
-	value=spiAlgorithm32_read((functionBitVal(AP_NOLOAD_32,1)),(functionBitVal(AP_NOLOAD_32,0))); //Call MSB and LSB from the register constant (template for how all functions should be called)
+	value=spiAlgorithm32_read((functionBitVal(PHNOLOAD_32,1)),(functionBitVal(PHNOLOAD_32,0))); //Call MSB and LSB from the register constant (template for how all functions should be called)
 return value;
   }
 
-long ADE7953::getInstVoltage(){
+
+long ADE9078::getInstVoltageA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(V_32,1)),(functionBitVal(V_32,0)));
+	value=spiAlgorithm32_read((functionBitVal(AV_PCF_32,1)),(functionBitVal(AV_PCF_32,0)));
 return value;
   }
+long ADE9078::getInstVoltageB(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BV_PCF_32,1)),(functionBitVal(BV_PCF_32,0)));
+  return value;
+}
+long ADE9078::getInstVoltageC(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CV_PCF_32,1)),(functionBitVal(CV_PCF_32,0)));
+  return value;
+}
 
-float ADE7953::getVrms(){
+float ADE9078::getAVrms(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(VRMS_32,1)),(functionBitVal(VRMS_32,0)));
+	value=spiAlgorithm32_read((functionBitVal(AVRMS_32,1)),(functionBitVal(AVRMS_32,0)));
 	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
-long ADE7953::getInstCurrentA(){
+float ADE9078::getBVrms(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BVRMS_32,1)),(functionBitVal(BVRMS_32,0)));
+	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
+return decimal;
+  }
+
+float ADE9078::getCVrms(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CVRMS_32,1)),(functionBitVal(CVRMS_32,0)));
+	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
+return decimal;
+  }
+
+long ADE9078::getInstCurrentA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(IA_32,1)),(functionBitVal(IA_32,0)));
+	value=spiAlgorithm32_read((functionBitVal(AI_PCF_32,1)),(functionBitVal(IA_PCF_32,0)));
 return value;
   }
 
-float ADE7953::getIrmsA(){
+long ADE9078::getInstCurrentB(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BI_PCF_32,1)),(functionBitVal(IB_PCF_32,0)));
+return value;
+  }
+
+long ADE9078::getInstCurrentC(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CI_PCF_32,1)),(functionBitVal(IC_PCF_32,0)));
+return value;
+  }
+
+float ADE9078::getIrmsA(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(IRMSA_32,1)),(functionBitVal(IRMSA_32,0)));
+	value=spiAlgorithm32_read((functionBitVal(AIRMS_32,1)),(functionBitVal(IRMSA_32,0)));
+	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
+  return decimal;
+}
+
+float ADE9078::getIrmsB(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BIRMS_32,1)),(functionBitVal(IRMSA_32,0)));
+	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
+  return decimal;
+}
+
+float ADE9078::getIrmsC(){
+	unsigned long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CIRMS_32,1)),(functionBitVal(IRMSA_32,0)));
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
-unsigned long ADE7953::getVpeak(){
+
+unsigned long ADE9078::getVpeak(){
 	unsigned long value=0;
 	value=spiAlgorithm32_read((functionBitVal(VPEAK_32,1)),(functionBitVal(VPEAK_32,0)));
 return value;
   }
 
-unsigned long ADE7953::getIpeakA(){
+unsigned long ADE9078::getIpeak(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(IAPEAK_32,1)),(functionBitVal(IAPEAK_32,0)));
+	value=spiAlgorithm32_read((functionBitVal(IPEAK_32,1)),(functionBitVal(IPEAK_32,0)));
 return value;
   }
 
-long ADE7953::getActiveEnergyA(){
+long ADE9078::getActiveEnergyA(){
 	long value=0;
 	value=spiAlgorithm32_read((functionBitVal(AENERGYA_32,1)),(functionBitVal(AENERGYA_32,0)));
 return value;
   }
 
-long ADE7953::getReactiveEnergyA(){
-	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(RENERGYA_32,1)),(functionBitVal(RENERGYA_32,0)));
-return value;
-  }
-
-long ADE7953::getApparentEnergyA(){
+long ADE9078::getApparentEnergyA(){
 	long value=0;
 	value=spiAlgorithm32_read((functionBitVal(APENERGYA_32,1)),(functionBitVal(APENERGYA_32,0)));
 return value;
   }
 
-float ADE7953::getInstApparentPowerA(){
+float ADE9078::getInstApparentPowerA(){
 	long value=0;
 	value=spiAlgorithm32_read((functionBitVal(AVA_32,1)),(functionBitVal(AVA_32,0)));
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
-float ADE7953::getInstActivePowerA(){
+float ADE9078::getInstApparentPowerB(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BVA_32,1)),(functionBitVal(BVA_32,0)));
+	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+return abs(decimal);
+  }
+
+float ADE9078::getInstApparentPowerC(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CVA_32,1)),(functionBitVal(CVA_32,0)));
+	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+return abs(decimal);
+  }
+
+
+float ADE9078::getInstActivePowerA(){
 	long value=0;
 	value=spiAlgorithm32_read((functionBitVal(AWATT_32,1)),(functionBitVal(AWATT_32,0)));
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
-float ADE7953::getInstReactivePowerA(){
+float ADE9078::getInstActivePowerB(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BWATT_32,1)),(functionBitVal(BWATT_32,0)));
+	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+return abs(decimal);
+  }
+
+float ADE9078::getInstActivePowerC(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CWATT_32,1)),(functionBitVal(CWATT_32,0)));
+	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+return abs(decimal);
+}
+
+float ADE9078::getInstReactivePowerA(){
 	long value=0;
 	value=spiAlgorithm32_read((functionBitVal(AVAR_32,1)),(functionBitVal(AVAR_32,0)));
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return decimal;
   }
+
+float ADE9078::getInstReactivePowerB(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(BVAR_32,1)),(functionBitVal(BVAR_32,0)));
+	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+return decimal;
+  }
+
+float ADE9078::getInstReactivePowerC(){
+	long value=0;
+	value=spiAlgorithm32_read((functionBitVal(CVAR_32,1)),(functionBitVal(CVAR_32,0)));
+	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+return decimal;
+  }
+
+
 
 //*******************************************************
 
@@ -785,7 +1066,7 @@ return decimal;
 //****************ADE 7953 Library Control Functions**************************************
 
 //****************Object Definition*****************
-ADE7953::ADE7953(int SS, int SPI_freq)
+ADE9078::ADE9078(int SS, int SPI_freq)
 {
   _SS=SS;
   _SPI_freq=SPI_freq;
@@ -793,10 +1074,10 @@ ADE7953::ADE7953(int SS, int SPI_freq)
 //**************************************************
 
 //****************Initialization********************
-void ADE7953::initialize(){
+void ADE9078::initialize(){
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953:initialize function started ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078:initialize function started ");
   #endif
 
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
@@ -811,21 +1092,21 @@ void ADE7953::initialize(){
   digitalWrite(_SS, LOW);//Enable data transfer by bringing SS line LOW.
   SPI.transfer(0x00); //Pass in MSB of register 0x00FE first.
   SPI.transfer(0xFE); //Pass in LSB of register 0x00FE next.
-  SPI.transfer(WRITE); //This tells the ADE7953 that data is to be written to register 0x00FE, per datasheet
+  SPI.transfer(WRITE); //This tells the ADE9078 that data is to be written to register 0x00FE, per datasheet
   SPI.transfer(0x00); //Pass in MSB of 0x00AD first to write to 0x00FE, per datasheet
   SPI.transfer(0xAD); //Pass in LSB of 0x00AD next to write to 0x00FE, per datasheet
 
   //Write 0x0030 to Register Address 0x0120. "This configures the optimum settings." per datasheet
   SPI.transfer(0x01); //Pass in MSB of register 0x0120 first, per datasheet
   SPI.transfer(0x20); //Pass in LSB of register 0x0120 next, per datasheet
-  SPI.transfer(WRITE);//This tells the ADE7953 that data is to be written to register 0x0120, per datasheet
+  SPI.transfer(WRITE);//This tells the ADE9078 that data is to be written to register 0x0120, per datasheet
   SPI.transfer(0x00); //Pass in MSB of 0x0030 first to write to 0x0120, per datasheet
   SPI.transfer(0x30); //Pass in LSB of 0x0030 next to write to 0x0120, per datasheet
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);//End data transfer by bringing SS line HIGH.
   delay(100);
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print(" ADE7953:initialize function completed ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print(" ADE9078:initialize function completed ");
   #endif
 
   //Default Calibrations - Per Datasheet
@@ -841,12 +1122,12 @@ void ADE7953::initialize(){
 }
 //**************************************************
 
-byte ADE7953::functionBitVal(int addr, uint8_t byteVal)
+byte ADE9078::functionBitVal(int addr, uint8_t byteVal)
 {
 //Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
   int x = ((addr >> (8*byteVal)) & 0xff);
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::functionBitVal function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::functionBitVal function details: ");
    Serial.print("Address input (dec): ");
    Serial.print(addr, DEC);
    Serial.print(" Byte requested (dec): ");
@@ -855,31 +1136,31 @@ byte ADE7953::functionBitVal(int addr, uint8_t byteVal)
    Serial.print(x, DEC);
    Serial.print(" Returned Value (HEX): ");
    Serial.print(x, HEX);
-   Serial.print(" ADE7953::functionBitVal function completed ");
+   Serial.print(" ADE9078::functionBitVal function completed ");
   #endif
   return x;
 }
 
-uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm8_read function started ");
+uint8_t ADE9078::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm8_read function started ");
   #endif
   uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
-  byte two; //This may be a dummy read, it looks like the ADE7953 is outputting an extra byte as a 16 bit response even for a 1 byte return
+  byte two; //This may be a dummy read, it looks like the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   SPI.transfer(MSB);  //Pass in MSB of register to be read first.
   SPI.transfer(LSB);  //Pass in LSB of register to be read next.
   //Read in values sequentially and bitshift for a 32 bit entry
   SPI.transfer(READ); //Send command to begin readout
-  one = (SPI.transfer(WRITE));  //MSB Byte 1  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte
+  one = (SPI.transfer(WRITE));  // MSB Byte 1  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte
   two = (SPI.transfer(WRITE));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte,
   SPI.endTransaction(); //end SPI communication
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm8_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm8_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -888,7 +1169,7 @@ uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorith
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.print(" ADE7953::spiAlgorithm8_read function completed ");
+   Serial.print(" ADE9078::spiAlgorithm8_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operation
@@ -897,9 +1178,9 @@ uint8_t ADE7953::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorith
  }
 
 
-uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm16_read function started ");
+uint16_t ADE9078::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm16_read function started ");
   #endif
   uint16_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
@@ -915,8 +1196,8 @@ uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm16_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm16_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -925,7 +1206,7 @@ uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.print(" ADE7953::spiAlgorithm16_read function completed ");
+   Serial.print(" ADE9078::spiAlgorithm16_read function completed ");
   #endif
 
    //Post-read packing and bitshifting operation
@@ -938,9 +1219,9 @@ uint16_t ADE7953::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
 
 
 
-uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm24_read function started ");
+uint32_t ADE9078::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm24_read function started ");
   #endif
   //long readval_signed=0;
   uint32_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
@@ -959,8 +1240,8 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
- #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm24_read function details: ");
+ #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm24_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -971,7 +1252,7 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
    Serial.print(two, HEX);
    Serial.print(" ");
    Serial.print(three, HEX);
-   Serial.print(" ADE7953::spiAlgorithm24_read function completed ");
+   Serial.print(" ADE9078::spiAlgorithm24_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operation
@@ -986,9 +1267,9 @@ uint32_t ADE7953::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algori
   }
 
 
-uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algorithm that reads from a 32 bit register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm32_read function started ");
+uint32_t ADE9078::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm32_read function started ");
   #endif
   uint32_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one;
@@ -1008,8 +1289,8 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm32_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm32_read function details: ");
    //Serial.print("Address Byte 1(MSB)[HEX]: ");
    //Serial.print(MSB, BIN);
    //Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -1022,7 +1303,7 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
    Serial.print(three, BIN);
    Serial.print(" ");
    Serial.print(four, BIN);
-   Serial.print(" ADE7953::spiAlgorithm32_read function completed ");
+   Serial.print(" ADE9078::spiAlgorithm32_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operations
@@ -1042,8 +1323,8 @@ uint32_t ADE7953::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
 }
 
 
-void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, byte three, byte fourlsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
+void ADE9078::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, byte three, byte fourlsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm32_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
@@ -1058,8 +1339,8 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   SPI.transfer(fourlsb);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm32_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm32_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -1077,8 +1358,8 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   }
 
 
-  void ADE7953::spiAlgorithm24_write(byte MSB, byte LSB, byte onemsb, byte two, byte threelsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
+  void ADE9078::spiAlgorithm24_write(byte MSB, byte LSB, byte onemsb, byte two, byte threelsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm24_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
@@ -1091,8 +1372,8 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   SPI.transfer(two);
   SPI.transfer(threelsb);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm24_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm24_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -1108,8 +1389,8 @@ void ADE7953::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   }
 
 
-void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
+void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm16_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
@@ -1121,8 +1402,8 @@ void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
   SPI.transfer(onemsb);
   SPI.transfer(twolsb);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm16_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm16_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -1136,8 +1417,8 @@ void ADE7953::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
   }
 
 
-void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is the algorithm that writes to a register in the ADE7953. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE7953_VERBOSE_DEBUG
+void ADE9078::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+  #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm8_write function started ");
   #endif
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
@@ -1148,8 +1429,8 @@ void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is t
   SPI.transfer(WRITE);
   SPI.transfer(onemsb);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm8_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm8_read function details: ");
    Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -1161,9 +1442,9 @@ void ADE7953::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is t
   }
 
 
-float ADE7953::decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+float ADE9078::decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
-  #ifdef ADE7953_VERBOSE_DEBUG
+  #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE7953::calibration and float type conversion function executed ");
   #endif
 return ((float)input/factor)+offset;
