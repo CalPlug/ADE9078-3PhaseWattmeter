@@ -32,18 +32,23 @@ class ADE9078 {
 	float getPeriod();
 	int16_t getPhaseCalibA();
 	unsigned long getPHNOLOAD();
+
   long getInstVoltageA();
   long getInstVoltageB();
   long getInstVoltageC();
+
 	float getAVrms();
   float getBVrms();
   float getCVrms();
+
 	long getInstCurrentA();
   long getInstCurrentB();
   long getInstCurrentC();
+
 	float getIrmsA();
   float getIrmsB();
   float getIrmsC();
+
 	unsigned long getVpeak();
 	unsigned long getIpeak();
 
@@ -54,9 +59,11 @@ class ADE9078 {
 	float getInstApparentPowerA();
   float getInstApparentPowerB();
   float getInstApparentPowerC();
+
 	float getInstActivePowerA();
   float getInstActivePowerB();
   float getInstActivePowerC();
+
 	float getInstReactivePowerA();
   float getInstReactivePowerB();
   float getInstReactivePowerC();

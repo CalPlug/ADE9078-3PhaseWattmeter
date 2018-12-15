@@ -1,6 +1,6 @@
 # ADE9078-3-Phase Wattmeter
 
-Version 0.1
+Version 0.2
 
 Example library for operating the ADE9078 3-Phase AC Line measurement IC over SPI interfacing
 

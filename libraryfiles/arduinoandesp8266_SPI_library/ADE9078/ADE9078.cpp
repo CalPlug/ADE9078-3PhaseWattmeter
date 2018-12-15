@@ -982,15 +982,9 @@ unsigned long ADE9078::getIpeak(){
 return value;
   }
 
-long ADE9078::getActiveEnergyA(){
+long ADE9078::getEnergyA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AENERGYA_32,1)),(functionBitVal(AENERGYA_32,0)));
-return value;
-  }
-
-long ADE9078::getApparentEnergyA(){
-	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(APENERGYA_32,1)),(functionBitVal(APENERGYA_32,0)));
+	value=spiAlgorithm16_read((functionBitVal(ACCMODE_16,1)),(functionBitVal(ACCMODE_16,0)));
 return value;
   }
 
