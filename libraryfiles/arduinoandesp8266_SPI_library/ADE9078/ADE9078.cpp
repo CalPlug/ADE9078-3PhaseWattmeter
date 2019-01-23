@@ -1,4 +1,4 @@
-ADE9078/*
+/* ADE9078
  ADE9078.cpp - Example library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
   Created by Umar Kazmi, Crystal Lai, and Michael J. Klopfer, Ph.D.
   January 23, 2017 - 0.1 (pre-release)
@@ -1082,8 +1082,11 @@ void ADE9078::initialize(){
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   delay(50);
 
-  //Write 0x00AD to Register Address 0x00FE. "This unlocks Register 0x120." per datasheet
   digitalWrite(_SS, LOW);//Enable data transfer by bringing SS line LOW.
+
+  /* The following block comment is not necessary for ADE 9078.
+
+  //Write 0x00AD to Register Address 0x00FE. "This unlocks Register 0x120." per datasheet
   SPI.transfer(0x00); //Pass in MSB of register 0x00FE first.
   SPI.transfer(0xFE); //Pass in LSB of register 0x00FE next.
   SPI.transfer(WRITE); //This tells the ADE9078 that data is to be written to register 0x00FE, per datasheet
@@ -1096,6 +1099,18 @@ void ADE9078::initialize(){
   SPI.transfer(WRITE);//This tells the ADE9078 that data is to be written to register 0x0120, per datasheet
   SPI.transfer(0x00); //Pass in MSB of 0x0030 first to write to 0x0120, per datasheet
   SPI.transfer(0x30); //Pass in LSB of 0x0030 next to write to 0x0120, per datasheet
+
+  */
+
+  // Configure service type (4 wire wye, 3 wire delta, etc.)
+  /*
+  VCONSEL
+  SPI.transfer(); // Pass in MSB of register ??? first
+  SPI.transfer(); // Pass in LSB of register ??? next
+  SPI.transfer(WRITE);
+  SPI.transfer(probably a variable passed into function); // Pass in MSB of ??? to write to ???
+  */
+
   SPI.endTransaction();
   digitalWrite(_SS, HIGH);//End data transfer by bringing SS line HIGH.
   delay(100);
@@ -1134,42 +1149,6 @@ byte ADE9078::functionBitVal(int addr, uint8_t byteVal)
   #endif
   return x;
 }
-
-uint8_t ADE9078::spiAlgorithm8_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm8_read function started ");
-  #endif
-  uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
-  byte one;
-  byte two; //This may be a dummy read, it looks like the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Read in values sequentially and bitshift for a 32 bit entry
-  SPI.transfer(READ); //Send command to begin readout
-  one = (SPI.transfer(WRITE));  // MSB Byte 1  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte
-  two = (SPI.transfer(WRITE));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte,
-  SPI.endTransaction(); //end SPI communication
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
-
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm8_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Returned bytes (1(MSB) and 2 - 2nd is for 16-bit return form): ");
-   Serial.print(one, HEX);
-   Serial.print(" ");
-   Serial.print(two, HEX);
-   Serial.print(" ADE9078::spiAlgorithm8_read function completed ");
-  #endif
-
-  //Post-read packing and bitshifting operation
-    readval_unsigned = one;  //Process MSB (nothing much to see here for only one 8 bit value - nothing to shift)
-	return readval_unsigned;  //uint8_t versus long because it is only an 8 bit value, function returns uint8_t.
- }
 
 
 uint16_t ADE9078::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
@@ -1210,55 +1189,6 @@ uint16_t ADE9078::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algori
    //readval_unsigned = (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
    return readval_unsigned;
     }
-
-
-
-uint32_t ADE9078::spiAlgorithm24_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm24_read function started ");
-  #endif
-  //long readval_signed=0;
-  uint32_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
-  byte one;
-  byte two;
-  byte three;
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Read in values sequentially and bitshift for a 32 bit entry
-  SPI.transfer(READ); //Send command to begin readout
-  one= SPI.transfer(WRITE); //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
-  two= SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
-  three= SPI.transfer(WRITE); //LSB Byte 3  (Read in data on dummy write (null MOSI signal))
-  SPI.endTransaction();
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-
- #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm24_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Returned bytes (1(MSB) to 3)[HEX]: ");
-   Serial.print(one, HEX);
-   Serial.print(" ");
-   Serial.print(two, HEX);
-   Serial.print(" ");
-   Serial.print(three, HEX);
-   Serial.print(" ADE9078::spiAlgorithm24_read function completed ");
-  #endif
-
-  //Post-read packing and bitshifting operation
-  readval_unsigned = (((uint32_t) one << 16)+ ((uint32_t) two << 8) + ((uint32_t) three)); //Shift algorithm
-
- //(Alternative Bitshift algorithm)
- // readval_unsigned =  ((one << 16) & 0x00FF0000);  //process MSB  //(Alternative shift algorithm)
- // readval_unsigned = readval_unsigned + ((two << 8) & 0X0000FF00);
- // readval_unsigned = readval_unsigned + (three & 0X000000FF);  //Process LSB
-
-			return readval_unsigned;
-  }
 
 
 uint32_t ADE9078::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
@@ -1352,37 +1282,6 @@ void ADE9078::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   }
 
 
-  void ADE9078::spiAlgorithm24_write(byte MSB, byte LSB, byte onemsb, byte two, byte threelsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm24_write function started ");
-  #endif
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Send the Write command
-  SPI.transfer(WRITE);
-  SPI.transfer(onemsb);
-  SPI.transfer(two);
-  SPI.transfer(threelsb);
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm24_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Written bytes (1(MSB) to 3)[HEX]: ");  //MSB to LSB order
-   Serial.print(onemsb, HEX);
-   Serial.print(" ");
-   Serial.print(two, HEX);
-   Serial.print(" ");
-   Serial.print(threelsb, HEX);
-   Serial.print(" spiAlgorithm24_write function completed ");
-  #endif
-  }
-
-
 void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm16_write function started ");
@@ -1406,31 +1305,6 @@ void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
    Serial.print(onemsb, HEX);
    Serial.print(" ");
    Serial.print(twolsb, HEX);
-   Serial.print(" spiAlgorithm16_write function completed ");
-  #endif
-  }
-
-
-void ADE9078::spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm8_write function started ");
-  #endif
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Send the Write command
-  SPI.transfer(WRITE);
-  SPI.transfer(onemsb);
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm8_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Written bytes (1 of 1)[HEX]: ");  //MSB to LSB order
-   Serial.print(onemsb, HEX);
    Serial.print(" spiAlgorithm16_write function completed ");
   #endif
   }
