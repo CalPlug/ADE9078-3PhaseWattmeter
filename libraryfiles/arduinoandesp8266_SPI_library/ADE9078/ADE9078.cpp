@@ -1246,7 +1246,7 @@ uint32_t ADE9078::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   return readval_unsigned;
 }
 
-
+/*
 void ADE9078::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, byte three, byte fourlsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm32_write function started ");
@@ -1281,7 +1281,9 @@ void ADE9078::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, by
   #endif
   }
 
+*/
 
+/*
 void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" spiAlgorithm16_write function started ");
@@ -1308,6 +1310,73 @@ void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
    Serial.print(" spiAlgorithm16_write function completed ");
   #endif
   }
+*/
+
+  void ADE9078::spiAlgorithm32_write_DAVID(uint16_t address, uint32_t data) {
+
+    // IF address IS GREATER THAN 2^12, ERROR. (use only 12 bits)
+    // Avoid bit fields so that compiler doesn't pad. If protection is desired,
+    // raise errors inside if statements.
+
+    uint8_t isRead = 0;
+
+    // contains upper 8 bits of address
+    uint8_t commandHeader1 = (address >> 4);
+
+    // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+    uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
+
+    // To understand these shifts, picture this group of 1's being modified
+    // Below is a 32 bit int. We're grabbing 1 byte out at a time. byteFour is the left most byte
+    // 1111 1111 1111 1111 1111 1111 1111 1111
+    uint8_t byteFour = (data >> 24);
+    uint8_t byteThree = (data & 0xFFFFFF) >> 16;
+    uint8_t byteTwo = (data & 0xFFFF) >> 8;
+    uint8_t byteOne = (data & 0xFF)
+
+
+    digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
+
+    // ????
+    // SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
+
+    SPI.transfer(commandHeader1);
+    SPI.transfer(commandHeader2);
+    
+    SPI.transfer(byteFour);
+    SPI.transfer(byteThree);
+    SPI.transfer(byteTwo);
+    SPI.transfer(byteOne);
+
+    digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+  }
+
+  void ADE9078::spiAlgorithm16_write_DAVID(uint16_t address, uint16_t data) {
+
+    // Same warnings as in 32 bit write.
+
+    uint8_t isRead = 0;
+
+    // contains upper 8 bits of address
+    uint8_t commandHeader1 = (address >> 4);
+
+    // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+    uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
+
+    uint8_t MSB_data = (data >> 8);
+    uint8_t LSB_data = (data & 0xFF)
+
+    digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
+
+    SPI.transfer(commandHeader1);
+    SPI.transfer(commandHeader2);
+
+    SPI.transfer(MSB_data);
+    SPI.transfer(LSB_data);
+
+    digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+}
+
 
 
 float ADE9078::decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
