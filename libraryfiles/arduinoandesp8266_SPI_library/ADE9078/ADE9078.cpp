@@ -856,12 +856,12 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 //****************User Program Functions*****************
 
 uint8_t ADE9078::getVersion(){
-  return spiAlgorithm8_read(functionBitVal(Version_16,1), functionBitVal(Version_16,0));  //An example of the address lookup - the spiAlgorithm8_read((functionBitVal(addr,1), functionBitVal(addr,1)) would return the eqivenet to spiAlgorithm8_read(0x07,0x02) when working properly
+  return spiAlgorithm16_read(Version_16);  //An example of the address lookup - the spiAlgorithm8_read((functionBitVal(addr,1), functionBitVal(addr,1)) would return the eqivenet to spiAlgorithm8_read(0x07,0x02) when working properly
 }
 
 float ADE9078::getPowerFactorA(){
 	int16_t value=0;
-	value=spiAlgorithm16_read((functionBitVal(PFA_16,1)),(functionBitVal(PFA_16,0)));
+	value=spiAlgorithm16_read(PFA_16);
 	float decimal = decimalize(value, 327.67, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
@@ -873,7 +873,7 @@ return abs(decimal);
 // which APHCAL should we use? There are 4
 int32_t ADE9078::getPhaseCalibA(){
 	int32_t value=0;
-	value=spiAlgorithm32_read((functionBitVal(APHCAL0_32,1)),(functionBitVal(APHCAL0_32,0)));
+	value=spiAlgorithm32_read(APHCAL0_32);
 return value;
   }
 
@@ -888,83 +888,83 @@ return value;
 // might need to edit to access bits for a/b/c
 unsigned long ADE9078::getPHNOLOAD(){  //use signed long for signed registers, and unsigned long for unsigned registers
 	unsigned long value=0;  //use signed long for signed registers, and unsigned long for unsigned registers
-	value=spiAlgorithm32_read((functionBitVal(PHNOLOAD_32,1)),(functionBitVal(PHNOLOAD_32,0))); //Call MSB and LSB from the register constant (template for how all functions should be called)
+	value=spiAlgorithm32_read(PHNOLOAD_32); //Call MSB and LSB from the register constant (template for how all functions should be called)
 return value;
   }
 
 
 long ADE9078::getInstVoltageA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AV_PCF_32,1)),(functionBitVal(AV_PCF_32,0)));
+	value=spiAlgorithm32_read(AV_PCF_32);
 return value;
   }
 long ADE9078::getInstVoltageB(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BV_PCF_32,1)),(functionBitVal(BV_PCF_32,0)));
+	value=spiAlgorithm32_read(BV_PCF_32);
   return value;
 }
 long ADE9078::getInstVoltageC(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CV_PCF_32,1)),(functionBitVal(CV_PCF_32,0)));
+	value=spiAlgorithm32_read(CV_PCF_32);
   return value;
 }
 
 float ADE9078::getAVrms(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AVRMS_32,1)),(functionBitVal(AVRMS_32,0)));
+	value=spiAlgorithm32_read(AVRMS_32);
 	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
 float ADE9078::getBVrms(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BVRMS_32,1)),(functionBitVal(BVRMS_32,0)));
+	value=spiAlgorithm32_read(BVRMS_32);
 	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
 float ADE9078::getCVrms(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CVRMS_32,1)),(functionBitVal(CVRMS_32,0)));
+	value=spiAlgorithm32_read(CVRMS_32);
 	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
 long ADE9078::getInstCurrentA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AI_PCF_32,1)),(functionBitVal(IA_PCF_32,0)));
+	value=spiAlgorithm32_read(AI_PCF_32);
 return value;
   }
 
 long ADE9078::getInstCurrentB(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BI_PCF_32,1)),(functionBitVal(IB_PCF_32,0)));
+	value=spiAlgorithm32_read(BI_PCF_32);
 return value;
   }
 
 long ADE9078::getInstCurrentC(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CI_PCF_32,1)),(functionBitVal(IC_PCF_32,0)));
+	value=spiAlgorithm32_read(CI_PCF_32);
 return value;
   }
 
 float ADE9078::getIrmsA(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AIRMS_32,1)),(functionBitVal(IRMSA_32,0)));
+	value=spiAlgorithm32_read(AIRMS_32);
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
   return decimal;
 }
 
 float ADE9078::getIrmsB(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BIRMS_32,1)),(functionBitVal(IRMSA_32,0)));
+	value=spiAlgorithm32_read(BIRMS_32,1);
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
   return decimal;
 }
 
 float ADE9078::getIrmsC(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CIRMS_32,1)),(functionBitVal(IRMSA_32,0)));
+	value=spiAlgorithm32_read(CIRMS_32,1);
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
 return decimal;
   }
@@ -972,39 +972,39 @@ return decimal;
 
 unsigned long ADE9078::getVpeak(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(VPEAK_32,1)),(functionBitVal(VPEAK_32,0)));
+	value=spiAlgorithm32_read(VPEAK_32);
 return value;
   }
 
 unsigned long ADE9078::getIpeak(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read((functionBitVal(IPEAK_32,1)),(functionBitVal(IPEAK_32,0)));
+	value=spiAlgorithm32_read(IPEAK_32);
 return value;
   }
 
 long ADE9078::getEnergyA(){
 	long value=0;
-	value=spiAlgorithm16_read((functionBitVal(ACCMODE_16,1)),(functionBitVal(ACCMODE_16,0)));
+	value=spiAlgorithm16_read(ACCMODE_16);
 return value;
   }
 
 float ADE9078::getInstApparentPowerA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AVA_32,1)),(functionBitVal(AVA_32,0)));
+	value=spiAlgorithm32_read(AVA_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
 float ADE9078::getInstApparentPowerB(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BVA_32,1)),(functionBitVal(BVA_32,0)));
+	value=spiAlgorithm32_read(BVA_32,1);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
 float ADE9078::getInstApparentPowerC(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CVA_32,1)),(functionBitVal(CVA_32,0)));
+	value=spiAlgorithm32_read(CVA_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
@@ -1012,42 +1012,42 @@ return abs(decimal);
 
 float ADE9078::getInstActivePowerA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AWATT_32,1)),(functionBitVal(AWATT_32,0)));
+	value=spiAlgorithm32_read(AWATT_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
 float ADE9078::getInstActivePowerB(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BWATT_32,1)),(functionBitVal(BWATT_32,0)));
+	value=spiAlgorithm32_read(BWATT_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
 
 float ADE9078::getInstActivePowerC(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CWATT_32,1)),(functionBitVal(CWATT_32,0)));
+	value=spiAlgorithm32_read(CWATT_32,);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
 }
 
 float ADE9078::getInstReactivePowerA(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(AVAR_32,1)),(functionBitVal(AVAR_32,0)));
+	value=spiAlgorithm32_read(AVAR_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
 float ADE9078::getInstReactivePowerB(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(BVAR_32,1)),(functionBitVal(BVAR_32,0)));
+	value=spiAlgorithm32_read(BVAR_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return decimal;
   }
 
 float ADE9078::getInstReactivePowerC(){
 	long value=0;
-	value=spiAlgorithm32_read((functionBitVal(CVAR_32,1)),(functionBitVal(CVAR_32,0)));
+	value=spiAlgorithm32_read(CVAR_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return decimal;
   }
@@ -1084,24 +1084,6 @@ void ADE9078::initialize(){
 
   digitalWrite(_SS, LOW);//Enable data transfer by bringing SS line LOW.
 
-  /* The following block comment is not necessary for ADE 9078.
-
-  //Write 0x00AD to Register Address 0x00FE. "This unlocks Register 0x120." per datasheet
-  SPI.transfer(0x00); //Pass in MSB of register 0x00FE first.
-  SPI.transfer(0xFE); //Pass in LSB of register 0x00FE next.
-  SPI.transfer(WRITE); //This tells the ADE9078 that data is to be written to register 0x00FE, per datasheet
-  SPI.transfer(0x00); //Pass in MSB of 0x00AD first to write to 0x00FE, per datasheet
-  SPI.transfer(0xAD); //Pass in LSB of 0x00AD next to write to 0x00FE, per datasheet
-
-  //Write 0x0030 to Register Address 0x0120. "This configures the optimum settings." per datasheet
-  SPI.transfer(0x01); //Pass in MSB of register 0x0120 first, per datasheet
-  SPI.transfer(0x20); //Pass in LSB of register 0x0120 next, per datasheet
-  SPI.transfer(WRITE);//This tells the ADE9078 that data is to be written to register 0x0120, per datasheet
-  SPI.transfer(0x00); //Pass in MSB of 0x0030 first to write to 0x0120, per datasheet
-  SPI.transfer(0x30); //Pass in LSB of 0x0030 next to write to 0x0120, per datasheet
-
-  */
-
   // Configure service type (4 wire wye, 3 wire delta, etc.)
   /*
   VCONSEL
@@ -1131,86 +1113,79 @@ void ADE9078::initialize(){
 }
 //**************************************************
 
-byte ADE9078::functionBitVal(int addr, uint8_t byteVal)
-{
-//Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
-  int x = ((addr >> (8*byteVal)) & 0xff);
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::functionBitVal function details: ");
-   Serial.print("Address input (dec): ");
-   Serial.print(addr, DEC);
-   Serial.print(" Byte requested (dec): ");
-   Serial.print(byteVal, DEC);
-   Serial.print(" Returned Value (dec): ");
-   Serial.print(x, DEC);
-   Serial.print(" Returned Value (HEX): ");
-   Serial.print(x, HEX);
-   Serial.print(" ADE9078::functionBitVal function completed ");
-  #endif
-  return x;
+
+uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+    #ifdef ADE9078_VERBOSE_DEBUG
+     Serial.print("ADE9078::spiAlgorithm16_read function started ");
+    #endif
+
+    // See SPI protocol in datasheet to understand this.
+    // Around p 62ish
+
+    uint8_t isRead = 1;
+
+    // contains upper 8 bits of address
+    uint8_t commandHeader1 = (address >> 4);
+
+    // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+    uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
+
+    byte one, two;
+    digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
+    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
+    SPI.transfer(commandHeader1);
+    SPI.transfer(commandHeader2);
+
+    //Read in values sequentially and bitshift for a 32 bit entry
+    one = SPI.transfer(WRITE);  //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
+    two = SPI.transfer(WRITE);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
+    SPI.endTransaction();
+    digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+
+    #ifdef ADE9078_VERBOSE_DEBUG
+     Serial.print("ADE9078::spiAlgorithm16_read function details: ");
+     Serial.print("Address Byte 1(MSB)[HEX]: ");
+     Serial.print(MSB, HEX);
+     Serial.print(" Address Byte 2(LSB)[HEX]: ");
+     Serial.print(LSB, HEX);
+     Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
+     Serial.print(one, HEX);
+     Serial.print(" ");
+     Serial.print(two, HEX);
+     Serial.print(" ADE9078::spiAlgorithm16_read function completed ");
+    #endif
+
+     return (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
 }
 
 
-uint16_t ADE9078::spiAlgorithm16_read(byte MSB, byte LSB) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm16_read function started ");
-  #endif
-  uint16_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
-  byte one;
-  byte two;
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Read in values sequentially and bitshift for a 32 bit entry
-  SPI.transfer(READ); //Send command to begin readout
-  one = SPI.transfer(WRITE);  //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
-  two = SPI.transfer(WRITE);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
-  SPI.endTransaction();
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm16_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
-   Serial.print(one, HEX);
-   Serial.print(" ");
-   Serial.print(two, HEX);
-   Serial.print(" ADE9078::spiAlgorithm16_read function completed ");
-  #endif
-
-   //Post-read packing and bitshifting operation
-   readval_unsigned = (one << 8);  //Process MSB  (Bitshift algorithm)
-   readval_unsigned = readval_unsigned + two;  //Process LSB
-
-   //readval_unsigned = (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
-   return readval_unsigned;
-    }
-
-
-uint32_t ADE9078::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
+uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078::spiAlgorithm32_read function started ");
   #endif
-  uint32_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
-  byte one;
-  byte two;
-  byte three;
-  byte four;
+
+  uint8_t isRead = 1;
+
+  // contains upper 8 bits of address
+  uint8_t commandHeader1 = (address >> 4);
+
+  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+  uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
+
+  byte one, two, three, four;
+
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
+  SPI.transfer(commandHeader1);
+  SPI.transfer(commandHeader2);
+
   //Read in values sequentially and bitshift for a 32 bit entry
-  SPI.transfer(READ); //Send command to begin readout
-  one= SPI.transfer(WRITE); //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
-  two= SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
-  three= SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
-  four= SPI.transfer(WRITE); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
+  one = SPI.transfer(WRITE); //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
+  two = SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
+  three = SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
+  four = SPI.transfer(WRITE); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
   SPI.endTransaction();
+
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
   #ifdef ADE9078_VERBOSE_DEBUG
@@ -1231,21 +1206,9 @@ uint32_t ADE9078::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   #endif
 
   //Post-read packing and bitshifting operations
-  readval_unsigned = (((uint32_t) one << 24)+ ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four);
+  return ((uint32_t) one << 24) + ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four;
 
-  //Alternate Bitshifting approach
-/*   readval_unsigned = (one << 24);  //Process MSB
-  //Serial.println(readval_unsigned, HEX);
-  readval_unsigned = readval_unsigned + (two << 16);
-  //Serial.println(readval_unsigned, HEX);
-  readval_unsigned = readval_unsigned + (three << 8);
-  //Serial.println(readval_unsigned, HEX);
-  readval_unsigned = (readval_unsigned + (four));  //Process LSB
-  Serial.println(readval_unsigned, BIN);  */
-
-  return readval_unsigned;
 }
-
 
 
   void ADE9078::spiAlgorithm32_write(uint16_t address, uint32_t data) {
