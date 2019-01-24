@@ -1246,73 +1246,9 @@ uint32_t ADE9078::spiAlgorithm32_read(byte MSB, byte LSB) { //This is the algori
   return readval_unsigned;
 }
 
-/*
-void ADE9078::spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, byte three, byte fourlsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm32_write function started ");
-  #endif
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Send the Write command
-  SPI.transfer(WRITE);
-  SPI.transfer(onemsb);
-  SPI.transfer(two);
-  SPI.transfer(three);
-  SPI.transfer(fourlsb);
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm32_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Written bytes (1(MSB) to 4)[HEX]: "); //MSB to LSB order
-   Serial.print(onemsb, HEX);
-   Serial.print(" ");
-   Serial.print(two, HEX);
-   Serial.print(" ");
-   Serial.print(three, HEX);
-   Serial.print(" ");
-   Serial.print(fourlsb, HEX);
-   Serial.print(" spiAlgorithm32_write function completed ");
-  #endif
-  }
 
-*/
-
-/*
-void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb) { //This is the algorithm that writes to a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print(" spiAlgorithm16_write function started ");
-  #endif
-  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-  SPI.transfer(MSB);  //Pass in MSB of register to be read first.
-  SPI.transfer(LSB);  //Pass in LSB of register to be read next.
-  //Send the Write command
-  SPI.transfer(WRITE);
-  SPI.transfer(onemsb);
-  SPI.transfer(twolsb);
-  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm16_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
-   Serial.print(" Written bytes (1(MSB) to 2)[HEX]: ");  //MSB to LSB order
-   Serial.print(onemsb, HEX);
-   Serial.print(" ");
-   Serial.print(twolsb, HEX);
-   Serial.print(" spiAlgorithm16_write function completed ");
-  #endif
-  }
-*/
-
-  void ADE9078::spiAlgorithm32_write_DAVID(uint16_t address, uint32_t data) {
+  void ADE9078::spiAlgorithm32_write(uint16_t address, uint32_t data) {
 
     // IF address IS GREATER THAN 2^12, ERROR. (use only 12 bits)
     // Avoid bit fields so that compiler doesn't pad. If protection is desired,
@@ -1342,7 +1278,7 @@ void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
 
     SPI.transfer(commandHeader1);
     SPI.transfer(commandHeader2);
-    
+
     SPI.transfer(byteFour);
     SPI.transfer(byteThree);
     SPI.transfer(byteTwo);
@@ -1351,7 +1287,7 @@ void ADE9078::spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb)
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   }
 
-  void ADE9078::spiAlgorithm16_write_DAVID(uint16_t address, uint16_t data) {
+  void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
 
     // Same warnings as in 32 bit write.
 
