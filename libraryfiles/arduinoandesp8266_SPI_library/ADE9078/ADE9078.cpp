@@ -1113,7 +1113,6 @@ void ADE9078::initialize(){
 }
 //**************************************************
 
-
 uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiAlgorithm16_read function started ");
@@ -1131,16 +1130,22 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
     uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
 
     byte one, two;
+
+    // beginTransaction is first
+    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
+
     SPI.transfer(commandHeader1);
     SPI.transfer(commandHeader2);
 
     //Read in values sequentially and bitshift for a 32 bit entry
     one = SPI.transfer(WRITE);  //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
     two = SPI.transfer(WRITE);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
-    SPI.endTransaction();
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+
+    // endTransaction is last
+    SPI.endTransaction();
 
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiAlgorithm16_read function details: ");
@@ -1155,7 +1160,7 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
      Serial.print(" ADE9078::spiAlgorithm16_read function completed ");
     #endif
 
-     return (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
+    return (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
 }
 
 
@@ -1174,8 +1179,9 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
 
   byte one, two, three, four;
 
+  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   SPI.transfer(commandHeader1);
   SPI.transfer(commandHeader2);
 
@@ -1184,9 +1190,10 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
   two = SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
   three = SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
   four = SPI.transfer(WRITE); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
-  SPI.endTransaction();
 
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+
+  SPI.endTransaction();
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078::spiAlgorithm32_read function details: ");
@@ -1233,21 +1240,25 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     uint8_t byteTwo = (data & 0xFFFF) >> 8;
     uint8_t byteOne = (data & 0xFF)
 
+    // beginTransaction before writing SS low
+    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
-    // ????
-    // SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
-
+    // Tell 9078 chip what address, and whether to read or write with commandHeader
     SPI.transfer(commandHeader1);
     SPI.transfer(commandHeader2);
 
+    // Write our data, msb first
     SPI.transfer(byteFour);
     SPI.transfer(byteThree);
     SPI.transfer(byteTwo);
     SPI.transfer(byteOne);
 
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+
+    // endTransaction after writing SS high
+    SPI.endTransaction();
   }
 
   void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
@@ -1265,6 +1276,8 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     uint8_t MSB_data = (data >> 8);
     uint8_t LSB_data = (data & 0xFF)
 
+    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
     SPI.transfer(commandHeader1);
@@ -1274,6 +1287,8 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     SPI.transfer(LSB_data);
 
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+
+    SPI.endTransaction();
 }
 
 
