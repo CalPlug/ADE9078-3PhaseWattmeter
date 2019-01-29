@@ -851,8 +851,6 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 
 
 
-
-
 //****************User Program Functions*****************
 
 uint8_t ADE9078::getVersion(){
@@ -1074,41 +1072,39 @@ void ADE9078::initialize(){
    Serial.print("ADE9078:initialize function started ");
   #endif
 
+
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
   digitalWrite(_SS, HIGH); //Initialize pin as HIGH to bring communication inactive
   SPI.begin();
   delay(50);
   SPI.setBitOrder(MSBFIRST);  //Define MSB as first (explicitly)
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   delay(50);
 
-  digitalWrite(_SS, LOW);//Enable data transfer by bringing SS line LOW.
 
-  // Configure service type (4 wire wye, 3 wire delta, etc.)
+  uint16_t settingsACCMODE = 0;
+
+  // https://www.arduino.cc/reference/en/language/variables/constants/integerconstants/
+  settingsACCMODE = 0x0000;
+  // Writing "B" before a number indicates it is binary.
+  //settingsACCMODE = B0000000000000000
+  //                 [15:9] 876543210
+  spialgorithm16_write(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
+  spiAlgorithm32_write(VLEVEL_32, 0x117514); // page 56 Datasheet
+  SPIALGORITHM16_write(CONFIG0_32, 0x00000000);
+
+  // For voltage/current gains: 0x4B9 PGA_GAIN
+
   /*
-  VCONSEL
-  SPI.transfer(); // Pass in MSB of register ??? first
-  SPI.transfer(); // Pass in LSB of register ??? next
-  SPI.transfer(WRITE);
-  SPI.transfer(probably a variable passed into function); // Pass in MSB of ??? to write to ???
+  Potentially useful registers to configure:
+  The following were in the 7953:
+    0x49A ZX_LP_SEL : to configure "zero crossing signal"
+    0x41F PHNOLOAD : To say if something is "no load".
+    Phase calibrations, such as APHCAL1_32
   */
 
-  SPI.endTransaction();
-  digitalWrite(_SS, HIGH);//End data transfer by bringing SS line HIGH.
-  delay(100);
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" ADE9078:initialize function completed ");
   #endif
-
-  //Default Calibrations - Per Datasheet
-  //spiAlgorithm16_write((functionBitVal(PHCALA_16,1)),(functionBitVal(PHCALA_16,0)),0x00,0x00);
-  //delay(100);
-  spiAlgorithm32_write((functionBitVal(AP_NOLOAD_32,1)),(functionBitVal(AP_NOLOAD_32,0)),0x00,0x00,0x00,0x01); //Check for ensuring read and write operations are okay
-  delay(100);
-  spiAlgorithm8_write((functionBitVal(LCYCMODE_8,1)),(functionBitVal(LCYCMODE_8,0)),0b01111111); //Enable line cycle accumulation mode for all energies and channels
-  delay(100);
-  spiAlgorithm16_write((functionBitVal(LINECYC_16,1)),(functionBitVal(LINECYC_16,0)),0x00,0x78); //Sets number of half line cycle accumulations to 120
-  delay(100);
 
 }
 //**************************************************
