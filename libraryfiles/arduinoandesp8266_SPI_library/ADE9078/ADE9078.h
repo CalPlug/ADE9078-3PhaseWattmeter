@@ -21,16 +21,11 @@ class ADE9078 {
   public:
     ADE9078(int SS, int SPI_freq);
     void initialize();
-    uint8_t spiAlgorithm8_read(byte MSB, byte LSB);
-	uint16_t spiAlgorithm16_read(byte MSB, byte LSB);
-    uint32_t spiAlgorithm24_read(byte MSB, byte LSB);
-    uint32_t spiAlgorithm32_read(byte MSB, byte LSB);
-
 
 	uint8_t getVersion();
-	float getPowerFactorA();
-	float getPeriod();
-	int16_t getPhaseCalibA();
+	float getPowerFactorA(); // only for A? Don't see for B/C
+	// float getPeriod();    // not done. can probably implement with USER_PERIOD_32
+	int16_t getPhaseCalibA(); // B/C?
 	unsigned long getPHNOLOAD();
 
   long getInstVoltageA();
@@ -52,10 +47,6 @@ class ADE9078 {
 	unsigned long getVpeak();
 	unsigned long getIpeak();
 
-	long getActiveEnergyA();
-	long getReactiveEnergyA();
-	long getApparentEnergyA();
-
 	float getInstApparentPowerA();
   float getInstApparentPowerB();
   float getInstApparentPowerC();
@@ -68,11 +59,11 @@ class ADE9078 {
   float getInstReactivePowerB();
   float getInstReactivePowerC();
 
-	byte functionBitVal(int addr, uint8_t byteVal);
-	void spiAlgorithm32_write(byte MSB, byte LSB, byte onemsb, byte two, byte three, byte fourlsb);
-	void spiAlgorithm24_write(byte MSB, byte LSB, byte onemsb, byte two, byte threelsb);
-	void spiAlgorithm16_write(byte MSB, byte LSB, byte onemsb, byte twolsb);
-	void spiAlgorithm8_write(byte MSB, byte LSB, byte onemsb);
+  uint16_t spiAlgorithm16_read(uint16_t);
+  uint32_t spiAlgorithm32_read(uint16_t);
+
+	void spiAlgorithm32_write(uint16_t, uint32_t); // address, data
+	void spiAlgorithm16_write(uint16_t);
 
 
 	float decimalize(long input, float factor, float offset);

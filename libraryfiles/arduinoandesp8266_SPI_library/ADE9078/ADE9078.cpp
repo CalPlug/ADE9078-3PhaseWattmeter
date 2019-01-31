@@ -875,6 +875,7 @@ int32_t ADE9078::getPhaseCalibA(){
 return value;
   }
 
+// TODO : USER_PERIOD_32
 // No period register?
 // float ADE9078::getPeriod(){
 // 	uint16_t value=0;
@@ -1055,7 +1056,7 @@ return decimal;
 //*******************************************************
 
 
-//****************ADE 7953 Library Control Functions**************************************
+//****************ADE 9078 Library Control Functions**************************************
 
 //****************Object Definition*****************
 ADE9078::ADE9078(int SS, int SPI_freq)
