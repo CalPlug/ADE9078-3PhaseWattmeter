@@ -1084,12 +1084,7 @@ void ADE9078::initialize(){
 
   uint16_t settingsACCMODE = 0;
 
-  // https://www.arduino.cc/reference/en/language/variables/constants/integerconstants/
-  settingsACCMODE = 0x0000;
-  // Writing "B" before a number indicates it is binary.
-  //settingsACCMODE = B0000000000000000
-  //                 [15:9] 876543210
-  spialgorithm16_write(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
+  spialgorithm16_write(ACCMODE_16, 0x0000); // chooses 4 wire WYE Blondel
   spiAlgorithm32_write(VLEVEL_32, 0x117514); // page 56 Datasheet
   SPIALGORITHM16_write(CONFIG0_32, 0x00000000);
 

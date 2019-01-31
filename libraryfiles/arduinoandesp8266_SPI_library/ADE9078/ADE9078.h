@@ -12,8 +12,6 @@
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
 #include <SPI.h>
 
-const unsigned int READ = 0b10000000;  //This value tells the ADE9078 that data is to be read from the requested register.
-const unsigned int WRITE = 0b00000000; //This value tells the ADE9078 that data is to be written to the requested register.
 const int SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.
 // const int SPI_freq = 12,288,000 // P 6: Input flock frequency
 
