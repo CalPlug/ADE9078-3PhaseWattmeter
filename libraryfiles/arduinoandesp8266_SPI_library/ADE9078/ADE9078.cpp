@@ -14,7 +14,7 @@
 
 #include "Arduino.h"
 #include <SPI.h>
-#include "ADE9078.h"
+#include "ADE9078.hpp"
 //Debug Control:
 //#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
 
@@ -25,7 +25,7 @@
 //****************ADE 9078 REGISTERS *****************************************************
 #define PFA_16 0x10A //PFA, (R/W) Reset:0x0000,
 
-#define 0X000 AIGAIN_32 // Reset: 0x00000000 Access: R/W Description: Phase A current gain adjust
+#define AIGAIN_32 0X000 // Reset: 0x00000000 Access: R/W Description: Phase A current gain adjust
 
 #define AIGAIN0_32 0x001 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
 #define AIGAIN1_32 0x002 /* Reset: 0x00000000 Access: R/W Description: Phase A multipoint gain correction factor. If multipoint gain and phase compenstation is enabled, with MTEN = 1 in the CONFIG0 register, an additional gain factor, AIGAIN0 through AIGAIN4, is applied based on the AIRMS current rms amplitude and the MTTHR_Lx and MTTHR_Hx register values */
@@ -553,7 +553,7 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 2 BitName: BWSIGN Reset: 0x0 Access: R Description: Phase B active power sign bit.
 // Bits: 1 BitName: AVARSIGN Reset: 0x0 Access: R Description: Phase A reactive power sign bit.  The PWR_SIGN_SEL bit in the EP_CFG selects whether this feature monitors total or fundamental reactive power.
 // Bits: 0 BitName: AWSIGN Reset: 0x0 Access: R Description: Phase A active power sign bit
-#define 0x4A0 WFB_CFG_16 //Reset: 0x0000 Access: R/W Description: Waveform buffer configuration register
+#define WFB_CFG_16 0x4A0 //Reset: 0x0000 Access: R/W Description: Waveform buffer configuration register
 // Bits: [15:13] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
 // Bits: 12 BitName: WF_IN_EN Reset: 0x0 Access: R/W Description: This setting determines whether the IN waveform samples are read out of the waveform buffer through SPI. 0: IN waveform samples are not read out of waveform buffer through SPI. 1: IN waveform samples are read out of waveform buffer through SPI
 // Bits: [11:10] BitName: RESERVED Reset: 0x0 Access: R Description: Sign of the sum of the powers included in the CF3 datapath. The CF3 energy is positive if this bit is clear and negative if this bit is set.
@@ -574,7 +574,7 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 4 Bitname: ZXIB Reset: 0x0 Access: R/W Description: Phase B current zero crossing.
 // Bits: 3 Bitname: ZXIA Reset: 0x0 Access: R/W Description: Phase A current zero crossing.
 // Bits: [2:0] Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
-#define 0x4A3 WFB_TRG_STAT_16 //Reset: 0x0000 Access: R/W Description: This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
+#define WFB_TRG_STAT_16 0x4A3 //Reset: 0x0000 Access: R/W Description: This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
 // Bits: [15:12] Bitname: WFB_LAST_PAGE Reset: 0x0 Access: R/W Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
 // Bits: 11 Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
 // Bits: [10:0]  Bitname: UPERIOD_SEL Reset: 0x0 Access: R Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
@@ -680,7 +680,7 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: [3:2] IB_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Voltage Channel B ADC. See 0x0 R/W VC_GAIN.
 // Bits: [1:0] IA_GAIN Reset: 0x0 Access: R/W Description: PGA gain for Current Channel A ADC. See 0x0 R/W VC_GAIN.
 
-#define 0x4BA CHNL_DIS_16 //Reset: 0x0000 Access: R/W
+#define CHNL_DIS_16 0x4BA //Reset: 0x0000 Access: R/W
 /* This register can be disables the ADCs individually */
 // Bits: [15:7] RESERVED Reset: 0x0 Access: R Description: Reserved.
 // Bits: 6 VC_DISAD Reset: 0x0 Access: R/W Description: Set this bit to one to disable the ADC.
@@ -854,8 +854,8 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 //****************User Program Functions*****************
 
 uint8_t ADE9078::getVersion(){
-  return spiAlgorithm16_read(Version_16);  //An example of the address lookup - the spiAlgorithm8_read((functionBitVal(addr,1), functionBitVal(addr,1)) would return the eqivenet to spiAlgorithm8_read(0x07,0x02) when working properly
-}
+  return spiAlgorithm16_read(VERSION_16);
+} 
 
 float ADE9078::getPowerFactorA(){
 	int16_t value=0;
@@ -883,7 +883,6 @@ return value;
 // 	float decimal = decimalize(value, 1, 0); //convert to float with calibration factors specified
 // return decimal;
 //   }
-
 // might need to edit to access bits for a/b/c
 unsigned long ADE9078::getPHNOLOAD(){  //use signed long for signed registers, and unsigned long for unsigned registers
 	unsigned long value=0;  //use signed long for signed registers, and unsigned long for unsigned registers
@@ -956,14 +955,14 @@ float ADE9078::getIrmsA(){
 
 float ADE9078::getIrmsB(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read(BIRMS_32,1);
+	value=spiAlgorithm32_read(BIRMS_32);
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
   return decimal;
 }
 
 float ADE9078::getIrmsC(){
 	unsigned long value=0;
-	value=spiAlgorithm32_read(CIRMS_32,1);
+	value=spiAlgorithm32_read(CIRMS_32);
 	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
 return decimal;
   }
@@ -996,7 +995,7 @@ return abs(decimal);
 
 float ADE9078::getInstApparentPowerB(){
 	long value=0;
-	value=spiAlgorithm32_read(BVA_32,1);
+	value=spiAlgorithm32_read(BVA_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
   }
@@ -1025,7 +1024,7 @@ return abs(decimal);
 
 float ADE9078::getInstActivePowerC(){
 	long value=0;
-	value=spiAlgorithm32_read(CWATT_32,);
+	value=spiAlgorithm32_read(CWATT_32);
 	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
 return abs(decimal);
 }
@@ -1084,9 +1083,9 @@ void ADE9078::initialize(){
 
   uint16_t settingsACCMODE = 0;
 
-  spialgorithm16_write(ACCMODE_16, 0x0000); // chooses 4 wire WYE Blondel
+  spiAlgorithm16_write(ACCMODE_16, 0x0000); // chooses 4 wire WYE Blondel
   spiAlgorithm32_write(VLEVEL_32, 0x117514); // page 56 Datasheet
-  SPIALGORITHM16_write(CONFIG0_32, 0x00000000);
+  spiAlgorithm16_write(CONFIG0_32, 0x00000000);
 
   // For voltage/current gains: 0x4B9 PGA_GAIN
 
@@ -1122,6 +1121,7 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
     uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
 
     byte one, two;
+	byte dummyWrite = 0x00;
 
     // beginTransaction is first
     SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
@@ -1132,8 +1132,8 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
     SPI.transfer(commandHeader2);
 
     //Read in values sequentially and bitshift for a 32 bit entry
-    one = SPI.transfer(WRITE);  //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
-    two = SPI.transfer(WRITE);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
+    one = SPI.transfer(dummyWrite);  //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
+    two = SPI.transfer(dummyWrite);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
     // endTransaction is last
@@ -1170,6 +1170,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
   uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
 
   byte one, two, three, four;
+  byte dummyWrite = 0x00;
 
   SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
@@ -1178,10 +1179,10 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
   SPI.transfer(commandHeader2);
 
   //Read in values sequentially and bitshift for a 32 bit entry
-  one = SPI.transfer(WRITE); //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
-  two = SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
-  three = SPI.transfer(WRITE);   // (Read in data on dummy write (null MOSI signal))
-  four = SPI.transfer(WRITE); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
+  one = SPI.transfer(dummyWrite); //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
+  two = SPI.transfer(dummyWrite);   // (Read in data on dummy write (null MOSI signal))
+  three = SPI.transfer(dummyWrite);   // (Read in data on dummy write (null MOSI signal))
+  four = SPI.transfer(dummyWrite); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
 
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
@@ -1230,7 +1231,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     uint8_t byteFour = (data >> 24);
     uint8_t byteThree = (data & 0xFFFFFF) >> 16;
     uint8_t byteTwo = (data & 0xFFFF) >> 8;
-    uint8_t byteOne = (data & 0xFF)
+    uint8_t byteOne = (data & 0xFF);
 
     // beginTransaction before writing SS low
     SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
@@ -1266,7 +1267,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
 
     uint8_t MSB_data = (data >> 8);
-    uint8_t LSB_data = (data & 0xFF)
+    uint8_t LSB_data = (data & 0xFF);
 
     SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
