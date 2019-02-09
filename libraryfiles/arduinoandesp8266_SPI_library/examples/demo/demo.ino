@@ -2,7 +2,7 @@
 //California Plug Load Research Center - 2017
 
 
-#include <ADE9078.h>
+#include <ADE9078.hpp>
 #include <SPI.h>
 
 //Define ADE9078 object with hardware parameters specified
