@@ -1058,7 +1058,7 @@ return decimal;
 //****************ADE 9078 Library Control Functions**************************************
 
 //****************Object Definition*****************
-ADE9078::ADE9078(int SS, int SPI_freq)
+ADE9078::ADE9078(int SS, long SPI_freq)
 {
   _SS=SS;
   _SPI_freq=SPI_freq;

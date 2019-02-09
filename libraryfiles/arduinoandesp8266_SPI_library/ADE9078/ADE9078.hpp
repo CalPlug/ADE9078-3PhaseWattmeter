@@ -17,7 +17,7 @@ const long SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.
 
 class ADE9078 {
   public:
-    ADE9078(int SS, int SPI_freq);
+    ADE9078(int SS, long SPI_freq);
     void initialize();
 
 	uint8_t getVersion();
