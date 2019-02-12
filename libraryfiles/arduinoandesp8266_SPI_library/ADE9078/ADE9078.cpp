@@ -855,7 +855,7 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 
 uint8_t ADE9078::getVersion(){
   return spiAlgorithm16_read(VERSION_16);
-} 
+}
 
 float ADE9078::getPowerFactorA(){
 	int16_t value=0;
@@ -1050,7 +1050,15 @@ float ADE9078::getInstReactivePowerC(){
 return decimal;
   }
 
-
+/*
+float ADE9078::read32Bit(uint16_t register)
+{
+  long value = 0;
+  value = spiAlgorithm32_read(register);
+  float decimal = decimalize(value, 1.502, 0);
+  return abs(decimal);
+}
+*/
 
 //*******************************************************
 

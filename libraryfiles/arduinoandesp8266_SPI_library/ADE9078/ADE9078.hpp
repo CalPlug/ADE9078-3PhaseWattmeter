@@ -24,7 +24,6 @@ class ADE9078 {
 	float getPowerFactorA(); // only for A? Don't see for B/C
 	// float getPeriod();    // not done. can probably implement with USER_PERIOD_32
 	int32_t getPhaseCalibA(); // B/C?
-	unsigned long getPHNOLOAD();
 
   long getInstVoltageA();
   long getInstVoltageB();
@@ -58,6 +57,10 @@ class ADE9078 {
 	float getInstReactivePowerA();
   float getInstReactivePowerB();
   float getInstReactivePowerC();
+
+  unsigned long getPHNOLOAD();
+
+  //loat read32Bit(uint16_t);
 
   uint16_t spiAlgorithm16_read(uint16_t);
   uint32_t spiAlgorithm32_read(uint16_t);
