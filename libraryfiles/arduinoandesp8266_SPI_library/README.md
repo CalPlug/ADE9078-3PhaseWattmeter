@@ -23,13 +23,11 @@ Installation
 --------------------------------------------------------------------------------
 
 To install this library, just place this entire folder as a subfolder in your
-Arduino/lib/targets/libraries folder.
+Arduino/libraries folder.
 When installed, this library should look like:
-Arduino/lib/targets/libraries/ADE9078              (this library's folder)
-Arduino/lib/targets/libraries/ADE9078/ADE7953.cpp     (the library implementation file)
-Arduino/lib/targets/libraries/ADE9078/ADE7953.h       (the library description file)
-Arduino/lib/targets/libraries/ADE9078/examples     (the examples)
-Arduino/lib/targets/libraries/ADE9078/readme.txt   (this file)
+Arduino/ADE9078              (this library's folder)
+Arduino/ADE9078/ADE9078.cpp     (the library implementation file)
+Arduino/ADE9078/ADE9078.h       (the library description file)
 
 Building
 --------------------------------------------------------------------------------

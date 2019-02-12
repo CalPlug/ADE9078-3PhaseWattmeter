@@ -15,6 +15,7 @@ void setup() {
   delay(200);
   SPI.begin();
   delay(200);
+
   myADE9078.initialize();   //The ADE9078 must be initialized once in setup.
 }
 
@@ -26,6 +27,14 @@ void loop() {
   float apparentPowerA, apparentPowerB, apparentPowerC;
   float reactivePowerA, reactivePowerB, reactivePowerC;
   float activePowerA, activePowerB, activePowerC;
+
+  Serial.print("Version_16: ");
+  Serial.println(myADE9078.getVersion()); // PHNOLOAD_32
+  delay(200);
+
+  Serial.print("PHNOLOAD_32: ");
+  Serial.println(myADE9078.getPHNOLOAD()); // PHNOLOAD_32
+  delay(200);
 
   AvRMS = myADE9078.getAVrms();
   Serial.print("AVrms (V): ");
