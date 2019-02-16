@@ -11,12 +11,17 @@
 ADE9078 myADE9078(local_SS, local_SPI_freq); // Call the ADE9078 Object with hardware parameters specified, the "local" lets us use the same parameters for examples in this program as what is assigned to the ADE9078 object
 
 void setup() {
+
+  struct InitializationSettings is = {.vAGain=1, .vBGain=1, .vCGain=1,
+                            .iAGain=1, .iBGain=1, .iCGain=1, .iNGain=1,
+                            .powerAGain=1, .powerBGain=1, .powerCGain=1,
+                            .vConsel=0, .iConsel=0};
   Serial.begin(115200);
   delay(200);
   SPI.begin();
   delay(200);
 
-  myADE9078.initialize();   //The ADE9078 must be initialized once in setup.
+  myADE9078.initialize(is);
 }
 
 

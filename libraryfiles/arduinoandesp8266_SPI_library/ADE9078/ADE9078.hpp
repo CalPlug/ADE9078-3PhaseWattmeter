@@ -15,10 +15,29 @@
 const long SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.
 // const int SPI_freq = 12,288,000 // P 6: Input flock frequency
 
+struct InitializationSettings {
+  // All gains are 2 bits. Options: 1, 2, 3, 4
+  uint8_t vAGain;
+  uint8_t vBGain;
+  uint8_t vCGain;
+
+  uint8_t iAGain;
+  uint8_t iBGain;
+  uint8_t iCGain;
+  uint8_t iNGain;
+
+  uint32_t powerAGain;
+  uint32_t powerBGain;
+  uint32_t powerCGain;
+
+  uint8_t vConsel;
+  uint8_t iConsel;
+};
+
 class ADE9078 {
   public:
     ADE9078(int SS, long SPI_freq);
-    void initialize();
+    void initialize(struct InitializationSettings);
 
 	uint8_t getVersion();
 	float getPowerFactorA(); // only for A? Don't see for B/C
@@ -60,7 +79,7 @@ class ADE9078 {
 
   unsigned long getPHNOLOAD();
 
-  //loat read32Bit(uint16_t);
+  float read32Bit(uint16_t);
 
   uint16_t spiAlgorithm16_read(uint16_t);
   uint32_t spiAlgorithm32_read(uint16_t);
@@ -69,7 +88,7 @@ class ADE9078 {
 	void spiAlgorithm16_write(uint16_t, uint16_t);
 
 
-	float decimalize(long input, float factor, float offset);
+
 
   private:
   	int _SS;

@@ -849,7 +849,28 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 /* SPI burst read accessible. Registers organized functionally. See NIRMS in Table 31*/
 
 
+//**************** Helper Functions *****************
 
+bool checkBit(int data, int i) // return true if i'th bit is set, false otherwise
+{
+    // datasheet counts bits starting at 0. so the 2nd bit would be the 1 in 00100
+    /* example: assume input.. data=5, i=2
+    data = 5 ----> 00101
+    00101 & 00100 ---> 00100 --> 4
+    4 > 0, return true, the bit is set.
+    */
+    return ((data) & (1 << i)) > 0;
+}
+
+float decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+{
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE7953::calibration and float type conversion function executed ");
+  #endif
+return ((float)input/factor)+offset;
+}
+
+//**************** End Helper Functions *****************
 
 //****************User Program Functions*****************
 
@@ -1050,15 +1071,14 @@ float ADE9078::getInstReactivePowerC(){
 return decimal;
   }
 
-/*
-float ADE9078::read32Bit(uint16_t register)
+
+float ADE9078::read32Bit(uint16_t readRegister)
 {
-  long value = 0;
-  value = spiAlgorithm32_read(register);
-  float decimal = decimalize(value, 1.502, 0);
+  uint32_t data = spiAlgorithm32_read(readRegister);
+  float decimal = decimalize(data, 1.502, 0);
   return abs(decimal);
 }
-*/
+
 
 //*******************************************************
 
@@ -1074,13 +1094,13 @@ ADE9078::ADE9078(int SS, long SPI_freq)
 //**************************************************
 
 //****************Initialization********************
-void ADE9078::initialize(){
+void ADE9078::initialize(struct InitializationSettings is){
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078:initialize function started ");
   #endif
 
-
+  // Arduino setup
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
   digitalWrite(_SS, HIGH); //Initialize pin as HIGH to bring communication inactive
   SPI.begin();
@@ -1088,14 +1108,39 @@ void ADE9078::initialize(){
   SPI.setBitOrder(MSBFIRST);  //Define MSB as first (explicitly)
   delay(50);
 
+  // Page 56 of datasheet quick start
+  // #1: Ensure power sequence completed
+  delay(30);
+  int status1Data = read32Bit(STATUS1_32);
+  if (!checkBit(read32Bit(STATUS1_32), 16)) {
+    Serial.print("WARNING, POWER UP MAY NOT BE FINISHED");
+  }
 
-  uint16_t settingsACCMODE = 0;
+    // #2: Configure Gains
+    spiAlgorithm32_write(APGAIN_32, is.powerAGain);
+    spiAlgorithm32_write(BPGAIN_32, is.powerBGain);
+    spiAlgorithm32_write(CPGAIN_32, is.powerCGain);
 
-  spiAlgorithm16_write(ACCMODE_16, 0x0000); // chooses 4 wire WYE Blondel
-  spiAlgorithm32_write(VLEVEL_32, 0x117514); // page 56 Datasheet
+    // first 2 reserved, next 6 are v gains, next 8 are i gains.
+    uint16_t pgaGain = (is.vCGain << 12) + (is.vBGain << 10) + (is.vCGain << 8) +
+                      (is.iNGain << 6) + (is.iCGain << 4) + (is.iBGain << 2) + is.iAGain;
+    spiAlgorithm16_write(PGA_GAIN_16, pgaGain);
+
+    // #5 : Write VLevel 0x117514
+    spiAlgorithm32_write(VLEVEL_32, 0x117514); // #5
+
+    // #7:  If current transformers are used, INTEN and ININTEN in the CONFIG0 register must = 0
   spiAlgorithm16_write(CONFIG0_32, 0x00000000);
+  // Table 24 to determine how to configure ICONSEL and VCONSEL in the ACCMODE register
+  // 0 is assuming 4 wyre Blondel
+  uint16_t settingsACCMODE = (is.iConsel << 6) + (is.vConsel << 5);
+  spiAlgorithm16_write(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
 
-  // For voltage/current gains: 0x4B9 PGA_GAIN
+  // 8: Write 1 to Run register
+  spiAlgorithm16_write(RUN_16, 1);
+
+  // 9: Write 1 to EP_CFG register
+  spiAlgorithm16_write(EP_CFG_16, 1);
 
   /*
   Potentially useful registers to configure:
@@ -1290,14 +1335,4 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
 
     SPI.endTransaction();
-}
-
-
-
-float ADE9078::decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
-{
-  #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE7953::calibration and float type conversion function executed ");
-  #endif
-return ((float)input/factor)+offset;
 }
