@@ -11,6 +11,7 @@
 
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
 #include <SPI.h>
+#include "ADE9078registers.hpp"
 
 const long SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.
 // const int SPI_freq = 12,288,000 // P 6: Input flock frequency
