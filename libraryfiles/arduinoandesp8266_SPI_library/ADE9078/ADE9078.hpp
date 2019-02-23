@@ -35,13 +35,14 @@ struct InitializationSettings {
   uint8_t iConsel;
 };
 
+
 class ADE9078 {
 
 
   public:
     ADE9078(int SS, long SPI_freq, InitializationSettings*);
     ~ADE9078() { delete is; }
-    
+
     void initialize();
 
 	uint8_t getVersion();
@@ -99,7 +100,7 @@ class ADE9078 {
   	int _SS;
     int _SPI_freq;
     InitializationSettings* is;
-
+    SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3);
 
 };
 

@@ -16,8 +16,17 @@
 #include <SPI.h>
 #include "ADE9078.hpp"
 //Debug Control:
-//#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
+#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
 
+/*
+// This might be a cleaner way of printing debug lines if it gets too messy in the future
+#define DEBUG
+#ifdef DEBUG
+  #define DEBUG_PRINT(x) {Serial.print(x);}
+#else
+  #define DEBUG_PRINT(x) {}
+#endif
+*/
 
 //**************** Helper Functions *****************
 
@@ -273,7 +282,7 @@ void ADE9078::initialize(){
 
   // Arduino setup
   SPI.begin();
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+  SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
   SPI.setBitOrder(MSBFIRST);  //Define MSB as first (explicitly)
@@ -335,7 +344,6 @@ void ADE9078::initialize(){
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" ADE9078:initialize function completed ");
   #endif
-
 }
 //**************************************************
 
@@ -359,7 +367,7 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
 	byte dummyWrite = 0x00;
 
     // beginTransaction is first
-    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+    SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
@@ -376,10 +384,8 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
 
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiAlgorithm16_read function details: ");
+     Serial.print("Command Header: " + commandHeader1 + commandHeader2);
      Serial.print("Address Byte 1(MSB)[HEX]: ");
-     Serial.print(MSB, HEX);
-     Serial.print(" Address Byte 2(LSB)[HEX]: ");
-     Serial.print(LSB, HEX);
      Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
      Serial.print(one, HEX);
      Serial.print(" ");
@@ -407,7 +413,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
   byte one, two, three, four;
   byte dummyWrite = 0x00;
 
-  SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+  SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.transfer(commandHeader1);
@@ -469,7 +475,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     uint8_t byteOne = (data & 0xFF);
 
     // beginTransaction before writing SS low
-    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+    SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
@@ -504,7 +510,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
     uint8_t MSB_data = (data >> 8);
     uint8_t LSB_data = (data & 0xFF);
 
-    SPI.beginTransaction(SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3));  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+    SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
