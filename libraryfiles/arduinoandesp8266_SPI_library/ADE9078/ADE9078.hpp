@@ -87,11 +87,11 @@ class ADE9078 {
 
   float read32Bit(uint16_t);
 
-  uint16_t spiAlgorithm16_read(uint16_t);
+  uint16_t spiAlgorithm16_read(uint16_t); // address
   uint32_t spiAlgorithm32_read(uint16_t);
 
-	void spiAlgorithm32_write(uint16_t, uint32_t); // address, data
-	void spiAlgorithm16_write(uint16_t, uint16_t);
+  void spiAlgorithm16_write(uint16_t, uint16_t); // address, data
+	void spiAlgorithm32_write(uint16_t, uint32_t);
 
 
 

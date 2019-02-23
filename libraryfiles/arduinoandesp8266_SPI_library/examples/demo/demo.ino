@@ -8,20 +8,34 @@
 //Define ADE9078 object with hardware parameters specified
 #define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz (#define, (no = or ;) helps to save memory)
 #define local_SS 10  //Set the SS pin for SPI communication as pin 10  (#define, (no = or ;) helps to save memory)
-ADE9078 myADE9078(local_SS, local_SPI_freq); // Call the ADE9078 Object with hardware parameters specified, the "local" lets us use the same parameters for examples in this program as what is assigned to the ADE9078 object
+
+struct InitializationSettings* is = new InitializationSettings;
+
+ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, the "local" lets us use the same parameters for examples in this program as what is assigned to the ADE9078 object
 
 void setup() {
+  is->vAGain=1;
+  is->vBGain=1;
+  is->vCGain=1;
 
-  struct InitializationSettings is = {.vAGain=1, .vBGain=1, .vCGain=1,
-                            .iAGain=1, .iBGain=1, .iCGain=1, .iNGain=1,
-                            .powerAGain=1, .powerBGain=1, .powerCGain=1,
-                            .vConsel=0, .iConsel=0};
+  is->iAGain=1;
+  is->iBGain=1;
+  is->iCGain=1;
+  is->iNGain=1;
+
+  is->powerAGain=1;
+  is->powerBGain=1;
+  is->powerCGain=1;
+
+  is->vConsel=0;
+  is->iConsel=0;
+
   Serial.begin(115200);
   delay(200);
   SPI.begin();
   delay(200);
 
-  myADE9078.initialize(is);
+  myADE9078.initialize();
 }
 
 

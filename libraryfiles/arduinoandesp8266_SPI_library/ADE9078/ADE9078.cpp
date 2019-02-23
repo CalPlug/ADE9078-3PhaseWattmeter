@@ -305,10 +305,12 @@ void ADE9078::initialize(){
     // first 2 reserved, next 6 are v gains, next 8 are i gains.
     uint16_t pgaGain = (is->vCGain << 12) + (is->vBGain << 10) + (is->vCGain << 8) +
                       (is->iNGain << 6) + (is->iCGain << 4) + (is->iBGain << 2) + is->iAGain;
+
     spiAlgorithm16_write(PGA_GAIN_16, pgaGain);
 
     // #5 : Write VLevel 0x117514
-    spiAlgorithm32_write(VLEVEL_32, 0x117514); // #5
+    uint32_t vLevelData = 0x117514;
+    spiAlgorithm32_write(VLEVEL_32, vLevelData); // #5
 
     // #7:  If current transformers are used, INTEN and ININTEN in the CONFIG0 register must = 0
   spiAlgorithm16_write(CONFIG0_32, 0x00000000);
@@ -342,7 +344,17 @@ void ADE9078::initialize(){
   // EP_CFG
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print(" ADE9078:initialize function completed ");
+   Serial.print(" ADE9078:initialize function completed. Showing values and registers written ");
+   Serial.print("APGAIN: " + is->powerAGain);
+   Serial.print("BPGAIN: " + is->powerBGain);
+   Serial.print("CPGAIN: " + is->powerCGain);
+   Serial.print("PGA_GAIN: " + pgaGain);
+   Serial.print("VLEVEL: " + vLevelData);
+   Serial.print("CONFIG0-3, ALL 0'S");
+   Serial.print("ACCMODE: " + settingsACCMODE);
+   Serial.print("RUN: " + 1);
+   Serial.print("EP_CFG: " + 1);
+   Serial.print("DICOEFF: " + 0xFFFFE000);
   #endif
 }
 //**************************************************
@@ -431,11 +443,8 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078::spiAlgorithm32_read function details: ");
-   //Serial.print("Address Byte 1(MSB)[HEX]: ");
-   //Serial.print(MSB, BIN);
-   //Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   //Serial.print(LSB, BIN);
-   Serial.print(" Returned bytes (1(MSB) to 4)[HEX]: ");
+   Serial.print("Command Header: " + commandHeader1 + commandHeader2);
+   Serial.print(" Returned bytes (1(MSB) to 4)[BINARY]: ");
    Serial.print(one, BIN);
    Serial.print(" ");
    Serial.print(two, BIN);
@@ -451,6 +460,45 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
 
 }
 
+void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
+
+  // Same warnings as in 32 bit write.
+
+  uint8_t isRead = 0;
+
+  // contains upper 8 bits of address
+  uint8_t commandHeader1 = (address >> 4);
+
+  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+  uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
+
+  uint8_t MSB_data = (data >> 8);
+  uint8_t LSB_data = (data & 0xFF);
+
+  SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+
+  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
+
+  SPI.transfer(commandHeader1);
+  SPI.transfer(commandHeader2);
+
+  SPI.transfer(MSB_data);
+  SPI.transfer(LSB_data);
+
+  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
+
+  SPI.endTransaction();
+
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm32_read function details: ");
+   Serial.print("Command Header: " + commandHeader1 + commandHeader2);
+   Serial.print(" Wrote bytes (2(MSB) to 1)[BINARY]: ");
+   Serial.print(MSB_data, BIN);
+   Serial.print(" ");
+   Serial.print(LSB_data, BIN);
+   Serial.print(" ADE9078::spiAlgorithm32_read function completed ");
+  #endif
+}
 
   void ADE9078::spiAlgorithm32_write(uint16_t address, uint32_t data) {
 
@@ -493,34 +541,19 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
 
     // endTransaction after writing SS high
     SPI.endTransaction();
+
+    #ifdef ADE9078_VERBOSE_DEBUG
+     Serial.print("ADE9078::spiAlgorithm32_read function details: ");
+     Serial.print("Command Header: " + commandHeader1 + commandHeader2);
+     Serial.print(" Wrote bytes (4(MSB) to 1)[BINARY]: ");
+     Serial.print(byteFour, BIN);
+     Serial.print(" ");
+     Serial.print(byteThree, BIN);
+     Serial.print(" ");
+     Serial.print(byteTwo, BIN);
+     Serial.print(" ");
+     Serial.print(byteOne, BIN);
+     Serial.print(" ADE9078::spiAlgorithm32_read function completed ");
+    #endif
+
   }
-
-  void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
-
-    // Same warnings as in 32 bit write.
-
-    uint8_t isRead = 0;
-
-    // contains upper 8 bits of address
-    uint8_t commandHeader1 = (address >> 4);
-
-    // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
-    uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);
-
-    uint8_t MSB_data = (data >> 8);
-    uint8_t LSB_data = (data & 0xFF);
-
-    SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
-
-    digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-
-    SPI.transfer(commandHeader1);
-    SPI.transfer(commandHeader2);
-
-    SPI.transfer(MSB_data);
-    SPI.transfer(LSB_data);
-
-    digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
-
-    SPI.endTransaction();
-}
