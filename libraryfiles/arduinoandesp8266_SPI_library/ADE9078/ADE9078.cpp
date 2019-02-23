@@ -256,15 +256,16 @@ float ADE9078::read32Bit(uint16_t readRegister)
 //****************ADE 9078 Library Control Functions**************************************
 
 //****************Object Definition*****************
-ADE9078::ADE9078(int SS, long SPI_freq)
+ADE9078::ADE9078(int SS, long SPI_freq, InitializationSettings* is)
 {
   _SS=SS;
   _SPI_freq=SPI_freq;
+  this->is = is;
   }
 //**************************************************
 
 //****************Initialization********************
-void ADE9078::initialize(struct InitializationSettings is){
+void ADE9078::initialize(){
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078:initialize function started ");
@@ -288,13 +289,13 @@ void ADE9078::initialize(struct InitializationSettings is){
   }
 
     // #2: Configure Gains
-    spiAlgorithm32_write(APGAIN_32, is.powerAGain);
-    spiAlgorithm32_write(BPGAIN_32, is.powerBGain);
-    spiAlgorithm32_write(CPGAIN_32, is.powerCGain);
+    spiAlgorithm32_write(APGAIN_32, is->powerAGain);
+    spiAlgorithm32_write(BPGAIN_32, is->powerBGain);
+    spiAlgorithm32_write(CPGAIN_32, is->powerCGain);
 
     // first 2 reserved, next 6 are v gains, next 8 are i gains.
-    uint16_t pgaGain = (is.vCGain << 12) + (is.vBGain << 10) + (is.vCGain << 8) +
-                      (is.iNGain << 6) + (is.iCGain << 4) + (is.iBGain << 2) + is.iAGain;
+    uint16_t pgaGain = (is->vCGain << 12) + (is->vBGain << 10) + (is->vCGain << 8) +
+                      (is->iNGain << 6) + (is->iCGain << 4) + (is->iBGain << 2) + is->iAGain;
     spiAlgorithm16_write(PGA_GAIN_16, pgaGain);
 
     // #5 : Write VLevel 0x117514
@@ -303,7 +304,7 @@ void ADE9078::initialize(struct InitializationSettings is){
     // #7:  If current transformers are used, INTEN and ININTEN in the CONFIG0 register must = 0
   spiAlgorithm16_write(CONFIG0_32, 0x00000000);
   // Table 24 to determine how to configure ICONSEL and VCONSEL in the ACCMODE register
-  uint16_t settingsACCMODE = (is.iConsel << 6) + (is.vConsel << 5);
+  uint16_t settingsACCMODE = (is->iConsel << 6) + (is->vConsel << 5);
   spiAlgorithm16_write(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
 
   // 8: Write 1 to Run register

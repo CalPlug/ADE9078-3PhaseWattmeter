@@ -36,9 +36,13 @@ struct InitializationSettings {
 };
 
 class ADE9078 {
+
+
   public:
-    ADE9078(int SS, long SPI_freq);
-    void initialize(struct InitializationSettings);
+    ADE9078(int SS, long SPI_freq, InitializationSettings*);
+    ~ADE9078() { delete is; }
+    
+    void initialize();
 
 	uint8_t getVersion();
 	float getPowerFactorA(); // only for A? Don't see for B/C
@@ -94,6 +98,9 @@ class ADE9078 {
   private:
   	int _SS;
     int _SPI_freq;
+    InitializationSettings* is;
+
+
 };
 
 #endif // ADE9078_HPP
