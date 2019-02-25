@@ -345,16 +345,25 @@ void ADE9078::initialize(){
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" ADE9078:initialize function completed. Showing values and registers written ");
-   Serial.print("APGAIN: " + is->powerAGain);
-   Serial.print("BPGAIN: " + is->powerBGain);
-   Serial.print("CPGAIN: " + is->powerCGain);
-   Serial.print("PGA_GAIN: " + pgaGain);
-   Serial.print("VLEVEL: " + vLevelData);
+   Serial.print("APGAIN: ");
+   Serial.print(is->powerAGain);
+   Serial.print("BPGAIN: ");
+   Serial.print(is->powerBGain);
+   Serial.print("CPGAIN: ");
+   Serial.print(is->powerCGain);
+   Serial.print("PGA_GAIN: ");
+   Serial.print(pgaGain);
+   Serial.print("VLEVEL: ");
+   Serial.print(vLevelData);
    Serial.print("CONFIG0-3, ALL 0'S");
-   Serial.print("ACCMODE: " + settingsACCMODE);
-   Serial.print("RUN: " + 1);
-   Serial.print("EP_CFG: " + 1);
-   Serial.print("DICOEFF: " + 0xFFFFE000);
+   Serial.print("ACCMODE: ");
+   Serial.print(settingsACCMODE);
+   Serial.print("RUN: ");
+   Serial.print(1);
+   Serial.print("EP_CFG: ");
+   Serial.print(1);
+   Serial.print("DICOEFF: ");
+   Serial.print(0xFFFFE000);
   #endif
 }
 //**************************************************
@@ -396,7 +405,9 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
 
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiAlgorithm16_read function details: ");
-     Serial.print("Command Header: " + commandHeader1 + commandHeader2);
+     Serial.print("Command Header: ");
+     Serial.print(commandHeader1);
+     Serial.print(commandHeader2);
      Serial.print("Address Byte 1(MSB)[HEX]: ");
      Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
      Serial.print(one, HEX);
@@ -442,9 +453,15 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
   SPI.endTransaction();
 
   #ifdef ADE9078_VERBOSE_DEBUG
+
+  Serial.print(" Returned bytes 1-4, 1 is MSB [HEX]: ");
+
    Serial.print("ADE9078::spiAlgorithm32_read function details: ");
-   Serial.print("Command Header: " + commandHeader1 + commandHeader2);
-   Serial.print(" Returned bytes (1(MSB) to 4)[BINARY]: ");
+   Serial.print("Command Header: ");
+   Serial.print(commandHeader1);
+   Serial.print(commandHeader2);
+
+   Serial.print("Returned bytes (1(MSB) to 4)[BINARY]: ");
    Serial.print(one, BIN);
    Serial.print(" ");
    Serial.print(two, BIN);
@@ -452,7 +469,6 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
    Serial.print(three, BIN);
    Serial.print(" ");
    Serial.print(four, BIN);
-   Serial.print(" ADE9078::spiAlgorithm32_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operations
@@ -491,7 +507,9 @@ void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078::spiAlgorithm32_read function details: ");
-   Serial.print("Command Header: " + commandHeader1 + commandHeader2);
+   Serial.print("Command Header: ");
+   Serial.print(commandHeader1);
+   Serial.print(commandHeader2);
    Serial.print(" Wrote bytes (2(MSB) to 1)[BINARY]: ");
    Serial.print(MSB_data, BIN);
    Serial.print(" ");
