@@ -186,6 +186,14 @@ uint32_t ADE9078::getEnergyA(){
 return value;
   }
 
+double ADE9078::readWattHoursA()
+{
+  uint32_t data = spiRead32(AWATTHR_HI_32);
+  double dec = decimalize(data, 1.502, 0);
+  return abs(dec);
+}
+
+
 double ADE9078::getInstApparentPowerA(){
 	uint32_t value=0;
 	value=spiRead32(AVA_32);

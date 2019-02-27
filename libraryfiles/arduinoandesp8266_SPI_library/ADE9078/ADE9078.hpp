@@ -71,6 +71,8 @@ class ADE9078 {
 
 	uint32_t getEnergyA();
 
+  double readWattHoursA();
+
 	double getInstApparentPowerA();
   double getInstApparentPowerB();
   double getInstApparentPowerC();

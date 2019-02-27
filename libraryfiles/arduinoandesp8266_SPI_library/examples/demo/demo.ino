@@ -41,11 +41,12 @@ void setup() {
 
 void loop() {
 
-  float AvRMS, BvRMS, CvRMS;
-  float IrmsA, IrmsB, IrmsC;
-  float apparentPowerA, apparentPowerB, apparentPowerC;
-  float reactivePowerA, reactivePowerB, reactivePowerC;
-  float activePowerA, activePowerB, activePowerC;
+  double AvRMS, BvRMS, CvRMS;
+  double IrmsA, IrmsB, IrmsC;
+  double wattHoursA;
+  double apparentPowerA, apparentPowerB, apparentPowerC;
+  double reactivePowerA, reactivePowerB, reactivePowerC;
+  double activePowerA, activePowerB, activePowerC;
 
   Serial.print("Version_16: ");
   Serial.println(myADE9078.getVersion()); // PHNOLOAD_32
@@ -84,6 +85,11 @@ void loop() {
   IrmsC = myADE9078.getIrmsC();
   Serial.print("IrmsA (mA): ");
   Serial.println(IrmsC);
+  delay(200);
+
+  wattHoursA = myADE9078.readWattHoursA();
+  Serial.print("WattHoursA: ");
+  Serial.println(wattHoursA);
   delay(200);
 
   apparentPowerA = myADE9078.getInstApparentPowerA();
