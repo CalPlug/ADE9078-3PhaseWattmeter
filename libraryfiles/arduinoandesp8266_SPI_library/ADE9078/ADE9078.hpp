@@ -46,52 +46,52 @@ class ADE9078 {
     void initialize();
 
 	uint8_t getVersion();
-	float getPowerFactorA(); // only for A? Don't see for B/C
-	// float getPeriod();    // not done. can probably implement with USER_PERIOD_32
-	int32_t getPhaseCalibA(); // B/C?
+	double getPowerFactorA(); // only for A? Don't see for B/C
+	// double getPeriod();    // not done. can probably implement with USER_PERIOD_32
+	uint32_t getPhaseCalibA(); // B/C?
 
-  long getInstVoltageA();
-  long getInstVoltageB();
-  long getInstVoltageC();
+  uint32_t getInstVoltageA();
+  uint32_t getInstVoltageB();
+  uint32_t getInstVoltageC();
 
-	float getAVrms();
-  float getBVrms();
-  float getCVrms();
+	double getAVrms();
+  double getBVrms();
+  double getCVrms();
 
-	long getInstCurrentA();
-  long getInstCurrentB();
-  long getInstCurrentC();
+	uint32_t getInstCurrentA();
+  uint32_t getInstCurrentB();
+  uint32_t getInstCurrentC();
 
-	float getIrmsA();
-  float getIrmsB();
-  float getIrmsC();
+	double getIrmsA();
+  double getIrmsB();
+  double getIrmsC();
 
-	unsigned long getVpeak();
-	unsigned long getIpeak();
+	uint32_t getVpeak();
+	uint32_t getIpeak();
 
-	long getEnergyA();
+	uint32_t getEnergyA();
 
-	float getInstApparentPowerA();
-  float getInstApparentPowerB();
-  float getInstApparentPowerC();
+	double getInstApparentPowerA();
+  double getInstApparentPowerB();
+  double getInstApparentPowerC();
 
-	float getInstActivePowerA();
-  float getInstActivePowerB();
-  float getInstActivePowerC();
+	double getInstActivePowerA();
+  double getInstActivePowerB();
+  double getInstActivePowerC();
 
-	float getInstReactivePowerA();
-  float getInstReactivePowerB();
-  float getInstReactivePowerC();
+	double getInstReactivePowerA();
+  double getInstReactivePowerB();
+  double getInstReactivePowerC();
 
-  unsigned long getPHNOLOAD();
+  uint32_t getPHNOLOAD();
 
-  float read32Bit(uint16_t);
+  double read32BitAndScale(uint16_t);
 
-  uint16_t spiAlgorithm16_read(uint16_t); // address
-  uint32_t spiAlgorithm32_read(uint16_t);
+  uint16_t spiRead16(uint16_t); // address
+  uint32_t spiRead32(uint16_t);
 
-  void spiAlgorithm16_write(uint16_t, uint16_t); // address, data
-	void spiAlgorithm32_write(uint16_t, uint32_t);
+  void spiWrite16(uint16_t, uint16_t); // address, data
+	void spiWrite32(uint16_t, uint32_t);
 
 
 

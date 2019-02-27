@@ -41,12 +41,12 @@ bool checkBit(int data, int i) // return true if i'th bit is set, false otherwis
     return ((data) & (1 << i)) > 0;
 }
 
-float decimalize(long input, float factor, float offset) //This function adds a decimal point to the input value and returns it as a float, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+double decimalize(uint32_t input, double factor, double offset) //This function adds a decimal point to the input value and returns it as a double, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE7953::calibration and float type conversion function executed ");
+   Serial.print("ADE7953::calibration and double type conversion function executed ");
   #endif
-return ((float)input/factor)+offset;
+return ((double)input/factor)+offset;
 }
 
 //**************** End Helper Functions *****************
@@ -54,207 +54,207 @@ return ((float)input/factor)+offset;
 //****************User Program Functions*****************
 
 uint8_t ADE9078::getVersion(){
-  return spiAlgorithm16_read(VERSION_16);
+  return spiRead16(VERSION_16);
 }
 
-float ADE9078::getPowerFactorA(){
+double ADE9078::getPowerFactorA(){
 	int16_t value=0;
-	value=spiAlgorithm16_read(PFA_16);
-	float decimal = decimalize(value, 327.67, 0); //convert to float with calibration factors specified
+	value=spiRead16(PFA_16);
+	double decimal = decimalize(value, 327.67, 0); //convert to double with calibration factors specified
 return abs(decimal);
   }
 
-// TODO: float ADE9078::getPowerFactorB(){
+// TODO: double ADE9078::getPowerFactorB(){
 
-// TODO: float ADE9078::getPowerFactorB(){
+// TODO: double ADE9078::getPowerFactorB(){
 
 // which APHCAL should we use? There are 4
-int32_t ADE9078::getPhaseCalibA(){
-	int32_t value=0;
-	value=spiAlgorithm32_read(APHCAL0_32);
+uint32_t ADE9078::getPhaseCalibA(){
+	uint32_t value=0;
+	value=spiRead32(APHCAL0_32);
 return value;
   }
 
 // TODO : USER_PERIOD_32
 // No period register?
-// float ADE9078::getPeriod(){
+// double ADE9078::getPeriod(){
 // 	uint16_t value=0;
-// 	value=spiAlgorithm16_read((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0)));
-// 	float decimal = decimalize(value, 1, 0); //convert to float with calibration factors specified
+// 	value=spiRead16((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0)));
+// 	double decimal = decimalize(value, 1, 0); //convert to double with calibration factors specified
 // return decimal;
 //   }
 // might need to edit to access bits for a/b/c
-unsigned long ADE9078::getPHNOLOAD(){  //use signed long for signed registers, and unsigned long for unsigned registers
-	unsigned long value=0;  //use signed long for signed registers, and unsigned long for unsigned registers
-	value=spiAlgorithm32_read(PHNOLOAD_32); //Call MSB and LSB from the register constant (template for how all functions should be called)
+uint32_t ADE9078::getPHNOLOAD(){  //use signed int32_t for signed registers, and unsigned uint32_t for unsigned registers
+	uint32_t value=0;  //use signed uint32_t for signed registers, and unsigned uint32_t for unsigned registers
+	value=spiRead32(PHNOLOAD_32); //Call MSB and LSB from the register constant (template for how all functions should be called)
 return value;
   }
 
 
-long ADE9078::getInstVoltageA(){
-	long value=0;
-	value=spiAlgorithm32_read(AV_PCF_32);
+uint32_t ADE9078::getInstVoltageA(){
+	uint32_t value=0;
+	value=spiRead32(AV_PCF_32);
 return value;
   }
-long ADE9078::getInstVoltageB(){
-	long value=0;
-	value=spiAlgorithm32_read(BV_PCF_32);
+uint32_t ADE9078::getInstVoltageB(){
+	uint32_t value=0;
+	value=spiRead32(BV_PCF_32);
   return value;
 }
-long ADE9078::getInstVoltageC(){
-	long value=0;
-	value=spiAlgorithm32_read(CV_PCF_32);
+uint32_t ADE9078::getInstVoltageC(){
+	uint32_t value=0;
+	value=spiRead32(CV_PCF_32);
   return value;
 }
 
-float ADE9078::getAVrms(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(AVRMS_32);
-	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
+double ADE9078::getAVrms(){
+	uint32_t value=0;
+	value=spiRead32(AVRMS_32);
+	double decimal = decimalize(value, 19090, 0); //convert to double with calibration factors specified
 return decimal;
   }
 
-float ADE9078::getBVrms(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(BVRMS_32);
-	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
+double ADE9078::getBVrms(){
+	uint32_t value=0;
+	value=spiRead32(BVRMS_32);
+	double decimal = decimalize(value, 19090, 0); //convert to double with calibration factors specified
 return decimal;
   }
 
-float ADE9078::getCVrms(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(CVRMS_32);
-	float decimal = decimalize(value, 19090, 0); //convert to float with calibration factors specified
+double ADE9078::getCVrms(){
+	uint32_t value=0;
+	value=spiRead32(CVRMS_32);
+	double decimal = decimalize(value, 19090, 0); //convert to double with calibration factors specified
 return decimal;
   }
 
-long ADE9078::getInstCurrentA(){
-	long value=0;
-	value=spiAlgorithm32_read(AI_PCF_32);
+uint32_t ADE9078::getInstCurrentA(){
+	uint32_t value=0;
+	value=spiRead32(AI_PCF_32);
 return value;
   }
 
-long ADE9078::getInstCurrentB(){
-	long value=0;
-	value=spiAlgorithm32_read(BI_PCF_32);
+uint32_t ADE9078::getInstCurrentB(){
+	uint32_t value=0;
+	value=spiRead32(BI_PCF_32);
 return value;
   }
 
-long ADE9078::getInstCurrentC(){
-	long value=0;
-	value=spiAlgorithm32_read(CI_PCF_32);
+uint32_t ADE9078::getInstCurrentC(){
+	uint32_t value=0;
+	value=spiRead32(CI_PCF_32);
 return value;
   }
 
-float ADE9078::getIrmsA(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(AIRMS_32);
-	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
+double ADE9078::getIrmsA(){
+	uint32_t value=0;
+	value=spiRead32(AIRMS_32);
+	double decimal = decimalize(value, 1327, 0); //convert to double with calibration factors specified
   return decimal;
 }
 
-float ADE9078::getIrmsB(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(BIRMS_32);
-	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
+double ADE9078::getIrmsB(){
+	uint32_t value=0;
+	value=spiRead32(BIRMS_32);
+	double decimal = decimalize(value, 1327, 0); //convert to double with calibration factors specified
   return decimal;
 }
 
-float ADE9078::getIrmsC(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(CIRMS_32);
-	float decimal = decimalize(value, 1327, 0); //convert to float with calibration factors specified
+double ADE9078::getIrmsC(){
+	uint32_t value=0;
+	value=spiRead32(CIRMS_32);
+	double decimal = decimalize(value, 1327, 0); //convert to double with calibration factors specified
 return decimal;
   }
 
 
-unsigned long ADE9078::getVpeak(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(VPEAK_32);
+uint32_t ADE9078::getVpeak(){
+	uint32_t value=0;
+	value=spiRead32(VPEAK_32);
 return value;
   }
 
-unsigned long ADE9078::getIpeak(){
-	unsigned long value=0;
-	value=spiAlgorithm32_read(IPEAK_32);
+uint32_t ADE9078::getIpeak(){
+	uint32_t value=0;
+	value=spiRead32(IPEAK_32);
 return value;
   }
 
-long ADE9078::getEnergyA(){
-	long value=0;
-	value=spiAlgorithm16_read(ACCMODE_16);
+uint32_t ADE9078::getEnergyA(){
+	uint32_t value=0;
+	value=spiRead16(ACCMODE_16);
 return value;
   }
 
-float ADE9078::getInstApparentPowerA(){
-	long value=0;
-	value=spiAlgorithm32_read(AVA_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstApparentPowerA(){
+	uint32_t value=0;
+	value=spiRead32(AVA_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return abs(decimal);
   }
 
-float ADE9078::getInstApparentPowerB(){
-	long value=0;
-	value=spiAlgorithm32_read(BVA_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstApparentPowerB(){
+	uint32_t value=0;
+	value=spiRead32(BVA_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return abs(decimal);
   }
 
-float ADE9078::getInstApparentPowerC(){
-	long value=0;
-	value=spiAlgorithm32_read(CVA_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstApparentPowerC(){
+	uint32_t value=0;
+	value=spiRead32(CVA_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return abs(decimal);
   }
 
 
-float ADE9078::getInstActivePowerA(){
-	long value=0;
-	value=spiAlgorithm32_read(AWATT_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstActivePowerA(){
+	uint32_t value=0;
+	value=spiRead32(AWATT_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return abs(decimal);
   }
 
-float ADE9078::getInstActivePowerB(){
-	long value=0;
-	value=spiAlgorithm32_read(BWATT_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstActivePowerB(){
+	uint32_t value=0;
+	value=spiRead32(BWATT_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return abs(decimal);
   }
 
-float ADE9078::getInstActivePowerC(){
-	long value=0;
-	value=spiAlgorithm32_read(CWATT_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstActivePowerC(){
+	uint32_t value=0;
+	value=spiRead32(CWATT_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return abs(decimal);
 }
 
-float ADE9078::getInstReactivePowerA(){
-	long value=0;
-	value=spiAlgorithm32_read(AVAR_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstReactivePowerA(){
+	uint32_t value=0;
+	value=spiRead32(AVAR_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return decimal;
   }
 
-float ADE9078::getInstReactivePowerB(){
-	long value=0;
-	value=spiAlgorithm32_read(BVAR_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstReactivePowerB(){
+	uint32_t value=0;
+	value=spiRead32(BVAR_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return decimal;
   }
 
-float ADE9078::getInstReactivePowerC(){
-	long value=0;
-	value=spiAlgorithm32_read(CVAR_32);
-	float decimal = decimalize(value, 1.502, 0); //convert to float with calibration factors specified
+double ADE9078::getInstReactivePowerC(){
+	uint32_t value=0;
+	value=spiRead32(CVAR_32);
+	double decimal = decimalize(value, 1.502, 0); //convert to double with calibration factors specified
 return decimal;
-  }
+}
 
 
-float ADE9078::read32Bit(uint16_t readRegister)
+double ADE9078::read32BitAndScale(uint16_t readRegister)
 {
-  uint32_t data = spiAlgorithm32_read(readRegister);
-  float decimal = decimalize(data, 1.502, 0);
+  uint32_t data = spiRead32(readRegister);
+  double decimal = decimalize(data, 1.502, 0);
   return abs(decimal);
 }
 
@@ -292,37 +292,37 @@ void ADE9078::initialize(){
   // Page 56 of datasheet quick start
   // #1: Ensure power sequence completed
   delay(30);
-  int status1Data = read32Bit(STATUS1_32);
-  if (!checkBit(read32Bit(STATUS1_32), 16)) {
+  int status1Data = read32BitAndScale(STATUS1_32);
+  if (!checkBit(status1Data, 16)) {
     Serial.print("WARNING, POWER UP MAY NOT BE FINISHED");
   }
 
     // #2: Configure Gains
-    spiAlgorithm32_write(APGAIN_32, is->powerAGain);
-    spiAlgorithm32_write(BPGAIN_32, is->powerBGain);
-    spiAlgorithm32_write(CPGAIN_32, is->powerCGain);
+    spiWrite32(APGAIN_32, is->powerAGain);
+    spiWrite32(BPGAIN_32, is->powerBGain);
+    spiWrite32(CPGAIN_32, is->powerCGain);
 
     // first 2 reserved, next 6 are v gains, next 8 are i gains.
     uint16_t pgaGain = (is->vCGain << 12) + (is->vBGain << 10) + (is->vCGain << 8) +
                       (is->iNGain << 6) + (is->iCGain << 4) + (is->iBGain << 2) + is->iAGain;
 
-    spiAlgorithm16_write(PGA_GAIN_16, pgaGain);
+    spiWrite16(PGA_GAIN_16, pgaGain);
 
     // #5 : Write VLevel 0x117514
     uint32_t vLevelData = 0x117514;
-    spiAlgorithm32_write(VLEVEL_32, vLevelData); // #5
+    spiWrite32(VLEVEL_32, vLevelData); // #5
 
     // #7:  If current transformers are used, INTEN and ININTEN in the CONFIG0 register must = 0
-  spiAlgorithm16_write(CONFIG0_32, 0x00000000);
+  spiWrite16(CONFIG0_32, 0x00000000);
   // Table 24 to determine how to configure ICONSEL and VCONSEL in the ACCMODE register
   uint16_t settingsACCMODE = (is->iConsel << 6) + (is->vConsel << 5);
-  spiAlgorithm16_write(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
+  spiWrite16(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
 
   // 8: Write 1 to Run register
-  spiAlgorithm16_write(RUN_16, 1);
+  spiWrite16(RUN_16, 1);
 
   // 9: Write 1 to EP_CFG register
-  spiAlgorithm16_write(EP_CFG_16, 1);
+  spiWrite16(EP_CFG_16, 1);
 
   /*
   Potentially useful registers to configure:
@@ -332,16 +332,16 @@ void ADE9078::initialize(){
     Phase calibrations, such as APHCAL1_32
   */
 
-  spiAlgorithm16_write(CONFIG1_16, 0x0000);
-  spiAlgorithm16_write(CONFIG2_16, 0x0000);
-  spiAlgorithm16_write(CONFIG3_16, 0x0000);
-  spiAlgorithm32_write(DICOEFF_32, 0xFFFFE000); // Recommended by datasheet
+  spiWrite16(CONFIG1_16, 0x0000);
+  spiWrite16(CONFIG2_16, 0x0000);
+  spiWrite16(CONFIG3_16, 0x0000);
+  spiWrite32(DICOEFF_32, 0xFFFFE000); // Recommended by datasheet
   /* Registers configured in ADE9000 code */
   // zx_lp_sel
   // mask0, mask1, event_mask,
   // wfb_cfg,
-  // EGY_TIME
-  // EP_CFG
+  spiWrite16(EGY_TIME_16, 0x0001);
+  spiWrite16(EP_CFG_16, 0x0021); // RD_EST_EN=1, EGY_LD_ACCUM=0, EGY_TMR_MODE=0, EGY_PWR_EN=1
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" ADE9078:initialize function completed. Showing values and registers written ");
@@ -368,9 +368,9 @@ void ADE9078::initialize(){
 }
 //**************************************************
 
-uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print("ADE9078::spiAlgorithm16_read function started ");
+     Serial.print("ADE9078::spiRead16 function started ");
     #endif
 
     // See SPI protocol in datasheet to understand this.
@@ -404,7 +404,7 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
     SPI.endTransaction();
 
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print("ADE9078::spiAlgorithm16_read function details: ");
+     Serial.print("ADE9078::spiRead16 function details: ");
      Serial.print("Command Header: ");
      Serial.print(commandHeader1);
      Serial.print(commandHeader2);
@@ -413,16 +413,16 @@ uint16_t ADE9078::spiAlgorithm16_read(uint16_t address) { //This is the algorith
      Serial.print(one, HEX);
      Serial.print(" ");
      Serial.print(two, HEX);
-     Serial.print(" ADE9078::spiAlgorithm16_read function completed ");
+     Serial.print(" ADE9078::spiRead16 function completed ");
     #endif
 
     return (((uint32_t) one << 8) + ((uint32_t) two));  //Alternate Bitshift algorithm)
 }
 
 
-uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
+uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm32_read function started ");
+   Serial.print("ADE9078::spiRead32 function started ");
   #endif
 
   uint8_t isRead = 1;
@@ -456,7 +456,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
 
   Serial.print(" Returned bytes 1-4, 1 is MSB [HEX]: ");
 
-   Serial.print("ADE9078::spiAlgorithm32_read function details: ");
+   Serial.print("ADE9078::spiRead32 function details: ");
    Serial.print("Command Header: ");
    Serial.print(commandHeader1);
    Serial.print(commandHeader2);
@@ -476,7 +476,7 @@ uint32_t ADE9078::spiAlgorithm32_read(uint16_t address) { //This is the algorith
 
 }
 
-void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
+void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 
   // Same warnings as in 32 bit write.
 
@@ -506,7 +506,7 @@ void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
   SPI.endTransaction();
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm32_read function details: ");
+   Serial.print("ADE9078::spiRead32 function details: ");
    Serial.print("Command Header: ");
    Serial.print(commandHeader1);
    Serial.print(commandHeader2);
@@ -514,11 +514,11 @@ void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
    Serial.print(MSB_data, BIN);
    Serial.print(" ");
    Serial.print(LSB_data, BIN);
-   Serial.print(" ADE9078::spiAlgorithm32_read function completed ");
+   Serial.print(" ADE9078::spiRead32 function completed ");
   #endif
 }
 
-  void ADE9078::spiAlgorithm32_write(uint16_t address, uint32_t data) {
+  void ADE9078::spiWrite32(uint16_t address, uint32_t data) {
 
     // IF address IS GREATER THAN 2^12, ERROR. (use only 12 bits)
     // Avoid bit fields so that compiler doesn't pad. If protection is desired,
@@ -561,7 +561,7 @@ void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
     SPI.endTransaction();
 
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print("ADE9078::spiAlgorithm32_read function details: ");
+     Serial.print("ADE9078::spiRead32 function details: ");
      Serial.print("Command Header: " + commandHeader1 + commandHeader2);
      Serial.print(" Wrote bytes (4(MSB) to 1)[BINARY]: ");
      Serial.print(byteFour, BIN);
@@ -571,7 +571,7 @@ void ADE9078::spiAlgorithm16_write(uint16_t address, uint16_t data) {
      Serial.print(byteTwo, BIN);
      Serial.print(" ");
      Serial.print(byteOne, BIN);
-     Serial.print(" ADE9078::spiAlgorithm32_read function completed ");
+     Serial.print(" ADE9078::spiRead32 function completed ");
     #endif
 
   }
