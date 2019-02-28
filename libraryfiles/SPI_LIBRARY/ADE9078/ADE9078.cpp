@@ -43,7 +43,7 @@ bool checkBit(int data, int i) // return true if i'th bit is set, false otherwis
 double decimalize(uint32_t input, double factor, double offset) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
 	#ifdef ADE9078_VERBOSE_DEBUG
-	Serial.print("ADE7953::calibration and double type conversion function executed ");
+	Serial.print(" ADE9078::calibration and double type conversion function executed ");
 	#endif
 	return ((double)input/factor)+offset;
 }
@@ -279,7 +279,7 @@ ADE9078::ADE9078(int SS, long SPI_freq, InitializationSettings* is)
 void ADE9078::initialize(){
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078:initialize function started"); //wiring configuration defined in VCONSEL and ICONSEL registers init. in this function
+   Serial.print(" ADE9078:initialize function started"); //wiring configuration defined in VCONSEL and ICONSEL registers init. in this function
   #endif
 
     /* //For reference, the following registers are written to on bootup for the ADE9000
@@ -353,7 +353,7 @@ void ADE9078::initialize(){
 
   /*
   Potentially useful registers to configure:
-  The following were in the 7953:
+  The following were in the 9078:
     0x49A ZX_LP_SEL : to configure "zero crossing signal"
     0x41F PHNOLOAD : To say if something is "no load".
     Phase calibrations, such as APHCAL1_32
@@ -400,9 +400,9 @@ byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
 //Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
   uint16_t x = ((addr >> (8*byteVal)) & 0xff);
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE9078::functionBitVal function (separates high and low command bytes of provided addresses) details: ");
-   Serial.print("Address input (dec): ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print(" ADE9078::functionBitVal function (separates high and low command bytes of provided addresses) details: ");
+   Serial.print(" Address input (dec): ");
    Serial.print(addr, DEC);
    Serial.print(" Byte requested (dec): ");
    Serial.print(byteVal, DEC);
@@ -410,7 +410,7 @@ byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
    Serial.print(x, DEC);
    Serial.print(" Returned Value (HEX): ");
    Serial.print(x, HEX);
-   Serial.println(" ADE7953::functionBitVal function completed ");
+   Serial.println(" ADE9078::functionBitVal function completed ");
   #endif
 
   return x;
@@ -424,8 +424,8 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm8_read function started ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print(" ADE9078::spiAlgorithm8_read function started ");
   #endif
   uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one, two; // the second input, byte2 is a dummy placeholder read in value: likely the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
@@ -456,8 +456,8 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
   #endif
 
-  #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE7953::spiAlgorithm8_read function details: ");
+  #ifdef ADE9078_VERBOSE_DEBUG
+   Serial.print(" ADE9078::spiAlgorithm8_read function details: ");
    Serial.print(" Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
@@ -466,7 +466,7 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.println(" ADE7953::spiAlgorithm8_read function completed ");
+   Serial.println(" ADE9078::spiAlgorithm8_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operation
@@ -476,7 +476,7 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
 
 uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print("ADE9078::spiRead16 function started ");
+     Serial.print(" ADE9078::spiRead16 function started ");
     #endif
    //Prepare the 12 bit command header from the inbound address provided to the function
    uint16_t temp_address, readval_unsigned;
@@ -502,7 +502,6 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
 	#ifdef AVRESP8266 //Arduino SPI Routine
     // beginTransaction is first
-    Serial.print("SPI Read 16 in progress. ");
     SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
     SPI.transfer(commandHeader1);  //Transfer first byte (MSB), command
@@ -515,7 +514,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 	#endif
 
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print("ADE9078::spiRead16 function details: ");
+     Serial.print(" ADE9078::spiRead16 function details: ");
      Serial.print(" Command Header: ");
      Serial.print(commandHeader1, BIN);
      Serial.print(commandHeader2, BIN);
@@ -534,7 +533,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
 uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiRead32 function started ");
+   Serial.print(" ADE9078::spiRead32 function started ");
   #endif
 
    //Prepare the 12 bit command header from the inbound address provided to the function
@@ -561,7 +560,6 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   #endif
 
   #ifdef AVRESP8266 //Arduino SPI Routine
-  Serial.print("AVRES8266 DEFINED");
   SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.transfer(commandHeader1);  //MSB Byte 1
@@ -633,7 +631,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   #endif
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiRead32 function details: ");
+   Serial.print(" ADE9078::spiRead32 function details: ");
    Serial.print("Command Header: ");
    Serial.print(commandHeader1);
    Serial.print(commandHeader2);
@@ -691,7 +689,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 	#endif
 
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print("ADE9078::spiRead32 function details: ");
+     Serial.print(" ADE9078::spiRead32 function details: ");
      Serial.print("Command Header: " + commandHeader1 + commandHeader2);
      Serial.print(" Wrote bytes (4(MSB) to 1)[BINARY]: ");
      Serial.print(byteFour, BIN);

@@ -28,9 +28,9 @@
 
 
 //Define Constants:
-#define dummyWrite 0x00 //Used for SPI Transfer to read out a value const unsigned int READ = 0b10000000;  //This value tells the ADE7953 that data is to be read from the requested register.
-const unsigned int WRITE = 0b00000000; //This value tells the ADE7953 that data is to be written to the requested register.
-const unsigned int READ = 0b10000000;  //This value tells the ADE7953 that data is to be read from the requested register.
+#define dummyWrite 0x00 //Used for SPI Transfer to read out a value const unsigned int READ = 0b10000000;  //This value tells the ADE9078 that data is to be read from the requested register.
+const unsigned int WRITE = 0b00000000; //This value tells the ADE9078 that data is to be written to the requested register.
+const unsigned int READ = 0b10000000;  //This value tells the ADE9078 that data is to be read from the requested register.
 
 
 const long SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.

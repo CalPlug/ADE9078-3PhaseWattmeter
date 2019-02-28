@@ -5,13 +5,15 @@
 #include <ADE9078.h>
 #include <SPI.h>
 
-//Define ADE9078 object with hardware parameters specified
-#define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz (#define, (no = or ;) helps to save memory)
-#define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
-
 //Architecture Control:
 //Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32
 //REMINDER: ONLY SELECT THE SINGLE OPTION FOR THE BOARD TYPE YOU ARE USING!
+
+
+//Define ADE9078 object with hardware parameters specified
+#define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
+#define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
+
 
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
@@ -37,16 +39,14 @@ void setup() {
   //Use these settings to configure wiring configuration at stertup
   //FYI: B010=2 in DEC
   //FYI: B100 = 4 in DEC
-  
-  
-  
-	//4 Wire Wye configuration - non blondel compliant
+    
+	//4 Wire Wye configuration - non-Blondel compliant:
 	is->vConsel=0;
 	is->iConsel=0;
 	
-	//Delta, blondell
-	is->vConsel=4; //byte value of 100,
-	is->iConsel=0;
+	//Delta, Blondel compliant:
+	//is->vConsel=4; //byte value of 100,
+	//is->iConsel=0;
 	
 
   SPI.begin();
