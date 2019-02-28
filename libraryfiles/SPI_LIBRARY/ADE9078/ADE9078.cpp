@@ -13,6 +13,7 @@
 */
 
 #include "Arduino.h"
+#include <SPI.h>  //Arduino SPI SPI library, may not always be needed for ESP32 use
 
 //Architecture Control:
 //Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
@@ -26,12 +27,9 @@
 #ifdef ESP32
 #include "esp32-hal-spi.h"
 spi_t * spy; //for ESP32, create object for SPI
-#include <SPI.h>
 #endif
 
-#ifdef AVRESP8266 //Arduino SPI SPI library
-#include <SPI.h>
-#endif
+
 
 #include "ADE9078.h"
 
