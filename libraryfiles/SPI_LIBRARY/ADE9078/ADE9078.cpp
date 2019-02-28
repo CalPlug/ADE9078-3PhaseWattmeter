@@ -17,8 +17,8 @@
 #include "ADE9078.h"
 
 //Architecture Control:
-//Select the architecture in use, one but not both!
-#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
+//Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
+// #define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
 // #define ESP32 //This architecture is for the ESP32
 
 //Debug Control:
@@ -308,12 +308,26 @@ void ADE9078::initialize(int configurationselection){
   
 
   // Arduino setup
+  #ifdef ESP32  //example SPI routine for the ESP32
+  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
+  spiAttachSCK(spy, -1);
+  spiAttachMOSI(spy, -1);
+  spiAttachMISO(spy, -1);
+  pinMode(_SS, OUTPUT);
+  spiStopBus(spy);
+  digitalWrite(_SS, HIGH); //Disable data transfer by bringing SS line HIGH
+  delay(50);
+  #endif
+
+  #ifdef AVRESP8266 //Arduino SPI Routine
   SPI.begin();
   SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
   SPI.setBitOrder(MSBFIRST);  //Define MSB as first (explicitly)
+  SPI.endTransaction(); //end SPI communication
   digitalWrite(_SS, HIGH); //Initialize pin as HIGH to bring communication inactive
   delay(50);
+  #endif
    
   // Page 56 of datasheet quick start
   // #1: Ensure power sequence completed
@@ -391,6 +405,7 @@ byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
 {
 //Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
   uint16_t x = ((addr >> (8*byteVal)) & 0xff);
+  
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE9078::functionBitVal function (separates high and low command bytes of provided addresses) details: ");
    Serial.print("Address input (dec): ");  
@@ -403,6 +418,7 @@ byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
    Serial.print(x, HEX); 
    Serial.print(" ADE7953::functionBitVal function completed "); 
   #endif
+  
   return x;
 }
 
@@ -422,7 +438,7 @@ uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
     
   #ifdef ESP32  //example SPI routine for the ESP32
-  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
   spiAttachMISO(spy, -1);
@@ -477,7 +493,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     byte one, two; //holders for the read values from the SPI Transfer
 		
 	#ifdef ESP32  //example SPI routine for the ESP32
-	  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+	  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
 	  spiAttachSCK(spy, -1);
       spiAttachMOSI(spy, -1);
       spiAttachMISO(spy, -1);
@@ -535,7 +551,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   byte one, two, three, four; //holders for the read values from the SPI Transfer
 
   #ifdef ESP32  //example SPI routine for the ESP32
-  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
   spiAttachMISO(spy, -1);
@@ -596,7 +612,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   uint8_t byteOne = (data & 0xFF);
 
   #ifdef ESP32  //example SPI routine for the ESP32
-  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
   spiAttachMISO(spy, -1);
@@ -648,7 +664,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     uint8_t byteOne = (data & 0xFF);
 	
     #ifdef ESP32  //example SPI routine for the ESP32
-    spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+    spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
     spiAttachSCK(spy, -1);
     spiAttachMOSI(spy, -1);
     spiAttachMISO(spy, -1);

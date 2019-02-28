@@ -93,7 +93,7 @@ class ADE9078 {
 
 	  double read32BitAndScale(uint16_t address);
 	  
-	  byte functionBitVal(uint16_t addr, uint8_t byteVal) //function used to separate each byte of an address provided
+	  byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
 	  uint8_t spiAlgorithm8_read(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
 	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
 	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
@@ -105,8 +105,13 @@ class ADE9078 {
 	  int _SS;
 	  int _SPI_freq;
 	  InitializationSettings* is;
+	  //Use SPI settings according to selected chipset in use
+	  #ifdef AVRESP8266
 	  SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE0);
-	  SPISettingsESP32 defaultSPISettingsESP32 = SPISettingsESP32(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);
+	  #endif
+	  #ifdef ESP32
+	  //SPISettings defaultSPISettings = SPISettings(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);, elected to hardcode right now
+	  #endif
 	  
 
 };

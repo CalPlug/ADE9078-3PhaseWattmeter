@@ -2,12 +2,17 @@
 //California Plug Load Research Center - 2019
 
 
-#include <ADE9078.hpp>
+#include <ADE9078.h>
 #include <SPI.h>
 
 //Define ADE9078 object with hardware parameters specified
 #define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz (#define, (no = or ;) helps to save memory)
 #define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
+
+//Architecture Control:
+//Select the architecture in use, one but not both!  Here are examples for the defines:
+//#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
+#define ESP32 //This architecture is for the ESP32, use if you are using on an ESP32 board (FYI: SPI settings hard coded into library)
 
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
