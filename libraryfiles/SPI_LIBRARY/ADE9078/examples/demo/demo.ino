@@ -1,5 +1,5 @@
 // Basic Test Demonstration for ADE9078 to read and report values (ADE9078_TEST)
-//California Plug Load Research Center - 2017
+//California Plug Load Research Center - 2019
 
 
 #include <ADE9078.hpp>
@@ -7,11 +7,11 @@
 
 //Define ADE9078 object with hardware parameters specified
 #define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz (#define, (no = or ;) helps to save memory)
-#define local_SS 10  //Set the SS pin for SPI communication as pin 10  (#define, (no = or ;) helps to save memory)
+#define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
 
-struct InitializationSettings* is = new InitializationSettings;
+struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
-ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, the "local" lets us use the same parameters for examples in this program as what is assigned to the ADE9078 object
+ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
 void setup() {
   is->vAGain=1;
@@ -35,7 +35,7 @@ void setup() {
   SPI.begin();
   delay(200);
 
-  myADE9078.initialize();
+  myADE9078.initialize(0); //Call mode 0 for 4 wire Wye, blondel configuration
 }
 
 

@@ -6,12 +6,13 @@
   Released into the public domain.
 */
 
-#ifndef ADE9078_hpp
-#define ADE9078_hpp
+#ifndef ADE9078_h
+#define ADE9078_h
 
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
 #include <SPI.h>
-#include "ADE9078registers.hpp"
+#include "ADE9078registers.h"
+
 
 const long SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.
 // const int SPI_freq = 12,288,000 // P 6: Input flock frequency
@@ -43,7 +44,7 @@ class ADE9078 {
     ADE9078(int SS, long SPI_freq, InitializationSettings*);
     ~ADE9078() { delete is; }
 
-    void initialize();
+    void initialize(int configurationselection);
 
 	uint8_t getVersion();
 	double getPowerFactorA(); // only for A? Don't see for B/C
@@ -94,9 +95,6 @@ class ADE9078 {
 
   void spiWrite16(uint16_t, uint16_t); // address, data
 	void spiWrite32(uint16_t, uint32_t);
-
-
-
 
   private:
   	int _SS;

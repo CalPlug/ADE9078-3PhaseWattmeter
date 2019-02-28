@@ -1,5 +1,5 @@
 /* ADE9078
- ADE9078.cpp - Example library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
+ ADE9078.cpp - Example library for operating the ADE9078 Three-Phase AC Line measurement IC over SPI for Arduino Uno/AVR/ESP8266
   Created by Umar Kazmi, Crystal Lai, and Michael J. Klopfer, Ph.D.
   January 23, 2017 - 0.1 (pre-release)
   May 3, 2018 - v6.2 (current version) - by MJK
@@ -14,19 +14,21 @@
 
 #include "Arduino.h"
 #include <SPI.h>
-#include "ADE9078.hpp"
+#include "ADE9078.h"
+
+//Architecture Control:
+//Select the architecture in use, one but not both!
+#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
+// #define ESP32 //This architecture is for the ESP32
+
 //Debug Control:
 #define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
 
-/*
-// This might be a cleaner way of printing debug lines if it gets too messy in the future
-#define DEBUG
-#ifdef DEBUG
-  #define DEBUG_PRINT(x) {Serial.print(x);}
-#else
-  #define DEBUG_PRINT(x) {}
+
+#ifdef ESP32
+#include "esp32-hal-spi.h"
+spi_t * spy; //for ESP32, create object for SPI
 #endif
-*/
 
 //**************** Helper Functions *****************
 
@@ -41,7 +43,7 @@ bool checkBit(int data, int i) // return true if i'th bit is set, false otherwis
     return ((data) & (1 << i)) > 0;
 }
 
-double decimalize(uint32_t input, double factor, double offset) //This function adds a decimal point to the input value and returns it as a double, it also provides linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+double decimalize(uint32_t input, double factor, double offset) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE7953::calibration and double type conversion function executed ");
@@ -193,7 +195,6 @@ double ADE9078::readWattHoursA()
   return abs(dec);
 }
 
-
 double ADE9078::getInstApparentPowerA(){
 	uint32_t value=0;
 	value=spiRead32(AVA_32);
@@ -258,7 +259,6 @@ double ADE9078::getInstReactivePowerC(){
 return decimal;
 }
 
-
 double ADE9078::read32BitAndScale(uint16_t readRegister)
 {
   uint32_t data = spiRead32(readRegister);
@@ -282,10 +282,11 @@ ADE9078::ADE9078(int SS, long SPI_freq, InitializationSettings* is)
 //**************************************************
 
 //****************Initialization********************
-void ADE9078::initialize(){
+void ADE9078::initialize(int configurationselection){
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078:initialize function started ");
+   Serial.print("ADE9078:initialize function started in wiring configuration mode: ");
+   Serial.println(configurationselection);
   #endif
 
   // Arduino setup
@@ -297,6 +298,31 @@ void ADE9078::initialize(){
   digitalWrite(_SS, HIGH); //Initialize pin as HIGH to bring communication inactive
   delay(50);
 
+  
+  
+  /* //For reference, the following registers are written to on bootup for the ADE9000
+   SPI_Write_16(ADDR_PGA_GAIN,ADE9000_PGA_GAIN);     
+ 	 SPI_Write_32(ADDR_CONFIG0,ADE9000_CONFIG0); 
+	 SPI_Write_16(ADDR_CONFIG1,ADE9000_CONFIG1);
+	 SPI_Write_16(ADDR_CONFIG2,ADE9000_CONFIG2);
+	 SPI_Write_16(ADDR_CONFIG3,ADE9000_CONFIG3);
+	 SPI_Write_16(ADDR_ACCMODE,ADE9000_ACCMODE);
+	 SPI_Write_16(ADDR_TEMP_CFG,ADE9000_TEMP_CFG);
+	 SPI_Write_16(ADDR_ZX_LP_SEL,ADE9000_ZX_LP_SEL);
+	 SPI_Write_32(ADDR_MASK0,ADE9000_MASK0);
+	 SPI_Write_32(ADDR_MASK1,ADE9000_MASK1);
+	 SPI_Write_32(ADDR_EVENT_MASK,ADE9000_EVENT_MASK);
+	 SPI_Write_16(ADDR_WFB_CFG,ADE9000_WFB_CFG);
+	 SPI_Write_32(ADDR_VLEVEL,ADE9000_VLEVEL);
+	 SPI_Write_32(ADDR_DICOEFF,ADE9000_DICOEFF);
+	 SPI_Write_16(ADDR_EGY_TIME,ADE9000_EGY_TIME);
+	 SPI_Write_16(ADDR_EP_CFG,ADE9000_EP_CFG);		//Energy accumulation ON
+	 SPI_Write_16(ADDR_RUN,ADE9000_RUN_ON);		//DSP ON
+	 */
+  
+   
+  
+  
   // Page 56 of datasheet quick start
   // #1: Ensure power sequence completed
   delay(30);
@@ -324,7 +350,10 @@ void ADE9078::initialize(){
   spiWrite16(CONFIG0_32, 0x00000000);
   // Table 24 to determine how to configure ICONSEL and VCONSEL in the ACCMODE register
   uint16_t settingsACCMODE = (is->iConsel << 6) + (is->vConsel << 5);
-  spiWrite16(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
+  if (configurationselection==0)
+	{
+	spiWrite16(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
+	} //Need the other if statements for all configuration modes
 
   // 8: Write 1 to Run register
   spiWrite16(RUN_16, 1);
@@ -394,7 +423,23 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
     byte one, two;
 	byte dummyWrite = 0x00;
+	
+	#ifdef ESP32  //example SPI routine for the ESP32
+	  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
+	  spiAttachSCK(spy, -1);
+      spiAttachMOSI(spy, -1);
+      spiAttachMISO(spy, -1);
+      digitalWrite(_SS, LOW);
+      spiTransferByte(spy, MSB);
+      spiTransferByte(spy, LSB);  
+      spiTransferByte(spy, READ);    
+      one = spiTransferByte(spy, WRITE);
+      two = spiTransferByte(spy, WRITE);
+      digitalWrite(_SS, HIGH);
+      spiStopBus(spy);
+	#endif
 
+	#ifdef AVRESP8266 //Arduino SPI Routine
     // beginTransaction is first
     SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 
@@ -410,6 +455,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
     // endTransaction is last
     SPI.endTransaction();
+	#endif
 
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead16 function details: ");
