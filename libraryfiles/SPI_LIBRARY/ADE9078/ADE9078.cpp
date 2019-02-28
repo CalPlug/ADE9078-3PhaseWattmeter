@@ -709,3 +709,34 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     #endif
 
   }
+  
+unsigned short crc16(char data_p, unsigned short length){ //example CCITT 16 CRC function for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
+   unsigned char i;
+   unsigned int data;
+   unsigned int crc;
+   #define POLY 0x8408
+	
+   crc = 0xffff;
+	
+   if (length == 0)
+		  return (~crc);
+	
+   do {
+		  for (i = 0; i < 8; i++) 
+		  {
+			  data = (unsigned int)0xff & data_p++; 
+			  data >>= 1;
+				if ((crc & 0x0001) ^ (data & 0x0001))
+					   crc = (crc >> 1) ^ POLY;
+				else
+					   crc >>= 1;
+		  }
+   } while (--length);
+	
+   crc = ~crc;
+	
+   data = crc;
+   crc = (crc << 8) | (data >> 8 & 0xFF);
+	
+   return (crc);
+}

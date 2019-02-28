@@ -101,6 +101,8 @@ class ADE9078 {
 	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
 	  void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
 	  void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
+	  
+	  unsigned short crc16(char data_p, unsigned short length); //CRC verification function
 
   private:
 	   //used within the class
