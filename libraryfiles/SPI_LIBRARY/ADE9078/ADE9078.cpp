@@ -243,31 +243,31 @@ double ADE9078::getInstApparentPowerC(){  //type conversion approach used for th
 
 double ADE9078::getInstActivePowerA(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(AWATT_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerB(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(BWATT_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerC(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(CWATT_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstReactivePowerA(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(AVAR_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
   }
 
 double ADE9078::getInstReactivePowerB(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(BVAR_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
