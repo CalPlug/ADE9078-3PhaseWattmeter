@@ -418,10 +418,25 @@ uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm
    Serial.print("ADE9078::spiAlgorithm8_read function started "); 
   #endif
   uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
-  byte one;
-  byte two; //This is a dummy placeholder read in value: likely the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
+  byte one, two; // the second input, byte2 is a dummy placeholder read in value: likely the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-  SPI.beginTransaction(defaultSPISettings);;  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
+    
+  #ifdef ESP32  //example SPI routine for the ESP32
+  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+  spiAttachSCK(spy, -1);
+  spiAttachMOSI(spy, -1);
+  spiAttachMISO(spy, -1);
+  digitalWrite(_SS, LOW); //Bring SS LOW (Active)
+  spiTransferByte(spy, commandHeader1); //Send MSB 
+  spiTransferByte(spy, commandHeader2);  //Send LSB 
+  one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
+  two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
+  digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
+  spiStopBus(spy);
+  #endif
+
+  #ifdef AVRESP8266 //Arduino SPI Routine
+  SPI.beginTransaction(defaultSPISettings);  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
   SPI.transfer(commandHeader1);  //Pass in MSB of register to be read first.
   SPI.transfer(commandHeader2);  //Pass in LSB of register to be read next.
   //Read in values sequentially and bitshift for a 32 bit entry
@@ -429,6 +444,7 @@ uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm
   two = (SPI.transfer(dummyWrite));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte, 
   SPI.endTransaction(); //end SPI communication
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
+  #endif
   
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm8_read function details: ");
@@ -444,7 +460,7 @@ uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm
   #endif
   
   //Post-read packing and bitshifting operation
-    readval_unsigned = one;  //Process MSB (nothing much to see here for only one 8 bit value - nothing to shift)
+    readval_unsigned = one;  //Process MSB (nothing much to see here for only one 8 bit value - nothing to shift), ignore second value read.
 	return readval_unsigned;  //uint8_t versus long because it is only an 8 bit value, function returns uint8_t.
  }
 
@@ -467,8 +483,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
       spiAttachMISO(spy, -1);
       digitalWrite(_SS, LOW); //Bring SS LOW (Active)
       spiTransferByte(spy, commandHeader1); //Send MSB 
-      spiTransferByte(spy, commandHeader2);  //Send LSB
-      spiTransferByte(spy, READ);    //Send SPI Read Command 
+      spiTransferByte(spy, commandHeader2);  //Send LSB 
       one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
       two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
       digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
@@ -519,6 +534,22 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
 
   byte one, two, three, four; //holders for the read values from the SPI Transfer
 
+  #ifdef ESP32  //example SPI routine for the ESP32
+  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+  spiAttachSCK(spy, -1);
+  spiAttachMOSI(spy, -1);
+  spiAttachMISO(spy, -1);
+  digitalWrite(_SS, LOW); //Bring SS LOW (Active)
+  spiTransferByte(spy, commandHeader1); //Send MSB 
+  spiTransferByte(spy, commandHeader2);  //Send LSB
+  one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
+  two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
+  three = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
+  digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
+  spiStopBus(spy);
+  #endif
+
+  #ifdef AVRESP8266 //Arduino SPI Routine
   SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.transfer(commandHeader1);  //MSB Byte 1
@@ -530,6 +561,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   four = SPI.transfer(dummyWrite); //LSB Byte 4  (Read in data on dummy write (null MOSI signal))
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   SPI.endTransaction();
+  #endif
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" Returned bytes 1-4, 1 is MSB [HEX]: ");
@@ -563,6 +595,21 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   uint8_t byteTwo = (data >> 8);
   uint8_t byteOne = (data & 0xFF);
 
+  #ifdef ESP32  //example SPI routine for the ESP32
+  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+  spiAttachSCK(spy, -1);
+  spiAttachMOSI(spy, -1);
+  spiAttachMISO(spy, -1);
+  digitalWrite(_SS, LOW); //Bring SS LOW (Active)
+  spiTransferByte(spy, commandHeader1); //Send MSB 
+  spiTransferByte(spy, commandHeader2);  //Send LSB
+  spiTransferByte(spy, byteTwo);  //dummy write MSB, read out MSB
+  spiTransferByte(spy, byteOne);  //dummy write LSB, read out LSB
+  digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
+  spiStopBus(spy);
+  #endif
+
+  #ifdef AVRESP8266 //Arduino SPI Routine
   SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.transfer(commandHeader1);
@@ -571,6 +618,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   SPI.transfer(byteOne);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   SPI.endTransaction();
+  #endif
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078::spiRead32 function details: ");
@@ -598,7 +646,24 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     uint8_t byteThree = (data & 0xFFFFFF) >> 16;
     uint8_t byteTwo = (data & 0xFFFF) >> 8;
     uint8_t byteOne = (data & 0xFF);
+	
+    #ifdef ESP32  //example SPI routine for the ESP32
+    spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
+    spiAttachSCK(spy, -1);
+    spiAttachMOSI(spy, -1);
+    spiAttachMISO(spy, -1);
+    digitalWrite(_SS, LOW); //Bring SS LOW (Active)
+    spiTransferByte(spy, commandHeader1); //Send MSB 
+    spiTransferByte(spy, commandHeader2);  //Send LSB
+    spiTransferByte(spy, byteFour);  //dummy write MSB, read out MSB
+	spiTransferByte(spy, byteThree);  //dummy write LSB, read out LSB
+	spiTransferByte(spy, byteTwo);  //dummy write LSB, read out LSB
+    spiTransferByte(spy, byteOne);  //dummy write LSB, read out LSB
+    digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
+    spiStopBus(spy);
+    #endif
 
+    #ifdef AVRESP8266 //Arduino SPI Routine
     // beginTransaction before writing SS low
     SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
@@ -611,6 +676,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     SPI.transfer(byteOne);
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
     SPI.endTransaction();      // endTransaction after writing SS high
+	#endif
 	
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead32 function details: ");
