@@ -11,8 +11,9 @@
 
 //Architecture Control:
 //Select the architecture in use, one but not both!  Here are examples for the defines:
-//#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
-#define ESP32 //This architecture is for the ESP32, use if you are using on an ESP32 board (FYI: SPI settings hard coded into library)
+//REMINDER: ONLY SELECT THE SINGLE OPTION FOR THE BOARD TYPE YOU ARE USING!
+#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
+//#define ESP32 //This architecture is for the ESP32, use if you are using on an ESP32 board (FYI: SPI settings hard coded into library)
 
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
