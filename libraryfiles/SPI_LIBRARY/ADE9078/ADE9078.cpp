@@ -51,6 +51,7 @@ double decimalize(uint32_t input, double factor, double offset) //This function 
 	return ((double)input/factor)+offset;
 }
 
+
 //**************** End Helper Functions *****************
 
 
@@ -460,7 +461,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     byte one, two; //holders for the read values from the SPI Transfer
 		
 	#ifdef ESP32  //example SPI routine for the ESP32
-	  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST); //Setup ESP32 SPI bus
+	  spy = spiStartBus(defaultSPISettingsESP32); //Setup ESP32 SPI bus
 	  spiAttachSCK(spy, -1);
       spiAttachMOSI(spy, -1);
       spiAttachMISO(spy, -1);

@@ -105,7 +105,9 @@ class ADE9078 {
 	  int _SS;
 	  int _SPI_freq;
 	  InitializationSettings* is;
-	  SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3);
+	  SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE0);
+	  SPISettingsESP32 defaultSPISettingsESP32 = SPISettingsESP32(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);
+	  
 
 };
 
