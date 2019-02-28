@@ -385,11 +385,34 @@ void ADE9078::initialize(int configurationselection){
   #endif
 }
 //**************************************************
+
+byte ADE9078::functionBitVal(int addr, uint8_t byteVal)
+{
+//Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
+  int x = ((addr >> (8*byteVal)) & 0xff);
+  #ifdef ADE7953_VERBOSE_DEBUG
+   Serial.print("ADE9078::functionBitVal function (separates high and low command bytes) details: ");
+   Serial.print("Address input (dec): ");  
+   Serial.print(addr, DEC);
+   Serial.print(" Byte requested (dec): ");  
+   Serial.print(byteVal, DEC);
+   Serial.print(" Returned Value (dec): ");
+   Serial.print(x, DEC);  
+   Serial.print(" Returned Value (HEX): ");
+   Serial.print(x, HEX); 
+   Serial.print(" ADE7953::functionBitVal function completed "); 
+  #endif
+  
+  return x;
+}
 //This is an example, 8 Bit registers for returned values are not used
-uint8_t ADE7953::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-   uint8_t isRead = 1;
-   uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address 
-   uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares  
+uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+   //Prepare the 12 bit command header from the inbound address provided to the function
+   uint16_t temp_address;
+   temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
+   byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE9078::spiAlgorithm8_read function started "); 
   #endif
@@ -429,12 +452,12 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead16 function started ");
     #endif
-
-    // See SPI protocol in datasheet to understand this, Around p 62ish
-    uint8_t isRead = 1;
-    uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address 
-    uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
-	uint16_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
+   //Prepare the 12 bit command header from the inbound address provided to the function
+   uint16_t temp_address;
+   temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
+   byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
+   
     byte one, two; //holders for the read values from the SPI Transfer
 		
 	#ifdef ESP32  //example SPI routine for the ESP32
@@ -488,9 +511,11 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
    Serial.print("ADE9078::spiRead32 function started ");
   #endif
 
-  uint8_t isRead = 1;
-  uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address
-  uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);   // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+   //Prepare the 12 bit command header from the inbound address provided to the function
+   uint16_t temp_address;
+   temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
+   byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
 
   byte one, two, three, four; //holders for the read values from the SPI Transfer
 
@@ -528,11 +553,13 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
 
 void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 
-  uint8_t isRead = 0;
-  uint8_t commandHeader1 = (address >> 4);    // contains upper 8 bits of address
-  uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);    // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+   //Prepare the 12 bit command header from the inbound address provided to the function
+   uint16_t temp_address;
+   temp_address = ((address << 4) & 0xFFF0);	//shift address to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
+   byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
 
-  //Structure inbound data into two bytes to send out sequentially, MSB is sent first	  
+  //Structure inbound function data into two bytes to send out over SPI sequentially, MSB is sent first	  
   uint8_t byteTwo = (data >> 8);
   uint8_t byteOne = (data & 0xFF);
 
@@ -560,16 +587,13 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 
   void ADE9078::spiWrite32(uint16_t address, uint32_t data) {
 
-    // IF address IS GREATER THAN 2^12, ERROR. (use only 12 bits) - so bitmask it!!
-	//upperbytemasked = (upperbyteinput & upperbytemask);  //upperbytemask = B1111111 , use whole upper byte
-	//lowerbytemasked = (lowerbyteinput & lowerbytemask);  // lowerbytemask = B1111000 , use only first nibble of lower byte
-    // Avoid bit fields so that compiler doesn't pad. If protection is desired, raise errors inside if statements.
-
-    uint8_t isRead = 0;
-    uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address
-    uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
-
-	//Structure inbound data to send out byte by byte with MSB first - 	//Perform bitshifts to structure the values: To understand these shifts, picture this group of 1's being modified - Below is a 32 bit int. We're grabbing 1 byte out at a time. byteFour is the left most byte// 1111 1111 1111 1111 1111 1111 1111 1111
+	//Prepare the 12 bit command header from the inbound address provided to the function
+	uint16_t temp_address;
+	temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+	byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
+	byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
+   
+	//Structure inbound function data to send out over SPI byte by byte with MSB first - 	//Perform bitshifts to structure the values: To understand these shifts, picture this group of 1's being modified - Below is a 32 bit int. We're grabbing 1 byte out at a time. byteFour is the left most byte// 1111 1111 1111 1111 1111 1111 1111 1111
 	uint8_t byteFour = (data >> 24);
     uint8_t byteThree = (data & 0xFFFFFF) >> 16;
     uint8_t byteTwo = (data & 0xFFFF) >> 8;
