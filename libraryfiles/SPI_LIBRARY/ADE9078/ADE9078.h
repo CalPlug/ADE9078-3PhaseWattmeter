@@ -94,7 +94,7 @@ class ADE9078 {
 	  double read32BitAndScale(uint16_t address);
 	  
 	  byte functionBitVal(uint16_t addr, uint8_t byteVal) //function used to separate each byte of an address provided
-	  uint8_t spiAlgorithm8_read(uint16_t address);   // Read, inbound function: address
+	  uint8_t spiAlgorithm8_read(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
 	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
 	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
 	  void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
