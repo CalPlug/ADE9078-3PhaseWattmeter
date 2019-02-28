@@ -12,7 +12,8 @@
 //Architecture Control:
 //Select the architecture in use, one but not both!  Here are examples for the defines:
 //REMINDER: ONLY SELECT THE SINGLE OPTION FOR THE BOARD TYPE YOU ARE USING!
-#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
+
+//#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
 //#define ESP32 //This architecture is for the ESP32, use if you are using on an ESP32 board (FYI: SPI settings hard coded into library)
 
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
@@ -20,7 +21,7 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
 void setup() {
-	
+
   Serial.begin(115200);
   delay(200);
   is->vAGain=1;
@@ -38,7 +39,7 @@ void setup() {
 
   is->vConsel=0;
   is->iConsel=0;
-  
+
   SPI.begin();
   delay(200);
 
@@ -142,6 +143,6 @@ void loop() {
   Serial.print("Rective Power C (mW): ");
   Serial.println(reactivePowerA);
   delay(10);
-  
+
   delay(1000); //Delay before repeating the loop
 }

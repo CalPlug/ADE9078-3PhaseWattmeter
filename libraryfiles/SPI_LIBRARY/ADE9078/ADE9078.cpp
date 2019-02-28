@@ -17,7 +17,7 @@
 
 //Architecture Control:
 //Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
-// #define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
+
 // #define ESP32 //This architecture is for the ESP32
 
 //Debug Control:
@@ -513,6 +513,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
 	#ifdef AVRESP8266 //Arduino SPI Routine
     // beginTransaction is first
+    Serial.print("SPI Read 16 in progress. ");
     SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
     SPI.transfer(commandHeader1);  //Transfer first byte (MSB), command
@@ -527,8 +528,8 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead16 function details: ");
      Serial.print("Command Header: ");
-     Serial.print(commandHeader1);
-     Serial.print(commandHeader2);
+     Serial.print(commandHeader1, BIN);
+     Serial.print(commandHeader2, BIN);
      Serial.print("Address Byte 1(MSB)[HEX]: ");
      Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
      Serial.print(one, HEX); //print MSB
@@ -571,6 +572,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   #endif
 
   #ifdef AVRESP8266 //Arduino SPI Routine
+  Serial.print("AVRES8266 DEFINED");
   SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.transfer(commandHeader1);  //MSB Byte 1
@@ -588,8 +590,8 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
    Serial.print(" Returned bytes 1-4, 1 is MSB [HEX]: ");
    Serial.print("ADE9078::spiRead32 function details: ");
    Serial.print("Command Header: ");
-   Serial.print(commandHeader1);
-   Serial.print(commandHeader2);
+   Serial.print(commandHeader1, BIN);
+   Serial.print(commandHeader2, BIN);
    Serial.print("Returned bytes (1(MSB) to 4)[BINARY]: ");
    Serial.print(one, BIN);
    Serial.print(" ");
