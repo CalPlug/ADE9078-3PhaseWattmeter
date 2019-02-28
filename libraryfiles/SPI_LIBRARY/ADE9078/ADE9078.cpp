@@ -485,7 +485,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
      Serial.print("ADE9078::spiRead16 function started ");
     #endif
    //Prepare the 12 bit command header from the inbound address provided to the function
-   uint16_t temp_address;
+   uint16_t temp_address, readval_unsigned;
    temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
@@ -642,9 +642,9 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
    Serial.print(commandHeader1);
    Serial.print(commandHeader2);
    Serial.print(" Wrote bytes (2(MSB) to 1)[BINARY]: ");
-   Serial.print(MSB_data, BIN);
+   Serial.print(byteTwo, BIN);
    Serial.print(" ");
-   Serial.print(LSB_data, BIN);
+   Serial.print(byteOne, BIN);
    Serial.print(" ADE9078::spiRead32 function completed ");
   #endif
 }
