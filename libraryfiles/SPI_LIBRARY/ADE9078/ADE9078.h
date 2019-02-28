@@ -13,6 +13,9 @@
 #include <SPI.h>
 #include "ADE9078registers.h"
 
+//Define Constants:
+#define dummyWrite 0x00 //Used for SPI Transfer to read out a value 
+
 
 const long SPI_freq = 1000000;//Communicate with the ADE9078 at 1 MHz frequency.
 // const int SPI_freq = 12,288,000 // P 6: Input flock frequency
@@ -88,13 +91,13 @@ class ADE9078 {
 
 	  uint32_t getPHNOLOAD();
 
-	  double read32BitAndScale(uint16_t);
-
-	  uint16_t spiRead16(uint16_t); // address
-	  uint32_t spiRead32(uint16_t);
-
-	  void spiWrite16(uint16_t, uint16_t); // address, data
-	  void spiWrite32(uint16_t, uint32_t);
+	  double read32BitAndScale(uint16_t address);
+	  
+	  uint8_t spiAlgorithm8_read(uint16_t address);   // Read, inbound function: address
+	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
+	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
+	  void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
+	  void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
 
   private:
 	   //used within the class

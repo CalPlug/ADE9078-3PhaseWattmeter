@@ -385,6 +385,45 @@ void ADE9078::initialize(int configurationselection){
   #endif
 }
 //**************************************************
+//This is an example, 8 Bit registers for returned values are not used
+uint8_t ADE7953::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+   uint8_t isRead = 1;
+   uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address 
+   uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares  
+  #ifdef ADE7953_VERBOSE_DEBUG
+   Serial.print("ADE9078::spiAlgorithm8_read function started "); 
+  #endif
+  uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
+  byte one;
+  byte two; //This is a dummy placeholder read in value: likely the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
+  digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
+  SPI.beginTransaction(defaultSPISettings);;  //Begin SPI transfer with most significant byte (MSB) first. Clock is high when inactive. Read at rising edge: SPIMODE3.
+  SPI.transfer(commandHeader1);  //Pass in MSB of register to be read first.
+  SPI.transfer(commandHeader2);  //Pass in LSB of register to be read next.
+  //Read in values sequentially and bitshift for a 32 bit entry
+  //SPI.transfer(READ); //Send command to begin readout
+  one = (SPI.transfer(dummyWrite));  //MSB Byte 1  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte
+  two = (SPI.transfer(dummyWrite));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte, 
+  SPI.endTransaction(); //end SPI communication
+  digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
+  
+  #ifdef ADE7953_VERBOSE_DEBUG
+   Serial.print("ADE7953::spiAlgorithm8_read function details: ");
+   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print(MSB, HEX);
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(LSB, HEX);
+   Serial.print(" Returned bytes (1(MSB) and 2 - 2nd is for 16-bit return form): ");
+   Serial.print(one, HEX);
+   Serial.print(" ");
+   Serial.print(two, HEX);
+   Serial.print(" ADE7953::spiAlgorithm8_read function completed "); 
+  #endif
+  
+  //Post-read packing and bitshifting operation
+    readval_unsigned = one;  //Process MSB (nothing much to see here for only one 8 bit value - nothing to shift)
+	return readval_unsigned;  //uint8_t versus long because it is only an 8 bit value, function returns uint8_t.
+ }
 
 uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
     #ifdef ADE9078_VERBOSE_DEBUG
@@ -395,6 +434,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     uint8_t isRead = 1;
     uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address 
     uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
+	uint16_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
     byte one, two; //holders for the read values from the SPI Transfer
 		
 	#ifdef ESP32  //example SPI routine for the ESP32
@@ -437,7 +477,10 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
      Serial.print(two, HEX);  //print LSB
      Serial.print(" ADE9078::spiRead16 function completed ");
     #endif
-    return (((uint32_t) one << 8) + ((uint32_t) two));  //Bitshift components together into a common return
+    
+	readval_unsigned = (one << 8);  //Process MSB  (Alternate bitshift algorithm)
+    readval_unsigned = readval_unsigned + two;  //Process LSB
+	return readval_unsigned;
 }
 
 uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that reads from a 32 bit register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.  Caution, some register elements contain information that is only 24 bit with padding on the MSB
