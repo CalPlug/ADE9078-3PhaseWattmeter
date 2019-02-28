@@ -21,8 +21,6 @@
 spi_t * spy; //for ESP32, create object for SPI
 #endif
 
-
-
 #include "ADE9078.h"
 
 
@@ -45,7 +43,7 @@ double decimalize(uint32_t input, double factor, double offset) //This function 
 	#ifdef ADE9078_VERBOSE_DEBUG
 	Serial.print(" ADE9078::calibration and double type conversion function executed ");
 	#endif
-	return ((double)input/factor)+offset;
+	return ((double)input*factor)+offset; //standard y=mx+b calibration function applied to return
 }
 
 
