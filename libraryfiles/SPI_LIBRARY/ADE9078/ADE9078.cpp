@@ -345,10 +345,8 @@ void ADE9078::initialize(){
   spiWrite16(CONFIG0_32, 0x00000000);  // #7:  If current transformers are used, INTEN and ININTEN in the CONFIG0 register must = 0
   // Table 24 to determine how to configure ICONSEL and VCONSEL in the ACCMODE register
   uint16_t settingsACCMODE = (is->iConsel << 6) + (is->vConsel << 5);
-  if (configurationselection==0)
-	{
-	spiWrite16(ACCMODE_16, settingsACCMODE); // chooses the wiring mode (delta/Wye, Blondel vs. Non-blondel to push up
-	} //Need the other if statements for all configuration modes
+
+	spiWrite16(ACCMODE_16, settingsACCMODE); // chooses the wiring mode (delta/Wye, Blondel vs. Non-blondel) to push up in initial config, Need the other if statements for all configuration modes
 
   spiWrite16(RUN_16, 1);  // 8: Write 1 to Run register
   spiWrite16(EP_CFG_16, 1);  // 9: Write 1 to EP_CFG register

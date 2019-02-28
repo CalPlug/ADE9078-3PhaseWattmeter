@@ -35,6 +35,11 @@ void setup() {
   is->powerCGain=1;
 
   //Use these settings to configure wiring configuration at stertup
+  //FYI: B010=2 in DEC
+  //FYI: B100 = 4 in DEC
+  
+  
+  
 	//4 Wire Wye configuration - non blondel compliant
 	is->vConsel=0;
 	is->iConsel=0;
