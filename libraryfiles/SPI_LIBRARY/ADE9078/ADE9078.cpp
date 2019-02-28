@@ -418,7 +418,6 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
     SPI.transfer(commandHeader1);  //Transfer first byte (MSB), command
     SPI.transfer(commandHeader2);  ;//Transfer second byte (LSB), command
-
     //Read in values sequentially and bitshift for a 32 bit entry
     one = SPI.transfer(dummyWrite);  //MSB Byte 1  (Read in data on dummy write (null MOSI signal))
     two = SPI.transfer(dummyWrite);  //LSB Byte 2  (Read in data on dummy write (null MOSI signal))
@@ -433,9 +432,9 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
      Serial.print(commandHeader2);
      Serial.print("Address Byte 1(MSB)[HEX]: ");
      Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
-     Serial.print(one, HEX);
+     Serial.print(one, HEX); //print MSB
      Serial.print(" ");
-     Serial.print(two, HEX);
+     Serial.print(two, HEX);  //print LSB
      Serial.print(" ADE9078::spiRead16 function completed ");
     #endif
     return (((uint32_t) one << 8) + ((uint32_t) two));  //Bitshift components together into a common return
@@ -490,19 +489,18 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   uint8_t commandHeader1 = (address >> 4);    // contains upper 8 bits of address
   uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);    // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
 
-  	uint8_t byteTwo, byteOne;  //holders for the read values from the SPI Transfer
+  //Structure inbound data into two bytes to send out sequentially, MSB is sent first	  
+  uint8_t byteTwo = (data >> 8);
+  uint8_t byteOne = (data & 0xFF);
 
   SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
   SPI.transfer(commandHeader1);
   SPI.transfer(commandHeader2);
-  SPI.transfer(byteTwo);
+  SPI.transfer(byteTwo);  // Write our data, msb first
   SPI.transfer(byteOne);
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
   SPI.endTransaction();
-  
-  uint8_t byteTwo = (data >> 8);
-  uint8_t byteOne = (data & 0xFF);
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print("ADE9078::spiRead32 function details: ");
@@ -528,7 +526,11 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     uint8_t commandHeader1 = (address >> 4);  // contains upper 8 bits of address
     uint8_t commandHeader2 = ((address & 0xF) << 4) | (isRead << 3);  // contains lower 4 bits of address, followed by a isRead bit, followed by 3 don't cares
 
-	uint8_t byteFour, byteThree, byteTwo, byteOne;  //holders for the read values from the SPI Transfer
+	//Structure inbound data to send out byte by byte with MSB first - 	//Perform bitshifts to structure the values: To understand these shifts, picture this group of 1's being modified - Below is a 32 bit int. We're grabbing 1 byte out at a time. byteFour is the left most byte// 1111 1111 1111 1111 1111 1111 1111 1111
+	uint8_t byteFour = (data >> 24);
+    uint8_t byteThree = (data & 0xFFFFFF) >> 16;
+    uint8_t byteTwo = (data & 0xFFFF) >> 8;
+    uint8_t byteOne = (data & 0xFF);
 
     // beginTransaction before writing SS low
     SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
@@ -536,19 +538,13 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     // Tell 9078 chip what address, and whether to read or write with commandHeader
     SPI.transfer(commandHeader1);
     SPI.transfer(commandHeader2);
-    SPI.transfer(byteFour);// Write our data, msb first
+    SPI.transfer(byteFour);  // Write our data, msb first
     SPI.transfer(byteThree);
     SPI.transfer(byteTwo);
     SPI.transfer(byteOne);
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
     SPI.endTransaction();      // endTransaction after writing SS high
 	
-	//Perform bitshifts to structure the returned values:  To understand these shifts, picture this group of 1's being modified - Below is a 32 bit int. We're grabbing 1 byte out at a time. byteFour is the left most byte// 1111 1111 1111 1111 1111 1111 1111 1111
-    byteFour = (data >> 24);
-    byteThree = (data & 0xFFFFFF) >> 16;
-    byteTwo = (data & 0xFFFF) >> 8;
-    byteOne = (data & 0xFF);
-
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead32 function details: ");
      Serial.print("Command Header: " + commandHeader1 + commandHeader2);
