@@ -15,14 +15,13 @@
 #include "Arduino.h"
 #include <SPI.h>  //Arduino SPI SPI library, may not always be needed for ESP32 use
 
-
 #ifdef ESP32
 #include "esp32-hal-spi.h"
 spi_t * spy; //for ESP32, create object for SPI
 #endif
 
 #include "ADE9078.h"
-
+#include "ADE9078Calibrations.h"
 
 
 //**************** Helper Functions *****************
@@ -140,21 +139,21 @@ uint32_t ADE9078::getInstVoltageC(){
 double ADE9078::getAVrms(){
 	uint32_t value=0;
 	value=spiRead32(AVRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified, no abs value
+	double decimal = decimalize(value, AVrmsGain, AVrmsOffset,0); //convert to double with calibration factors specified, no abs value
 	return decimal;
 }
 
 double ADE9078::getBVrms(){
 	uint32_t value=0;
 	value=spiRead32(BVRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified, no abs value
+	double decimal = decimalize(value, BVrmsGain, BVrmsOffset,0); //convert to double with calibration factors specified, no abs value
 	return decimal;
 }
 
 double ADE9078::getCVrms(){
 	uint32_t value=0;
 	value=spiRead32(CVRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified,  no abs value
+	double decimal = decimalize(value, CVrmsGain, CVrmsOffset,0); //convert to double with calibration factors specified,  no abs value
 	return decimal;
 }
 
@@ -179,21 +178,21 @@ uint32_t ADE9078::getInstCurrentC(){
 double ADE9078::getIrmsA(){
 	uint32_t value=0;
 	value=spiRead32(AIRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, AIrmsGain, AIrmsOffset,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::getIrmsB(){
 	uint32_t value=0;
 	value=spiRead32(BIRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, BIrmsGain, BIrmsOffset,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::getIrmsC(){
 	uint32_t value=0;
 	value=spiRead32(CIRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, CIrmsGain, CIrmsOffset, 0); //convert to double with calibration factors specified
 	return decimal;
 }
 
@@ -217,63 +216,63 @@ uint32_t ADE9078::getEnergyA(){
 
 double ADE9078::readWattHoursA(){
 	uint32_t data = spiRead32(AWATTHR_HI_32);
-	double decimal = decimalize(data, 1.0, 0.0,0);
+	double decimal = decimalize(data, AWattHrGain, AWattHrOffset,0);
 	return (decimal);
 }
 
 double ADE9078::getInstApparentPowerA(){
 	uint32_t value=0;
 	value=spiRead32(AVA_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, AAppPowerGain, AAppPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstApparentPowerB(){
 	uint32_t value=0;
 	value=spiRead32(BVA_32);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, BAppPowerGain, BAppPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstApparentPowerC(){  //type conversion approach used for the ADE9000
-	int32_t value = (int32_t)spiRead32(CVA_32);  
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	int32_t value = (int32_t)spiRead32(CVA_32);
+	double decimal = decimalizesigned(value, CAppPowerGain, CAppPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerA(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(AWATT_32);
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, AInstPowerGain, AInstPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerB(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(BWATT_32);
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, BInstPowerGain, BInstPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerC(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(CWATT_32);
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, CInstPowerGain, CInstPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstReactivePowerA(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(AVAR_32);
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, AInstReactivePowerGain, AInstReactivePowerOffset,0); //convert to double with calibration factors specified
 	return decimal;
   }
 
 double ADE9078::getInstReactivePowerB(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(BVAR_32);
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, BInstReactivePowerGain, BInstReactivePowerOffset,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::getInstReactivePowerC(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(CVAR_32);
-	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalizesigned(value, CInstReactivePowerGain, CInstReactivePowerOffset,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
