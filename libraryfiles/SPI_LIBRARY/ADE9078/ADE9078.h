@@ -18,7 +18,7 @@
 
 //Debug Control:
 //#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
-
+#define ADE9078_Calibration //Shows the output of the type cast functions to allow the raw values to be seen - very helpful in calibration
 
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
 #include <SPI.h>
@@ -108,7 +108,7 @@ class ADE9078 {
 	  uint32_t getPHNOLOAD();
 
 	  double read32BitAndScale(uint16_t address);
-
+	  
 	  byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
 	  uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
 	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address

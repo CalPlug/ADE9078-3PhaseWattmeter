@@ -57,6 +57,7 @@ void setup() {
 
 
 void loop() {
+  //char str_display[10]; //used to display decimal values that are very high as floating points (similar to %f for sprintf()
 
   double AvRMS, BvRMS, CvRMS;
   double IrmsA, IrmsB, IrmsC;
@@ -139,17 +140,20 @@ void loop() {
   delay(10);
 
   reactivePowerA = myADE9078.getInstReactivePowerA();
-  Serial.print("Rective Power A (mW): ");
+  Serial.print("Reactive Power A (mW): ");
+  //Alternative floating point display approach for printout - in this config. 4 is mininum width, 2 is precision; float value is copied onto str_display
+  //dtostrf(reactivePowerA, 4, 2, str_display);
+  //sprintf("%s", str_display);
   Serial.println(reactivePowerA);
   delay(10);
 
   reactivePowerB = myADE9078.getInstReactivePowerB();
-  Serial.print("Rective Power B (mW): ");
+  Serial.print("Reactive Power B (mW): ");
   Serial.println(reactivePowerA);
   delay(10);
 
   reactivePowerC = myADE9078.getInstReactivePowerC();
-  Serial.print("Rective Power C (mW): ");
+  Serial.print("Reactive Power C (mW): ");
   Serial.println(reactivePowerA);
   delay(10);
 

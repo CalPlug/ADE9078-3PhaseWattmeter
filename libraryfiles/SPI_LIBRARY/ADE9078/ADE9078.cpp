@@ -38,12 +38,42 @@ bool checkBit(int data, int i) // return true if i'th bit is set, false otherwis
     return ((data) & (1 << i)) > 0;
 }
 
-double decimalize(uint32_t input, double factor, double offset) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+double decimalize(uint32_t input, double factor, double offset, bool absolutevalue) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
 	#ifdef ADE9078_VERBOSE_DEBUG
-	Serial.print(" ADE9078::calibration and double type conversion function executed ");
+	Serial.print(" ADE9078::calibration (decimalize) and double type conversion function executed, RAW input: ");
+	Serial.println(input);
 	#endif
-	return ((double)input*factor)+offset; //standard y=mx+b calibration function applied to return
+	#ifdef ADE9078_Calibration
+	Serial.print(" ADE9078::calibration (decimalize) and double type conversion function executed, RAW input: ");
+	Serial.println(input);
+	#endif
+	//Warning, you can get overflows due to the printout of returned values in Arduino, See: http://forum.arduino.cc/index.php/topic,46931.0.html
+	if(absolutevalue == 0){
+	return (((double)input*factor)+offset); //standard y=mx+b calibration function applied to return
+	}
+	else{
+		return (abs(((double)input*factor)+offset)); //standard y=mx+b calibration function applied to return
+	}
+}
+
+double decimalizesigned(int32_t input, double factor, double offset, bool absolutevalue) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+{
+	#ifdef ADE9078_VERBOSE_DEBUG
+	Serial.print(" ADE9078::calibration (decimalize-signed) and double type conversion function executed, RAW input: ");
+	Serial.println(input);
+	#endif
+    #ifdef ADE9078_Calibration
+	Serial.print(" ADE9078::calibration (decimalize-signed) and double type conversion function executed, RAW input: ");
+	Serial.println(input);
+	#endif
+	//Warning, you can get overflows due to the printout of returned values in Arduino, See: http://forum.arduino.cc/index.php/topic,46931.0.html
+	if(absolutevalue == 0){
+	return (((double)input*factor)+offset); //standard y=mx+b calibration function applied to return
+	}
+	else{
+		return (abs(((double)input*factor)+offset)); //standard y=mx+b calibration function applied to return
+	}
 }
 
 
@@ -59,7 +89,7 @@ uint8_t ADE9078::getVersion(){
 double ADE9078::getPowerFactorA(){
 	int16_t value=0;
 	value=spiRead16(PFA_16);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
@@ -79,7 +109,7 @@ uint32_t ADE9078::getPhaseCalibA(){
 // double ADE9078::getPeriod(){
 // 	uint16_t value=0;
 // 	value=spiRead16((functionBitVal(Period_16,1)),(functionBitVal(Period_16,0)));
-// 	double decimal = decimalize(value, 1, 0); //convert to double with calibration factors specified
+// 	double decimal = decimalize(value, 1, 0,0); //convert to double with calibration factors specified
 // return decimal;
 //   }
 // might need to edit to access bits for a/b/c
@@ -110,21 +140,21 @@ uint32_t ADE9078::getInstVoltageC(){
 double ADE9078::getAVrms(){
 	uint32_t value=0;
 	value=spiRead32(AVRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified, no abs value
 	return decimal;
 }
 
 double ADE9078::getBVrms(){
 	uint32_t value=0;
 	value=spiRead32(BVRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified, no abs value
 	return decimal;
 }
 
 double ADE9078::getCVrms(){
 	uint32_t value=0;
 	value=spiRead32(CVRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified,  no abs value
 	return decimal;
 }
 
@@ -149,21 +179,21 @@ uint32_t ADE9078::getInstCurrentC(){
 double ADE9078::getIrmsA(){
 	uint32_t value=0;
 	value=spiRead32(AIRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::getIrmsB(){
 	uint32_t value=0;
 	value=spiRead32(BIRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::getIrmsC(){
 	uint32_t value=0;
 	value=spiRead32(CIRMS_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
@@ -187,76 +217,69 @@ uint32_t ADE9078::getEnergyA(){
 
 double ADE9078::readWattHoursA(){
 	uint32_t data = spiRead32(AWATTHR_HI_32);
-	double decimal = decimalize(data, 1.0, 0.0);
+	double decimal = decimalize(data, 1.0, 0.0,0);
 	return (decimal);
 }
 
 double ADE9078::getInstApparentPowerA(){
 	uint32_t value=0;
 	value=spiRead32(AVA_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstApparentPowerB(){
 	uint32_t value=0;
 	value=spiRead32(BVA_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
-double ADE9078::getInstApparentPowerC(){
-	uint32_t value=0;
-	value=spiRead32(CVA_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstApparentPowerC(){  //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(CVA_32);  
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
-double ADE9078::getInstActivePowerA(){
-	uint32_t value=0;
-	value=spiRead32(AWATT_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstActivePowerA(){ //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(AWATT_32);
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
-double ADE9078::getInstActivePowerB(){
-	uint32_t value=0;
-	value=spiRead32(BWATT_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstActivePowerB(){ //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(BWATT_32);
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
-double ADE9078::getInstActivePowerC(){
-	uint32_t value=0;
-	value=spiRead32(CWATT_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstActivePowerC(){ //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(CWATT_32);
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
-double ADE9078::getInstReactivePowerA(){
-	uint32_t value=0;
-	value=spiRead32(AVAR_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstReactivePowerA(){ //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(AVAR_32);
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
   }
 
-double ADE9078::getInstReactivePowerB(){
-	uint32_t value=0;
-	value=spiRead32(BVAR_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstReactivePowerB(){ //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(BVAR_32);
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
-double ADE9078::getInstReactivePowerC(){
-	uint32_t value=0;
-	value=spiRead32(CVAR_32);
-	double decimal = decimalize(value, 1.0, 0.0); //convert to double with calibration factors specified
+double ADE9078::getInstReactivePowerC(){ //type conversion approach used for the ADE9000
+	int32_t value = (int32_t)spiRead32(CVAR_32);
+	double decimal = decimalizesigned(value, 1.0, 0.0,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::read32BitAndScale(uint16_t readRegister){
 	uint32_t data = spiRead32(readRegister);
-	double decimal = decimalize(data, 1.0, 0.0);
+	double decimal = decimalize(data, 1.0, 0.0,0);
 	return (decimal);
 }
 //*******************************************************
@@ -702,7 +725,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 
   }
 
-unsigned short crc16(char data_p, unsigned short length){ //example CCITT 16 CRC function for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
+unsigned short ADE9078::crc16(char data_p, unsigned short length){ //example CCITT 16 CRC function for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
    unsigned char i;
    unsigned int data;
    unsigned int crc;
