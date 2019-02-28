@@ -386,12 +386,12 @@ void ADE9078::initialize(int configurationselection){
 }
 //**************************************************
 
-byte ADE9078::functionBitVal(int addr, uint8_t byteVal)
+byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
 {
 //Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
-  int x = ((addr >> (8*byteVal)) & 0xff);
+  uint16_t x = ((addr >> (8*byteVal)) & 0xff);
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE9078::functionBitVal function (separates high and low command bytes) details: ");
+   Serial.print("ADE9078::functionBitVal function (separates high and low command bytes of provided addresses) details: ");
    Serial.print("Address input (dec): ");  
    Serial.print(addr, DEC);
    Serial.print(" Byte requested (dec): ");  
