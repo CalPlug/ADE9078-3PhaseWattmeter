@@ -10,11 +10,8 @@
 #define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
 
 //Architecture Control:
-//Select the architecture in use, one but not both!  Here are examples for the defines:
+//Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32
 //REMINDER: ONLY SELECT THE SINGLE OPTION FOR THE BOARD TYPE YOU ARE USING!
-
-//#define AVRESP8266 //this architecture is for AVR/Arduino boards and the ESP8266
-//#define ESP32 //This architecture is for the ESP32, use if you are using on an ESP32 board (FYI: SPI settings hard coded into library)
 
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
@@ -37,13 +34,20 @@ void setup() {
   is->powerBGain=1;
   is->powerCGain=1;
 
-  is->vConsel=0;
-  is->iConsel=0;
+  //Use these settings to configure wiring configuration at stertup
+	//4 Wire Wye configuration - non blondel compliant
+	is->vConsel=0;
+	is->iConsel=0;
+	
+	//Delta, blondell
+	is->vConsel=4; //byte value of 100,
+	is->iConsel=0;
+	
 
   SPI.begin();
   delay(200);
 
-  myADE9078.initialize(0); //Call mode 0 for 4 wire Wye, blondel configuration
+  myADE9078.initialize(); //Call mode 0 for 4 wire Wye, blondel configuration
 }
 
 

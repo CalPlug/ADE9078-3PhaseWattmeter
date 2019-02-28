@@ -15,14 +15,6 @@
 #include "Arduino.h"
 #include <SPI.h>  //Arduino SPI SPI library, may not always be needed for ESP32 use
 
-//Architecture Control:
-//Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
-
-// #define ESP32 //This architecture is for the ESP32
-
-//Debug Control:
-#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
-
 
 #ifdef ESP32
 #include "esp32-hal-spi.h"
@@ -284,11 +276,10 @@ ADE9078::ADE9078(int SS, long SPI_freq, InitializationSettings* is)
 //**************************************************
 
 //****************Hardware Initialization********************
-void ADE9078::initialize(int configurationselection){
+void ADE9078::initialize(){
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print("ADE9078:initialize function started in wiring configuration mode: ");
-   Serial.println(configurationselection);
+   Serial.print("ADE9078:initialize function started"); //wiring configuration defined in VCONSEL and ICONSEL registers init. in this function
   #endif
 
     /* //For reference, the following registers are written to on bootup for the ADE9000
@@ -338,7 +329,7 @@ void ADE9078::initialize(int configurationselection){
   // #1: Ensure power sequence completed
   delay(30);
   if (!checkBit((int)read32BitAndScale(STATUS1_32), 16)) {
-    Serial.print("WARNING, POWER UP MAY NOT BE FINISHED");
+    Serial.println("WARNING, POWER UP MAY NOT BE FINISHED");
   }
    // #2: Configure Gains
    spiWrite32(APGAIN_32, is->powerAGain);
@@ -356,7 +347,7 @@ void ADE9078::initialize(int configurationselection){
   uint16_t settingsACCMODE = (is->iConsel << 6) + (is->vConsel << 5);
   if (configurationselection==0)
 	{
-	spiWrite16(ACCMODE_16, settingsACCMODE); // chooses 4 wire WYE Blondel
+	spiWrite16(ACCMODE_16, settingsACCMODE); // chooses the wiring mode (delta/Wye, Blondel vs. Non-blondel to push up
 	} //Need the other if statements for all configuration modes
 
   spiWrite16(RUN_16, 1);  // 8: Write 1 to Run register
@@ -383,25 +374,25 @@ void ADE9078::initialize(int configurationselection){
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" ADE9078:initialize function completed. Showing values and registers written ");
-   Serial.print("APGAIN: ");
+   Serial.print(" APGAIN: ");
    Serial.print(is->powerAGain);
-   Serial.print("BPGAIN: ");
+   Serial.print(" BPGAIN: ");
    Serial.print(is->powerBGain);
-   Serial.print("CPGAIN: ");
+   Serial.print(" CPGAIN: ");
    Serial.print(is->powerCGain);
-   Serial.print("PGA_GAIN: ");
+   Serial.print(" PGA_GAIN: ");
    Serial.print(pgaGain);
-   Serial.print("VLEVEL: ");
+   Serial.print(" VLEVEL: ");
    Serial.print(vLevelData);
-   Serial.print("CONFIG0-3, ALL 0'S");
-   Serial.print("ACCMODE: ");
+   Serial.print(" CONFIG0-3, ALL 0'S");
+   Serial.print(" ACCMODE: ");
    Serial.print(settingsACCMODE);
-   Serial.print("RUN: ");
+   Serial.print(" RUN: ");
    Serial.print(1);
-   Serial.print("EP_CFG: ");
+   Serial.print(" EP_CFG: ");
    Serial.print(1);
-   Serial.print("DICOEFF: ");
-   Serial.print(0xFFFFE000);
+   Serial.print(" DICOEFF: ");
+   Serial.println(0xFFFFE000);
   #endif
 }
 //**************************************************
@@ -421,7 +412,7 @@ byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
    Serial.print(x, DEC);
    Serial.print(" Returned Value (HEX): ");
    Serial.print(x, HEX);
-   Serial.print(" ADE7953::functionBitVal function completed ");
+   Serial.println(" ADE7953::functionBitVal function completed ");
   #endif
 
   return x;
@@ -469,7 +460,7 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
 
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm8_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");
+   Serial.print(" Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
@@ -477,7 +468,7 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.print(" ADE7953::spiAlgorithm8_read function completed ");
+   Serial.println(" ADE7953::spiAlgorithm8_read function completed ");
   #endif
 
   //Post-read packing and bitshifting operation
@@ -527,15 +518,15 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead16 function details: ");
-     Serial.print("Command Header: ");
+     Serial.print(" Command Header: ");
      Serial.print(commandHeader1, BIN);
      Serial.print(commandHeader2, BIN);
-     Serial.print("Address Byte 1(MSB)[HEX]: ");
+     Serial.print(" Address Byte 1(MSB)[HEX]: ");
      Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
      Serial.print(one, HEX); //print MSB
      Serial.print(" ");
      Serial.print(two, HEX);  //print LSB
-     Serial.print(" ADE9078::spiRead16 function completed ");
+     Serial.println(" ADE9078::spiRead16 function completed ");
     #endif
 
 	readval_unsigned = (one << 8);  //Process MSB  (Alternate bitshift algorithm)
@@ -588,18 +579,18 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
 
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" Returned bytes 1-4, 1 is MSB [HEX]: ");
-   Serial.print("ADE9078::spiRead32 function details: ");
-   Serial.print("Command Header: ");
+   Serial.print(" ADE9078::spiRead32 function details: ");
+   Serial.print(" Command Header: ");
    Serial.print(commandHeader1, BIN);
    Serial.print(commandHeader2, BIN);
-   Serial.print("Returned bytes (1(MSB) to 4)[BINARY]: ");
+   Serial.print(" Returned bytes (1(MSB) to 4)[BINARY]: ");
    Serial.print(one, BIN);
    Serial.print(" ");
    Serial.print(two, BIN);
    Serial.print(" ");
    Serial.print(three, BIN);
    Serial.print(" ");
-   Serial.print(four, BIN);
+   Serial.println(four, BIN);
   #endif
 
   //Post-read packing and bitshifting operations
@@ -652,7 +643,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
    Serial.print(byteTwo, BIN);
    Serial.print(" ");
    Serial.print(byteOne, BIN);
-   Serial.print(" ADE9078::spiRead32 function completed ");
+   Serial.println(" ADE9078::spiRead32 function completed ");
   #endif
 }
 
@@ -712,7 +703,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
      Serial.print(byteTwo, BIN);
      Serial.print(" ");
      Serial.print(byteOne, BIN);
-     Serial.print(" ADE9078::spiRead32 function completed ");
+     Serial.println(" ADE9078::spiRead32 function completed ");
     #endif
 
   }
