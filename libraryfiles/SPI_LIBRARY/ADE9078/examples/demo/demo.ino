@@ -14,6 +14,9 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
 void setup() {
+	
+  Serial.begin(115200);
+  delay(200);
   is->vAGain=1;
   is->vBGain=1;
   is->vCGain=1;
@@ -29,9 +32,7 @@ void setup() {
 
   is->vConsel=0;
   is->iConsel=0;
-
-  Serial.begin(115200);
-  delay(200);
+  
   SPI.begin();
   delay(200);
 
@@ -50,93 +51,91 @@ void loop() {
 
   Serial.print("Version_16: ");
   Serial.println(myADE9078.getVersion()); // PHNOLOAD_32
-  delay(200);
+  delay(20);
 
   Serial.print("PHNOLOAD_32: ");
   Serial.println(myADE9078.getPHNOLOAD()); // PHNOLOAD_32
-  delay(200);
+  delay(20);
 
   AvRMS = myADE9078.getAVrms();
   Serial.print("AVrms (V): ");
   Serial.println(AvRMS);
-  delay(200);
+  delay(10);
 
   BvRMS = myADE9078.getBVrms();
   Serial.print("BVrms (V): ");
   Serial.println(BvRMS);
-  delay(200);
+  delay(10);
 
   CvRMS = myADE9078.getCVrms();
   Serial.print("BVrms (V): ");
   Serial.println(BvRMS);
-  delay(200);
-
+  delay(10);
 
   IrmsA = myADE9078.getIrmsA();
   Serial.print("IrmsA (mA): ");
   Serial.println(IrmsA);
-  delay(200);
+  delay(10);
 
   IrmsB = myADE9078.getIrmsB();
   Serial.print("IrmsB (mA): ");
   Serial.println(IrmsB);
-  delay(200);
+  delay(10);
 
   IrmsC = myADE9078.getIrmsC();
   Serial.print("IrmsA (mA): ");
   Serial.println(IrmsC);
-  delay(200);
+  delay(10);
 
   wattHoursA = myADE9078.readWattHoursA();
   Serial.print("WattHoursA: ");
   Serial.println(wattHoursA);
-  delay(200);
+  delay(10);
 
   apparentPowerA = myADE9078.getInstApparentPowerA();
   Serial.print("Apparent Power A (mW): ");
   Serial.println(apparentPowerA);
-  delay(200);
+  delay(10);
 
   apparentPowerB = myADE9078.getInstApparentPowerB();
   Serial.print("Apparent Power B (mW): ");
   Serial.println(apparentPowerB);
-  delay(200);
+  delay(10);
 
   apparentPowerC = myADE9078.getInstApparentPowerC();
   Serial.print("Apparent Power C (mW): ");
   Serial.println(apparentPowerC);
-  delay(200);
+  delay(10);
 
   activePowerA = myADE9078.getInstActivePowerA();
   Serial.print("Active Power A (mW): ");
   Serial.println(activePowerA);
-  delay(200);
+  delay(10);
 
   activePowerB = myADE9078.getInstActivePowerB();
   Serial.print("Active Power B (mW): ");
   Serial.println(activePowerB);
-  delay(200);
+  delay(10);
 
   activePowerC = myADE9078.getInstActivePowerC();
   Serial.print("Active Power C (mW): ");
   Serial.println(activePowerC);
-  delay(200);
+  delay(10);
 
   reactivePowerA = myADE9078.getInstReactivePowerA();
   Serial.print("Rective Power A (mW): ");
   Serial.println(reactivePowerA);
-  delay(200);
+  delay(10);
 
   reactivePowerB = myADE9078.getInstReactivePowerB();
   Serial.print("Rective Power B (mW): ");
   Serial.println(reactivePowerA);
-  delay(200);
+  delay(10);
 
   reactivePowerC = myADE9078.getInstReactivePowerC();
   Serial.print("Rective Power C (mW): ");
   Serial.println(reactivePowerA);
-  delay(200);
-
-
-
+  delay(10);
+  
+  delay(1000); //Delay before repeating the loop
 }

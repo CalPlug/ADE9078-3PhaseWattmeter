@@ -1,7 +1,7 @@
 /*
  ADE9078.cpp - Simple library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
-  Created by Umar Kazmi, Crystal Lai, and Michael Klopfer, Ph.D.
-  January 23, 2017 - v6.2 (pre-release)
+  Created by XXXXXXX   and Michael Klopfer, Ph.D.
+  February 20, 2019 - v6.2 (pre-release)
   University of California, Irvine - California Plug Load Research Center (CalPlug)
   Released into the public domain.
 */
@@ -39,69 +39,70 @@ struct InitializationSettings {
 
 class ADE9078 {
 
-
   public:
-    ADE9078(int SS, long SPI_freq, InitializationSettings*);
-    ~ADE9078() { delete is; }
+	  //available from within or outside the class
+	  ADE9078(int SS, long SPI_freq, InitializationSettings*);
+	  ~ADE9078() { delete is; }
 
-    void initialize(int configurationselection);
+	  void initialize(int configurationselection);
 
-	uint8_t getVersion();
-	double getPowerFactorA(); // only for A? Don't see for B/C
-	// double getPeriod();    // not done. can probably implement with USER_PERIOD_32
-	uint32_t getPhaseCalibA(); // B/C?
+	  uint8_t getVersion();
+	  double getPowerFactorA(); // only for A? Don't see for B/C
+	  // double getPeriod();    // not done. can probably implement with USER_PERIOD_32
+	  uint32_t getPhaseCalibA(); // B/C? - Implement for all phases
 
-  uint32_t getInstVoltageA();
-  uint32_t getInstVoltageB();
-  uint32_t getInstVoltageC();
+	  uint32_t getInstVoltageA();
+	  uint32_t getInstVoltageB();
+	  uint32_t getInstVoltageC();
 
-	double getAVrms();
-  double getBVrms();
-  double getCVrms();
+	  double getAVrms();
+	  double getBVrms();
+	  double getCVrms();
 
-	uint32_t getInstCurrentA();
-  uint32_t getInstCurrentB();
-  uint32_t getInstCurrentC();
+	  uint32_t getInstCurrentA();
+	  uint32_t getInstCurrentB();
+	  uint32_t getInstCurrentC();
 
-	double getIrmsA();
-  double getIrmsB();
-  double getIrmsC();
+	  double getIrmsA();
+	  double getIrmsB();
+	  double getIrmsC();
 
-	uint32_t getVpeak();
-	uint32_t getIpeak();
+	  uint32_t getVpeak();
+	  uint32_t getIpeak();
 
-	uint32_t getEnergyA();
+	  uint32_t getEnergyA();
 
-  double readWattHoursA();
+	  double readWattHoursA();
 
-	double getInstApparentPowerA();
-  double getInstApparentPowerB();
-  double getInstApparentPowerC();
+	  double getInstApparentPowerA();
+	  double getInstApparentPowerB();
+	  double getInstApparentPowerC();
 
-	double getInstActivePowerA();
-  double getInstActivePowerB();
-  double getInstActivePowerC();
+	  double getInstActivePowerA();
+	  double getInstActivePowerB();
+	  double getInstActivePowerC();
 
-	double getInstReactivePowerA();
-  double getInstReactivePowerB();
-  double getInstReactivePowerC();
+	  double getInstReactivePowerA();
+	  double getInstReactivePowerB();
+	  double getInstReactivePowerC();
 
-  uint32_t getPHNOLOAD();
+	  uint32_t getPHNOLOAD();
 
-  double read32BitAndScale(uint16_t);
+	  double read32BitAndScale(uint16_t);
 
-  uint16_t spiRead16(uint16_t); // address
-  uint32_t spiRead32(uint16_t);
+	  uint16_t spiRead16(uint16_t); // address
+	  uint32_t spiRead32(uint16_t);
 
-  void spiWrite16(uint16_t, uint16_t); // address, data
-	void spiWrite32(uint16_t, uint32_t);
+	  void spiWrite16(uint16_t, uint16_t); // address, data
+	  void spiWrite32(uint16_t, uint32_t);
 
   private:
-  	int _SS;
-    int _SPI_freq;
-    InitializationSettings* is;
-    SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3);
+	   //used within the class
+	  int _SS;
+	  int _SPI_freq;
+	  InitializationSettings* is;
+	  SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE3);
 
 };
 
-#endif // ADE9078_HPP
+#endif // ADE9078_H
