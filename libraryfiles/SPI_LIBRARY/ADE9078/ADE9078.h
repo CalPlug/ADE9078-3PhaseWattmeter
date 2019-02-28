@@ -94,14 +94,14 @@ class ADE9078 {
 	  uint32_t getPHNOLOAD();
 
 	  double read32BitAndScale(uint16_t address);
-	  
+
 	  byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
-	  uint8_t spiAlgorithm8_read(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
+	  uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
 	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
 	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
 	  void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
 	  void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
-	  
+
 	  unsigned short crc16(char data_p, unsigned short length); //CRC verification function
 
   private:
@@ -117,7 +117,7 @@ class ADE9078 {
 	  //#define ESP32SPIDefaultSettings VSPI,SPI_CLOCK_DIV16,SPI_MODE0,SPI_MSBFIRST //"ESP32SPIDefaultSettings" is used as macro holder for default settings
 	  //SPISettings defaultSPISettings = SPISettings(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);, elected to hardcode right now
 	  #endif
-	  
+
 
 };
 

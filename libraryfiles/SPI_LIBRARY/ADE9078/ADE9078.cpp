@@ -290,10 +290,10 @@ void ADE9078::initialize(int configurationselection){
    Serial.print("ADE9078:initialize function started in wiring configuration mode: ");
    Serial.println(configurationselection);
   #endif
-  
+
     /* //For reference, the following registers are written to on bootup for the ADE9000
-   SPI_Write_16(ADDR_PGA_GAIN,ADE9000_PGA_GAIN);     
- 	 SPI_Write_32(ADDR_CONFIG0,ADE9000_CONFIG0); 
+   SPI_Write_16(ADDR_PGA_GAIN,ADE9000_PGA_GAIN);
+ 	 SPI_Write_32(ADDR_CONFIG0,ADE9000_CONFIG0);
 	 SPI_Write_16(ADDR_CONFIG1,ADE9000_CONFIG1);
 	 SPI_Write_16(ADDR_CONFIG2,ADE9000_CONFIG2);
 	 SPI_Write_16(ADDR_CONFIG3,ADE9000_CONFIG3);
@@ -310,7 +310,7 @@ void ADE9078::initialize(int configurationselection){
 	 SPI_Write_16(ADDR_EP_CFG,ADE9000_EP_CFG);		//Energy accumulation ON
 	 SPI_Write_16(ADDR_RUN,ADE9000_RUN_ON);		//DSP ON
 	 */
-  
+
 
   // Arduino setup
   #ifdef ESP32  //example SPI routine for the ESP32
@@ -333,7 +333,7 @@ void ADE9078::initialize(int configurationselection){
   digitalWrite(_SS, HIGH); //Initialize pin as HIGH to bring communication inactive
   delay(50);
   #endif
-   
+
   // Page 56 of datasheet quick start
   // #1: Ensure power sequence completed
   delay(30);
@@ -344,13 +344,13 @@ void ADE9078::initialize(int configurationselection){
    spiWrite32(APGAIN_32, is->powerAGain);
    spiWrite32(BPGAIN_32, is->powerBGain);
    spiWrite32(CPGAIN_32, is->powerCGain);
-   
+
    uint16_t pgaGain = (is->vCGain << 12) + (is->vBGain << 10) + (is->vCGain << 8) +   // first 2 reserved, next 6 are v gains, next 8 are i gains.
                       (is->iNGain << 6) + (is->iCGain << 4) + (is->iBGain << 2) + is->iAGain;
    spiWrite16(PGA_GAIN_16, pgaGain);
    uint32_t vLevelData = 0x117514;  // #5 : Write VLevel 0x117514
    spiWrite32(VLEVEL_32, vLevelData); // #5
-    
+
   spiWrite16(CONFIG0_32, 0x00000000);  // #7:  If current transformers are used, INTEN and ININTEN in the CONFIG0 register must = 0
   // Table 24 to determine how to configure ICONSEL and VCONSEL in the ACCMODE register
   uint16_t settingsACCMODE = (is->iConsel << 6) + (is->vConsel << 5);
@@ -373,7 +373,7 @@ void ADE9078::initialize(int configurationselection){
   spiWrite16(CONFIG2_16, 0x0000);
   spiWrite16(CONFIG3_16, 0x0000);
   spiWrite32(DICOEFF_32, 0xFFFFE000); // Recommended by datasheet
-  
+
   /* Registers configured in ADE9000 code */
   // zx_lp_sel
   // mask0, mask1, event_mask,
@@ -410,46 +410,46 @@ byte ADE9078::functionBitVal(uint16_t addr, uint8_t byteVal)
 {
 //Returns as integer an address of a specified byte - basically a byte controlled shift register with "byteVal" controlling the byte that is read and returned
   uint16_t x = ((addr >> (8*byteVal)) & 0xff);
-  
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE9078::functionBitVal function (separates high and low command bytes of provided addresses) details: ");
-   Serial.print("Address input (dec): ");  
+   Serial.print("Address input (dec): ");
    Serial.print(addr, DEC);
-   Serial.print(" Byte requested (dec): ");  
+   Serial.print(" Byte requested (dec): ");
    Serial.print(byteVal, DEC);
    Serial.print(" Returned Value (dec): ");
-   Serial.print(x, DEC);  
+   Serial.print(x, DEC);
    Serial.print(" Returned Value (HEX): ");
-   Serial.print(x, HEX); 
-   Serial.print(" ADE7953::functionBitVal function completed "); 
+   Serial.print(x, HEX);
+   Serial.print(" ADE7953::functionBitVal function completed ");
   #endif
-  
+
   return x;
 }
 
 //NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
-uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
+uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
    //Prepare the 12 bit command header from the inbound address provided to the function
    uint16_t temp_address;
-   temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
 
   #ifdef ADE7953_VERBOSE_DEBUG
-   Serial.print("ADE9078::spiAlgorithm8_read function started "); 
+   Serial.print("ADE9078::spiAlgorithm8_read function started ");
   #endif
   uint8_t readval_unsigned = 0;  //This variable is the unsigned integer value to compile read bytes into (if needed)
   byte one, two; // the second input, byte2 is a dummy placeholder read in value: likely the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-    
+
   #ifdef ESP32  //example SPI routine for the ESP32
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
   spiAttachMISO(spy, -1);
   digitalWrite(_SS, LOW); //Bring SS LOW (Active)
-  spiTransferByte(spy, commandHeader1); //Send MSB 
-  spiTransferByte(spy, commandHeader2);  //Send LSB 
+  spiTransferByte(spy, commandHeader1); //Send MSB
+  spiTransferByte(spy, commandHeader2);  //Send LSB
   one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
   two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
   digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
@@ -462,24 +462,24 @@ uint8_t ADE9078::spiAlgorithm8_read(uint16_t address)  { //This is the algorithm
   SPI.transfer(commandHeader2);  //Pass in LSB of register to be read next.
   //Read in values sequentially and bitshift for a 32 bit entry
   one = (SPI.transfer(dummyWrite));  //MSB Byte 1  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte
-  two = (SPI.transfer(dummyWrite));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte, 
+  two = (SPI.transfer(dummyWrite));  //"LSB "Byte 2?"  (Read in data on dummy write (null MOSI signal)) - only one needed as 1 byte, but it seems like it responses will send a byte back in 16 bit response total, likely this LSB is useless, but for timing it will be collected.  This may always be a duplicate of the first byte,
   SPI.endTransaction(); //end SPI communication
   digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH (device made inactive)
   #endif
-  
+
   #ifdef ADE7953_VERBOSE_DEBUG
    Serial.print("ADE7953::spiAlgorithm8_read function details: ");
-   Serial.print("Address Byte 1(MSB)[HEX]: ");  
+   Serial.print("Address Byte 1(MSB)[HEX]: ");
    Serial.print(MSB, HEX);
-   Serial.print(" Address Byte 2(LSB)[HEX]: ");  
+   Serial.print(" Address Byte 2(LSB)[HEX]: ");
    Serial.print(LSB, HEX);
    Serial.print(" Returned bytes (1(MSB) and 2 - 2nd is for 16-bit return form): ");
    Serial.print(one, HEX);
    Serial.print(" ");
    Serial.print(two, HEX);
-   Serial.print(" ADE7953::spiAlgorithm8_read function completed "); 
+   Serial.print(" ADE7953::spiAlgorithm8_read function completed ");
   #endif
-  
+
   //Post-read packing and bitshifting operation
     readval_unsigned = one;  //Process MSB (nothing much to see here for only one 8 bit value - nothing to shift), ignore second value read.
 	return readval_unsigned;  //uint8_t versus long because it is only an 8 bit value, function returns uint8_t.
@@ -491,20 +491,20 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
     #endif
    //Prepare the 12 bit command header from the inbound address provided to the function
    uint16_t temp_address, readval_unsigned;
-   temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
-   
+
     byte one, two; //holders for the read values from the SPI Transfer
-		
+
 	#ifdef ESP32  //example SPI routine for the ESP32
 	  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
 	  spiAttachSCK(spy, -1);
       spiAttachMOSI(spy, -1);
       spiAttachMISO(spy, -1);
       digitalWrite(_SS, LOW); //Bring SS LOW (Active)
-      spiTransferByte(spy, commandHeader1); //Send MSB 
-      spiTransferByte(spy, commandHeader2);  //Send LSB 
+      spiTransferByte(spy, commandHeader1); //Send MSB
+      spiTransferByte(spy, commandHeader2);  //Send LSB
       one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
       two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
       digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
@@ -536,7 +536,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
      Serial.print(two, HEX);  //print LSB
      Serial.print(" ADE9078::spiRead16 function completed ");
     #endif
-    
+
 	readval_unsigned = (one << 8);  //Process MSB  (Alternate bitshift algorithm)
     readval_unsigned = readval_unsigned + two;  //Process LSB
 	return readval_unsigned;
@@ -549,7 +549,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
 
    //Prepare the 12 bit command header from the inbound address provided to the function
    uint16_t temp_address;
-   temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
+   temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
 
@@ -561,7 +561,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   spiAttachMOSI(spy, -1);
   spiAttachMISO(spy, -1);
   digitalWrite(_SS, LOW); //Bring SS LOW (Active)
-  spiTransferByte(spy, commandHeader1); //Send MSB 
+  spiTransferByte(spy, commandHeader1); //Send MSB
   spiTransferByte(spy, commandHeader2);  //Send LSB
   one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
   two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
@@ -589,7 +589,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
    Serial.print("ADE9078::spiRead32 function details: ");
    Serial.print("Command Header: ");
    Serial.print(commandHeader1);
-   Serial.print(commandHeader2); 
+   Serial.print(commandHeader2);
    Serial.print("Returned bytes (1(MSB) to 4)[BINARY]: ");
    Serial.print(one, BIN);
    Serial.print(" ");
@@ -612,7 +612,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
 
-  //Structure inbound function data into two bytes to send out over SPI sequentially, MSB is sent first	  
+  //Structure inbound function data into two bytes to send out over SPI sequentially, MSB is sent first
   uint8_t byteTwo = (data >> 8);
   uint8_t byteOne = (data & 0xFF);
 
@@ -622,7 +622,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   spiAttachMOSI(spy, -1);
   spiAttachMISO(spy, -1);
   digitalWrite(_SS, LOW); //Bring SS LOW (Active)
-  spiTransferByte(spy, commandHeader1); //Send MSB 
+  spiTransferByte(spy, commandHeader1); //Send MSB
   spiTransferByte(spy, commandHeader2);  //Send LSB
   spiTransferByte(spy, byteTwo);  //dummy write MSB, read out MSB
   spiTransferByte(spy, byteOne);  //dummy write LSB, read out LSB
@@ -661,20 +661,20 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 	temp_address = ((address << 4) & 0xFFF0);	//shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header
 	byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
 	byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
-   
+
 	//Structure inbound function data to send out over SPI byte by byte with MSB first - 	//Perform bitshifts to structure the values: To understand these shifts, picture this group of 1's being modified - Below is a 32 bit int. We're grabbing 1 byte out at a time. byteFour is the left most byte// 1111 1111 1111 1111 1111 1111 1111 1111
 	uint8_t byteFour = (data >> 24);
     uint8_t byteThree = (data & 0xFFFFFF) >> 16;
     uint8_t byteTwo = (data & 0xFFFF) >> 8;
     uint8_t byteOne = (data & 0xFF);
-	
+
     #ifdef ESP32  //example SPI routine for the ESP32
     spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
     spiAttachSCK(spy, -1);
     spiAttachMOSI(spy, -1);
     spiAttachMISO(spy, -1);
     digitalWrite(_SS, LOW); //Bring SS LOW (Active)
-    spiTransferByte(spy, commandHeader1); //Send MSB 
+    spiTransferByte(spy, commandHeader1); //Send MSB
     spiTransferByte(spy, commandHeader2);  //Send LSB
     spiTransferByte(spy, byteFour);  //dummy write MSB, read out MSB
 	spiTransferByte(spy, byteThree);  //dummy write LSB, read out LSB
@@ -698,7 +698,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     digitalWrite(_SS, HIGH);  //End data transfer by bringing SS line HIGH
     SPI.endTransaction();      // endTransaction after writing SS high
 	#endif
-	
+
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print("ADE9078::spiRead32 function details: ");
      Serial.print("Command Header: " + commandHeader1 + commandHeader2);
@@ -714,17 +714,17 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     #endif
 
   }
-  
+
 unsigned short crc16(char data_p, unsigned short length){ //example CCITT 16 CRC function for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
    unsigned char i;
    unsigned int data;
    unsigned int crc;
    #define POLY 0x8408
-	
+
    crc = 0xffff;
 	       if (length == 0)
               return (~crc);
-        
+
        do {
               for (i = 0, data = (unsigned int)0xff & data_p++; i < 8; i++, data >>= 1) //alternative notation for nested for loops
 			  {
@@ -734,11 +734,11 @@ unsigned short crc16(char data_p, unsigned short length){ //example CCITT 16 CRC
                            crc >>= 1;
               }
        } while (--length);
-        
+
        crc = ~crc;
-        
+
        data = crc;
        crc = (crc << 8) | (data >> 8 & 0xFF);
-        
+
        return (crc);
 }
