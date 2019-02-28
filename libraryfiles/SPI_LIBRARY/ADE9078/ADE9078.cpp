@@ -459,9 +459,9 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
   #ifdef ADE9078_VERBOSE_DEBUG
    Serial.print(" ADE9078::spiAlgorithm8_read function details: ");
    Serial.print(" Address Byte 1(MSB)[HEX]: ");
-   Serial.print(MSB, HEX);
+   Serial.print(commandHeader1, HEX);
    Serial.print(" Address Byte 2(LSB)[HEX]: ");
-   Serial.print(LSB, HEX);
+   Serial.print(commandHeader2, HEX);
    Serial.print(" Returned bytes (1(MSB) and 2 - 2nd is for 16-bit return form): ");
    Serial.print(one, HEX);
    Serial.print(" ");
