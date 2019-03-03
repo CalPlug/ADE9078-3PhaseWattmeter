@@ -12,13 +12,14 @@
 
 //Architecture Control:
 //Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
-
 // #define ESP32 //This architecture is for the ESP32
 #define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
 
 //Debug Control:
-//#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output!  Reported bytes are in HEX
+//#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output that can challenge device memory!  Reported bytes are typically in HEX
 #define ADE9078_Calibration //Shows the output of the type cast functions to allow the raw values to be seen - very helpful in calibration
+#define ADE9078_CRC_Output //Used to output debug information for the CRC check functions
+
 
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
 #include <SPI.h>
@@ -63,7 +64,7 @@ class ADE9078 {
 	  //available from within or outside the class
 	  ADE9078(int SS, long SPI_freq, InitializationSettings*);
 	  ~ADE9078() { delete is; }
-
+	  struct LastReads lastReads;
 	  void initialize();
 
 	  uint8_t getVersion();
@@ -125,10 +126,8 @@ class ADE9078 {
 	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
 	  void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
 	  void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
-
-	  unsigned short crc16(char data_p, unsigned short length); //CRC verification function
-
-      struct LastReads lastReads;
+	  uint32_t spiRead32CRC(uint16_t address,bool &ValidCRC); //Function to allow CRC checking for 32 bit returns
+	  uint16_t spiRead16CRC(uint16_t address, bool &ValidCRC); //Function to allow CRC checking for 16 bit returns
 
   private:
 	   //used within the class
