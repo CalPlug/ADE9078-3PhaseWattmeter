@@ -12,7 +12,7 @@
 
 //Architecture Control:
 //Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
-// #define ESP32 //This architecture is for the ESP32
+//#define ESP32ARCH //This architecture is for the ESP32
 #define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
 
 //Debug Control:
@@ -138,7 +138,7 @@ class ADE9078 {
 	  #ifdef AVRESP8266
 	  SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE0);
 	  #endif
-	  #ifdef ESP32
+	  #ifdef ESP32ARCH
 	  //#define ESP32SPIDefaultSettings VSPI,SPI_CLOCK_DIV16,SPI_MODE0,SPI_MSBFIRST //"ESP32SPIDefaultSettings" is used as macro holder for default settings
 	  //SPISettings defaultSPISettings = SPISettings(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);, elected to hardcode right now
 	  #endif

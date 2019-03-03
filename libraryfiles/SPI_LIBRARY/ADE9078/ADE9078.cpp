@@ -14,14 +14,14 @@
 
 #include "Arduino.h"
 #include <SPI.h>  //Arduino SPI SPI library, may not always be needed for ESP32 use
-
-#ifdef ESP32
-#include "esp32-hal-spi.h"
-spi_t * spy; //for ESP32, create object for SPI
-#endif
-
 #include "ADE9078.h"
 #include "ADE9078Calibrations.h"
+
+
+#ifdef ESP32ARCH
+	#include "esp32-hal-spi.h"
+	spi_t * spy; //for ESP32, create object for SPI
+#endif
 
 
 //**************** Helper Functions *****************
@@ -75,7 +75,7 @@ double decimalizeSigned(int32_t input, double factor, double offset, bool absolu
 	}
 }
 
-uint16_t crc16(char data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
+uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
    unsigned char i;
    unsigned int data;
    unsigned int crc;
@@ -86,7 +86,7 @@ uint16_t crc16(char data_p, uint16_t length){ //example CCITT 16 CRC function th
               return (~crc);
 
        do {
-              for (i = 0, data = (unsigned int)0xff & data_p++; i < 8; i++, data >>= 1) //alternative notation for nested for loops
+              for (i = 0, data = (unsigned int)0xff & *data_p++; i < 8; i++, data >>= 1) //alternative notation for nested for loops
 			  {
                     if ((crc & 0x0001) ^ (data & 0x0001))
                            crc = (crc >> 1) ^ POLY;
@@ -423,8 +423,8 @@ void ADE9078::initialize(){
 	 */
 
 
-  // Arduino setup
-  #ifdef ESP32  //example SPI routine for the ESP32
+  // ESP32 Architecture setup
+  #ifdef ESP32ARCH  //example SPI routine for the ESP32
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -437,7 +437,7 @@ void ADE9078::initialize(){
 
   #ifdef AVRESP8266 //Arduino SPI Routine
   SPI.begin();
-  SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+  SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3 or 0 modes.
   pinMode(_SS, OUTPUT); // FYI: SS is pin 10 by Arduino's SPI library on many boards (including the UNO), set SS pin as Output
   SPI.setBitOrder(MSBFIRST);  //Define MSB as first (explicitly)
   SPI.endTransaction(); //end SPI communication
@@ -551,7 +551,7 @@ uint8_t ADE9078::spiRead8(uint16_t address)  { //This is the algorithm that read
   byte one, two; // the second input, byte2 is a dummy placeholder read in value: likely the ADE9078 is outputting an extra byte as a 16 bit response even for a 1 byte return
   digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
-  #ifdef ESP32  //example SPI routine for the ESP32
+  #ifdef ESP32ARCH  //example SPI routine for the ESP32
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -606,7 +606,7 @@ uint16_t ADE9078::spiRead16(uint16_t address) { //This is the algorithm that rea
 
     byte one, two; //holders for the read values from the SPI Transfer
 
-	#ifdef ESP32  //example SPI routine for the ESP32
+	#ifdef ESP32ARCH  //example SPI routine for the ESP32
 	  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
 	  spiAttachSCK(spy, -1);
       spiAttachMOSI(spy, -1);
@@ -664,7 +664,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
 
   byte one, two, three, four; //holders for the read values from the SPI Transfer
 
-  #ifdef ESP32  //example SPI routine for the ESP32
+  #ifdef ESP32ARCH  //example SPI routine for the ESP32
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -711,7 +711,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   #endif
 
   //Post-read packing and bitshifting operations
-  return ((uint32_t) one << 24) + ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four;
+  return (((uint32_t) one << 24) + ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four);
 }
 
 void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
@@ -726,7 +726,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
   uint8_t byteTwo = (data >> 8);
   uint8_t byteOne = (data & 0xFF);
 
-  #ifdef ESP32  //example SPI routine for the ESP32
+  #ifdef ESP32ARCH  //example SPI routine for the ESP32
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -778,7 +778,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
     uint8_t byteTwo = (data & 0xFFFF) >> 8;
     uint8_t byteOne = (data & 0xFF);
 
-    #ifdef ESP32  //example SPI routine for the ESP32
+    #ifdef ESP32ARCH  //example SPI routine for the ESP32
     spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
     spiAttachSCK(spy, -1);
     spiAttachMOSI(spy, -1);
@@ -831,7 +831,7 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
     #endif
    //Prepare the 12 bit command header from the inbound address provided to the function
    uint16_t temp_address, readval_unsigned, CRC_Value, returnedCRC;
-   unsigned char CRCCheckInput[2]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
+   static unsigned char CRCCheckInput[2]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
@@ -839,7 +839,7 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
     byte one, two; //holders for the read values from the SPI Transfer
 	byte crcOne, crcTwo; //holders for returned CRC values
 
-	#ifdef ESP32  //example SPI routine for the ESP32
+	#ifdef ESP32ARCH  //example SPI routine for the ESP32
 	  spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
 	  spiAttachSCK(spy, -1);
       spiAttachMOSI(spy, -1);
@@ -890,10 +890,10 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
 	
 	CRCCheckInput[0] = one; //load first value into the array
 	CRCCheckInput[1] = two; //load second value into the array
-	CRCCheckInput[2] = NULL; //load terminal value into the array
+	CRCCheckInput[2] = 0; //load terminal value into the array  (previously: CRCCheckInput[2] = NULL;)
 	
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)3)); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified 
+	returnedCRC = crc16(CRCCheckInput, (short)3); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified 
 	
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
@@ -905,8 +905,8 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
 	}
 	
    #ifdef ADE9078_CRC_Output
-   Serial.print(" Read 32 value fed into the CRC Check function[HEX]: ");
-   Serial.print(returnedValue, BIN);
+   Serial.print(" Read 16-bit value fed into the CRC Check function[HEX]: ");
+   Serial.print(readval_unsigned, BIN);
    Serial.print(" ADE9087 Read CRC Value Byte 1[HEX]: ");
    Serial.print(crcOne, BIN);
    Serial.print(" ADE9087 Read CRC Value Byte 2[HEX]: ");
@@ -930,7 +930,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
    //Prepare the 12 bit command header from the inbound address provided to the function
    uint16_t temp_address, CRC_Value, returnedCRC;
    uint32_t returnedValue;
-   unsigned char CRCCheckInput[4]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
+   static unsigned char CRCCheckInput[4]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
@@ -938,7 +938,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
   byte one, two, three, four; //holders for the read values from the SPI Transfer
   byte crcOne, crcTwo; //holders for returned CRC values
 
-  #ifdef ESP32  //example SPI routine for the ESP32
+  #ifdef ESP32ARCH  //example SPI routine for the ESP32
   spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
   spiAttachSCK(spy, -1);
   spiAttachMOSI(spy, -1);
@@ -999,10 +999,10 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
 	CRCCheckInput[1] = two; //load second value into the array
     CRCCheckInput[2] = three; //load third value into the array
 	CRCCheckInput[3] = four; //load fourth value into the array
-	CRCCheckInput[4] = NULL; //load terminal value into the array
+	CRCCheckInput[4] = 0; //load terminal value into the array (previously: CRCCheckInput[4] = NULL;)
 	
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)4)); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified 
+	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified 
 	
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
@@ -1013,7 +1013,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
 		ValidCRC = 0; //value does not match, return a 0 to indicate a match has not taken place and the returned data is invalid
 	}
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = ccrc16(returnedValue, (short)4)); // enter CRC value into the check algorithm MSB first, the length is 4 bytes (32 bit), this is specified 
+	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 4 bytes (32 bit), this is specified 
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
 	ValidCRC = 1; //value matches, return a 1 to indicate a match has taken place and the returned data is valid
