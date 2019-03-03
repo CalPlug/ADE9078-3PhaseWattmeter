@@ -15,6 +15,10 @@
 
 #define AWattHrGain 1
 #define AWattHrOffset 0
+#define BWattHrGain 1
+#define BWattHrOffset 0
+#define CWattHrGain 1
+#define CWattHrOffset 0
 
 #define AAppPowerGain 1
 #define AAppPowerOffset 0

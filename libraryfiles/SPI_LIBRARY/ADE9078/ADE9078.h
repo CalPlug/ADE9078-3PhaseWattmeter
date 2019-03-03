@@ -23,6 +23,7 @@
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
 #include <SPI.h>
 #include "ADE9078registers.h"
+#include "LastReads.h"
 
 #define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
 
@@ -73,42 +74,51 @@ class ADE9078 {
 	  uint32_t getInstVoltageA();
 	  uint32_t getInstVoltageB();
 	  uint32_t getInstVoltageC();
+      void readVoltage();
 
 	  double getAVrms();
 	  double getBVrms();
 	  double getCVrms();
+      void readVrms();
 
 	  uint32_t getInstCurrentA();
 	  uint32_t getInstCurrentB();
 	  uint32_t getInstCurrentC();
+      void  readInstCurrent();
 
 	  double getIrmsA();
 	  double getIrmsB();
 	  double getIrmsC();
+      void readIrms();
 
 	  uint32_t getVpeak();
 	  uint32_t getIpeak();
-
-	  uint32_t getEnergyA();
+      void readPeak();
 
 	  double readWattHoursA();
+      double readWattHoursB();
+      double readWattHoursC();
+      void readWattHours();
 
 	  double getInstApparentPowerA();
 	  double getInstApparentPowerB();
 	  double getInstApparentPowerC();
+      void readInstApparentPower();
 
 	  double getInstActivePowerA();
 	  double getInstActivePowerB();
 	  double getInstActivePowerC();
+      void readInstActivePower();
 
 	  double getInstReactivePowerA();
 	  double getInstReactivePowerB();
 	  double getInstReactivePowerC();
+      void readInstReactivePower();
 
 	  uint32_t getPHNOLOAD();
 
 	  double read32BitAndScale(uint16_t address);
-	  
+
 	  byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
 	  uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
 	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
@@ -117,6 +127,8 @@ class ADE9078 {
 	  void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
 
 	  unsigned short crc16(char data_p, unsigned short length); //CRC verification function
+
+      struct LastReads lastReads;
 
   private:
 	   //used within the class

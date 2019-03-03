@@ -56,7 +56,7 @@ double decimalize(uint32_t input, double factor, double offset, bool absoluteval
 	}
 }
 
-double decimalizesigned(int32_t input, double factor, double offset, bool absolutevalue) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
+double decimalizeSigned(int32_t input, double factor, double offset, bool absolutevalue) //This function converts to floating point with an optional linear calibration (y=mx+b) by providing input in the following way as arguments (rawinput, gain, offset)
 {
 	#ifdef ADE9078_VERBOSE_DEBUG
 	Serial.print(" ADE9078::calibration (decimalize-signed) and double type conversion function executed, RAW input: ");
@@ -136,6 +136,13 @@ uint32_t ADE9078::getInstVoltageC(){
 	return value;
 }
 
+void ADE9078::readVoltage()
+{
+    lastReads.instVoltage.a = spiRead32(AV_PCF_32);
+    lastReads.instVoltage.b = spiRead32(BV_PCF_32);
+    lastReads.instVoltage.c = spiRead32(CV_PCF_32);
+}
+
 double ADE9078::getAVrms(){
 	uint32_t value=0;
 	value=spiRead32(AVRMS_32);
@@ -157,23 +164,13 @@ double ADE9078::getCVrms(){
 	return decimal;
 }
 
-uint32_t ADE9078::getInstCurrentA(){
-	uint32_t value=0;
-	value=spiRead32(AI_PCF_32);
-	return value;
+void ADE9078::readVrms()
+{
+    lastReads.vrms.a = decimalize(spiRead32(AVRMS_32), AVrmsGain, AVrmsOffset, 0);
+    lastReads.vrms.b = decimalize(spiRead32(BVRMS_32), BVrmsGain, BVrmsOffset, 0);
+    lastReads.vrms.c = decimalize(spiRead32(CVRMS_32), CVrmsGain, CVrmsOffset, 0);
 }
 
-uint32_t ADE9078::getInstCurrentB(){
-	uint32_t value=0;
-	value=spiRead32(BI_PCF_32);
-	return value;
-}
-
-uint32_t ADE9078::getInstCurrentC(){
-	uint32_t value=0;
-	value=spiRead32(CI_PCF_32);
-	return value;
-}
 
 double ADE9078::getIrmsA(){
 	uint32_t value=0;
@@ -196,28 +193,63 @@ double ADE9078::getIrmsC(){
 	return decimal;
 }
 
-uint32_t ADE9078::getVpeak(){
+void ADE9078::readIrms()
+{
+    lastReads.irms.a = decimalize(spiRead32(AIRMS_32), AIrmsGain, AIrmsOffset, 0);
+    lastReads.irms.b = decimalize(spiRead32(BIRMS_32), BIrmsGain, BIrmsOffset, 0);
+    lastReads.irms.c = decimalize(spiRead32(CIRMS_32), CIrmsGain, CIrmsOffset, 0);
+}
+
+
+uint32_t ADE9078::getInstCurrentA(){
 	uint32_t value=0;
-	value=spiRead32(VPEAK_32);
+	value=spiRead32(AI_PCF_32);
 	return value;
 }
 
-uint32_t ADE9078::getIpeak(){
+uint32_t ADE9078::getInstCurrentB(){
 	uint32_t value=0;
-	value=spiRead32(IPEAK_32);
+	value=spiRead32(BI_PCF_32);
 	return value;
 }
 
-uint32_t ADE9078::getEnergyA(){
+uint32_t ADE9078::getInstCurrentC(){
 	uint32_t value=0;
-	value=spiRead16(ACCMODE_16);
+	value=spiRead32(CI_PCF_32);
 	return value;
 }
+
+void ADE9078::readInstCurrent()
+{
+    lastReads.instCurrent.a = spiRead32(AI_PCF_32);
+    lastReads.instCurrent.b = spiRead32(BI_PCF_32);
+    lastReads.instCurrent.c = spiRead32(CI_PCF_32);
+}
+
 
 double ADE9078::readWattHoursA(){
 	uint32_t data = spiRead32(AWATTHR_HI_32);
 	double decimal = decimalize(data, AWattHrGain, AWattHrOffset,0);
 	return (decimal);
+}
+
+double ADE9078::readWattHoursB(){
+	uint32_t data = spiRead32(BWATTHR_HI_32);
+	double decimal = decimalize(data, AWattHrGain, AWattHrOffset,0);
+	return (decimal);
+}
+
+double ADE9078::readWattHoursC(){
+	uint32_t data = spiRead32(CWATTHR_HI_32);
+	double decimal = decimalize(data, AWattHrGain, AWattHrOffset,0);
+	return (decimal);
+}
+
+void ADE9078::readWattHours()
+{
+    lastReads.wattHours.a = decimalize(spiRead32(AWATTHR_HI_32), AWattHrGain, AWattHrOffset, 0);
+    lastReads.wattHours.b = decimalize(spiRead32(BWATTHR_HI_32), BWattHrGain, BWattHrOffset, 0);
+    lastReads.wattHours.c = decimalize(spiRead32(CWATTHR_HI_32), CWattHrGain, CWattHrOffset, 0);
 }
 
 double ADE9078::getInstApparentPowerA(){
@@ -236,45 +268,86 @@ double ADE9078::getInstApparentPowerB(){
 
 double ADE9078::getInstApparentPowerC(){  //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(CVA_32);
-	double decimal = decimalizesigned(value, CAppPowerGain, CAppPowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, CAppPowerGain, CAppPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
+void ADE9078::readInstApparentPower()
+{
+    lastReads.instApparentPower.a = decimalizeSigned(spiRead32(AVA_32), AAppPowerGain, AAppPowerOffset, 0);
+    lastReads.instApparentPower.b = decimalizeSigned(spiRead32(BVA_32), BAppPowerGain, BAppPowerOffset, 0);
+    lastReads.instApparentPower.c = decimalizeSigned(spiRead32(CVA_32), CAppPowerGain, CAppPowerOffset, 0);
+}
+
+
 double ADE9078::getInstActivePowerA(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(AWATT_32);
-	double decimal = decimalizesigned(value, AInstPowerGain, AInstPowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, AInstPowerGain, AInstPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerB(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(BWATT_32);
-	double decimal = decimalizesigned(value, BInstPowerGain, BInstPowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, BInstPowerGain, BInstPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
 }
 
 double ADE9078::getInstActivePowerC(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(CWATT_32);
-	double decimal = decimalizesigned(value, CInstPowerGain, CInstPowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, CInstPowerGain, CInstPowerOffset,0); //convert to double with calibration factors specified
 	return (decimal);
+}
+
+void ADE9078::readInstActivePower()
+{
+    lastReads.instActivePower.a = decimalizeSigned(spiRead32(AWATT_32), AInstPowerGain, AInstPowerOffset, 0);
+    lastReads.instActivePower.b = decimalizeSigned(spiRead32(BWATT_32), BInstPowerGain, BInstPowerOffset, 0);
+    lastReads.instActivePower.c = decimalizeSigned(spiRead32(CWATT_32), CInstPowerGain, CInstPowerOffset, 0);
 }
 
 double ADE9078::getInstReactivePowerA(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(AVAR_32);
-	double decimal = decimalizesigned(value, AInstReactivePowerGain, AInstReactivePowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, AInstReactivePowerGain, AInstReactivePowerOffset,0); //convert to double with calibration factors specified
 	return decimal;
   }
 
 double ADE9078::getInstReactivePowerB(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(BVAR_32);
-	double decimal = decimalizesigned(value, BInstReactivePowerGain, BInstReactivePowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, BInstReactivePowerGain, BInstReactivePowerOffset,0); //convert to double with calibration factors specified
 	return decimal;
 }
 
 double ADE9078::getInstReactivePowerC(){ //type conversion approach used for the ADE9000
 	int32_t value = (int32_t)spiRead32(CVAR_32);
-	double decimal = decimalizesigned(value, CInstReactivePowerGain, CInstReactivePowerOffset,0); //convert to double with calibration factors specified
+	double decimal = decimalizeSigned(value, CInstReactivePowerGain, CInstReactivePowerOffset,0); //convert to double with calibration factors specified
 	return decimal;
 }
+
+void ADE9078::readInstReactivePower()
+{
+    lastReads.instReactivePower.a = decimalizeSigned(spiRead32(AVAR_32), AInstReactivePowerGain, AInstReactivePowerOffset, 0);
+    lastReads.instReactivePower.b = decimalizeSigned(spiRead32(BVAR_32), BInstReactivePowerGain, BInstReactivePowerOffset, 0);
+    lastReads.instReactivePower.c = decimalizeSigned(spiRead32(CVAR_32), CInstReactivePowerGain, CInstReactivePowerOffset, 0);
+}
+
+uint32_t ADE9078::getVpeak(){
+	uint32_t value=0;
+	value=spiRead32(VPEAK_32);
+	return value;
+}
+
+uint32_t ADE9078::getIpeak(){
+	uint32_t value=0;
+	value=spiRead32(IPEAK_32);
+	return value;
+}
+
+void ADE9078::readPeak()
+{
+    lastReads.peak.Vpeak = spiRead32(VPEAK_32);
+    lastReads.peak.Ipeak = spiRead32(IPEAK_32);
+}
+
 
 double ADE9078::read32BitAndScale(uint16_t readRegister){
 	uint32_t data = spiRead32(readRegister);
@@ -575,6 +648,7 @@ uint32_t ADE9078::spiRead32(uint16_t address) { //This is the algorithm that rea
   one = spiTransferByte(spy, WRITE);  //dummy write MSB, read out MSB
   two = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
   three = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
+  four = spiTransferByte(spy, WRITE);  //dummy write LSB, read out LSB
   digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
   spiStopBus(spy);
   #endif

@@ -39,16 +39,16 @@ void setup() {
   //Use these settings to configure wiring configuration at stertup
   //FYI: B010=2 in DEC
   //FYI: B100 = 4 in DEC
-    
+
 	//4 Wire Wye configuration - non-Blondel compliant:
 	is->vConsel=0;
 	is->iConsel=0;
-	
+
 	//Delta, Blondel compliant:
 	//is->vConsel=4; //byte value of 100,
 	//is->iConsel=0;
-	
-	
+
+
 	 //Please continue for all cases
 
   SPI.begin();
@@ -67,6 +67,7 @@ void loop() {
   double reactivePowerA, reactivePowerB, reactivePowerC;
   double activePowerA, activePowerB, activePowerC;
 
+
   Serial.print("Version_16: ");
   Serial.println(myADE9078.getVersion()); // PHNOLOAD_32
   delay(20);
@@ -75,35 +76,53 @@ void loop() {
   Serial.println(myADE9078.getPHNOLOAD()); // PHNOLOAD_32
   delay(20);
 
-  AvRMS = myADE9078.getAVrms();
-  Serial.print("AVrms (V): ");
-  Serial.println(AvRMS);
-  delay(10);
+  myADE9078.readVrms();
+  Serial.print("A, B, C rms (V): ");
+  Serial.print(myADE9078.lastReads.vrms.a);
+  Serial.print(" ");
+  Serial.print(myADE9078.lastReads.vrms.b);
+  Serial.print(" ");
+  Serial.print(myADE9078.lastReads.vrms.c);
+  Serial.print(" ");
 
-  BvRMS = myADE9078.getBVrms();
-  Serial.print("BVrms (V): ");
-  Serial.println(BvRMS);
-  delay(10);
+  // AvRMS = myADE9078.getAVrms();
+  // Serial.print("AVrms (V): ");
+  // Serial.println(AvRMS);
+  // delay(10);
+  //
+  // BvRMS = myADE9078.getBVrms();
+  // Serial.print("BVrms (V): ");
+  // Serial.println(BvRMS);
+  // delay(10);
+  //
+  // CvRMS = myADE9078.getCVrms();
+  // Serial.print("BVrms (V): ");
+  // Serial.println(BvRMS);
+  // delay(10);
 
-  CvRMS = myADE9078.getCVrms();
-  Serial.print("BVrms (V): ");
-  Serial.println(BvRMS);
-  delay(10);
+  myADE9078.readIrms();
+  Serial.print("A, B, C rms (I): ");
+  Serial.print(myADE9078.lastReads.irms.a);
+  Serial.print(" ");
+  Serial.print(myADE9078.lastReads.irms.b);
+  Serial.print(" ");
+  Serial.print(myADE9078.lastReads.irms.c);
+  Serial.print(" ");
 
-  IrmsA = myADE9078.getIrmsA();
-  Serial.print("IrmsA (mA): ");
-  Serial.println(IrmsA);
-  delay(10);
-
-  IrmsB = myADE9078.getIrmsB();
-  Serial.print("IrmsB (mA): ");
-  Serial.println(IrmsB);
-  delay(10);
-
-  IrmsC = myADE9078.getIrmsC();
-  Serial.print("IrmsA (mA): ");
-  Serial.println(IrmsC);
-  delay(10);
+  // IrmsA = myADE9078.getIrmsA();
+  // Serial.print("IrmsA (mA): ");
+  // Serial.println(IrmsA);
+  // delay(10);
+  //
+  // IrmsB = myADE9078.getIrmsB();
+  // Serial.print("IrmsB (mA): ");
+  // Serial.println(IrmsB);
+  // delay(10);
+  //
+  // IrmsC = myADE9078.getIrmsC();
+  // Serial.print("IrmsA (mA): ");
+  // Serial.println(IrmsC);
+  // delay(10);
 
   wattHoursA = myADE9078.readWattHoursA();
   Serial.print("WattHoursA: ");
