@@ -31,6 +31,28 @@ Copyright (C) The Regents of the University of California, 2019
 	spi_t * spy; //for ESP32, create object for SPI
 #endif
 
+//****EEPROM Settings******
+#define NUM_ELEMENTS 14 //Define total fields for EEPROM storage that are cleared and used
+// temporary char buffers for individual EEPROM saved values, local copy for the RAM to use after EEPROM load complete
+char data[250] = {}; //holder for the string pushed into the EEPROM; buffer for EEPROM string
+char data2[250] = {}; //holder for the string pushed into the EEPROM; used for test read from the EEPROM
+
+//Fields for calibration values from ADE9000 example, declare blank to begin with
+char Valconfigured[5]; //Identification if previous values are OK (can be used to detect good values on boot-up, if not, load default values
+char ValADDR_AIGAIN[20];
+char ValADDR_BIGAIN[20];
+char ValADDR_CIGAIN[20];
+char ValADDR_NIGAIN[20];
+char ValADDR_AVGAIN[20];
+char ValADDR_BVGAIN[20];
+char ValADDR_CVGAIN[20];
+char ValADDR_APHCAL0[20];
+char ValADDR_BPHCAL0[20];
+char ValADDR_CPHCAL0[20];
+char ValADDR_APGAIN[20];
+char ValADDR_BPGAIN[20];
+char ValADDR_CPGAIN[20];
+//**********
 
 
 //**************** Helper Functions *****************

@@ -5,6 +5,7 @@
 #include <ADE9078.h>
 #include <SPI.h>
 
+
 //Architecture Control:
 //Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32
 //REMINDER: ONLY SELECT THE SINGLE OPTION FOR THE BOARD TYPE YOU ARE USING!
@@ -53,8 +54,10 @@ void setup() {
 
   SPI.begin();
   delay(200);
+    myADE9078.initialize(); //Call initialization of the ADE9078 withe default configuration plus options specified
+	//EEPROMInit()  //call only once on a virgin chip to "partition" EEPROM for the input type expected moving forward
+	//load_data_allfields();  //load EEPROM values 
 
-  myADE9078.initialize(); //Call mode 0 for 4 wire Wye, blondel configuration
 }
 
 
