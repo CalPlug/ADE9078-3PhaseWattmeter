@@ -1,4 +1,4 @@
-/*
+/* ADE9078
  ADE9078.h - Simple library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
   example library for operating the ADE9078 3-Phase AC Line measurement IC over SPI interfacing
 
