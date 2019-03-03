@@ -1,15 +1,22 @@
 /* ADE9078
  ADE9078.cpp - Example library for operating the ADE9078 Three-Phase AC Line measurement IC over SPI for Arduino Uno/AVR/ESP8266
-  Created by Umar Kazmi, Crystal Lai, and Michael J. Klopfer, Ph.D.
-  January 23, 2017 - 0.1 (pre-release)
-  May 3, 2018 - v6.2 (current version) - by MJK
-  Verified for compatibility with Arduino Uno and Espressif ESP8266, please see README about ESP32 compatibility.
-  University of California, Irvine - California Plug Load Research Center (CalPlug)
-  Copyright: The Regents of the University of California
-  Released into the public domain with Share-alike licensing.
-  Be decent: if our work helped you, then please reference/acknowledge this project and its authors in your work!
+  example library for operating the ADE9078 3-Phase AC Line measurement IC over SPI interfacing
+
+ADE9078 board and library created by: David Brady, Jeff Baez, and Jacky Wan 11/2018
+
+Code major development by David Brady
+
+PCB design done by Esteban Granizo and Peter Nguyen (12/2018)
+
+University of California, Irvine - California Plug Load Research Center (CalPlug)
+
+December 2018 - Library First Release (December 2018) - Library Latest Release for ADE9078
+
+Copyright (C) The Regents of the University of California, 2019
 
   Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
+  
+   Released into the public domain.
 */
 
 #include "Arduino.h"
@@ -75,11 +82,11 @@ double decimalizeSigned(int32_t input, double factor, double offset, bool absolu
 	}
 }
 
-uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
+uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed Bob Felice, 2007 from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926
    unsigned char i;
    unsigned int data;
    unsigned int crc;
-   #define POLY 0x8408
+   #define POLY 0x8408 //deff. of the polynomial used for the calculation
 
    crc = 0xffff;
 	       if (length == 0)

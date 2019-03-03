@@ -1,8 +1,21 @@
 /*
- ADE9078.cpp - Simple library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
-  Created by XXXXXXX   and Michael Klopfer, Ph.D.
-  February 20, 2019 - v6.2 (pre-release)
-  University of California, Irvine - California Plug Load Research Center (CalPlug)
+ ADE9078.h - Simple library for operating the ADE9078 Single-Phase AC Line measurement IC over SPI for Arduino Uno
+  example library for operating the ADE9078 3-Phase AC Line measurement IC over SPI interfacing
+
+ADE9078 board and library created by: David Brady, Jeff Baez, and Jacky Wan 11/2018
+
+Code major development by David Brady
+
+PCB design done by Esteban Granizo and Peter Nguyen (12/2018)
+
+University of California, Irvine - California Plug Load Research Center (CalPlug)
+
+December 2018 - Library First Release (December 2018) - Library Latest Release for ADE9078
+
+Copyright (C) The Regents of the University of California, 2019
+
+  Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
+  
   Released into the public domain.
 */
 
