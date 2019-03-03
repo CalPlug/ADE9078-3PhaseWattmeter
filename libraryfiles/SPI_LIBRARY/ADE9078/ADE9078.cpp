@@ -31,28 +31,7 @@ Copyright (C) The Regents of the University of California, 2019
 	spi_t * spy; //for ESP32, create object for SPI
 #endif
 
-//****EEPROM Settings******
-#define NUM_ELEMENTS 14 //Define total fields for EEPROM storage that are cleared and used
-// temporary char buffers for individual EEPROM saved values, local copy for the RAM to use after EEPROM load complete
-char data[250] = {}; //holder for the string pushed into the EEPROM; buffer for EEPROM string
-char data2[250] = {}; //holder for the string pushed into the EEPROM; used for test read from the EEPROM
 
-//Fields for calibration values from ADE9000 example, decalre blank to begin with
-char Valconfigured[5]; //Identification if previous values are OK (can be used to detect good values on boot-up, if not, load default values
-char ValADDR_AIGAIN[20];
-char ValADDR_BIGAIN[20];
-char ValADDR_CIGAIN[20];
-char ValADDR_NIGAIN[20];
-char ValADDR_AVGAIN[20];
-char ValADDR_BVGAIN[20];
-char ValADDR_CVGAIN[20];
-char ValADDR_APHCAL0[20];
-char ValADDR_BPHCAL0[20];
-char ValADDR_CPHCAL0[20];
-char ValADDR_APGAIN[20];
-char ValADDR_BPGAIN[20];
-char ValADDR_CPGAIN[20];
-//**********
 
 //**************** Helper Functions *****************
 
@@ -171,7 +150,7 @@ void wipe_data()
 void EEPROMInit() { //function called once on a virgin micro-controller to set the EEPROM with used fields
   Serial.println(" Begin EEPROM Initialization Function...");
   //Default values
-  strcpy(Valconfigured, "0"); //indication that the EEPROM is configured with values
+  strcpy(Valconfigured, "0"); //indication that the EEPROM is configured with values, use 0, the un-configured, default state
   //Set field values with default calibration values
   strcpy(ValADDR_AIGAIN, "1");  
   strcpy(ValADDR_BIGAIN, "1");  
@@ -287,12 +266,12 @@ uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC f
    unsigned int crc;
    #define POLY 0x8408 //deff. of the polynomial used for the calculation
 
-   crc = 0xffff;
+   crc = 0xffff; //initial reset calculation value
 	       if (length == 0)
               return (~crc);
 
        do {
-              for (i = 0, data = (unsigned int)0xff & *data_p++; i < 8; i++, data >>= 1) //alternative notation for nested for loops
+              for (i = 0, data = (unsigned int)0xff & *data_p++; i < 8; i++, data >>= 1) //*data_p++ is often without ++ in other versions, see links above for details on this and implementation/usage
 			  {
                     if ((crc & 0x0001) ^ (data & 0x0001))
                            crc = (crc >> 1) ^ POLY;
@@ -1036,7 +1015,8 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
      Serial.print(" ADE9078::spiRead16-CRC function started ");
     #endif
    //Prepare the 12 bit command header from the inbound address provided to the function
-   uint16_t temp_address, readval_unsigned, CRC_Value, returnedCRC;
+   uint16_t temp_address, readval_unsigned, CRC_Value;
+   uint16_t returnedCRC = 0;
    static unsigned char CRCCheckInput[2]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
@@ -1093,7 +1073,7 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
     readval_unsigned = readval_unsigned + two;  //Process LSB
 	CRC_Value = (crcOne << 8); //Push in first CRC value into the 16bit holder
 	CRC_Value = CRC_Value + crcTwo;  //Process LSB for CRC
-	
+	//Load in forward into the CRC check - double check byte order!
 	CRCCheckInput[0] = one; //load first value into the array
 	CRCCheckInput[1] = two; //load second value into the array
 	CRCCheckInput[2] = 0; //load terminal value into the array  (previously: CRCCheckInput[2] = NULL;)
@@ -1134,7 +1114,8 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
   #endif
 
    //Prepare the 12 bit command header from the inbound address provided to the function
-   uint16_t temp_address, CRC_Value, returnedCRC;
+   uint16_t temp_address, CRC_Value;
+   uint16_t returnedCRC = 0;
    uint32_t returnedValue;
    static unsigned char CRCCheckInput[4]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
@@ -1200,7 +1181,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
   
   	CRC_Value = (crcOne << 8); //Push in first CRC value into the 16bit holder
 	CRC_Value = CRC_Value + crcTwo;  //Process LSB for CRC
-	
+	//Load in forward into the CRC check - double check byte order!
 	CRCCheckInput[0] = one; //load first value into the array
 	CRCCheckInput[1] = two; //load second value into the array
     CRCCheckInput[2] = three; //load third value into the array
