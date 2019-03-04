@@ -15,7 +15,7 @@ December 2018 - Library First Release (December 2018) - Library Latest Release f
 Copyright (C) The Regents of the University of California, 2019
 
   Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
-  
+
   Released into the public domain.
 */
 
@@ -73,88 +73,94 @@ struct InitializationSettings {
 
 class ADE9078 {
 
-  public:
-	  //available from within or outside the class
-	  ADE9078(int SS, long SPI_freq, InitializationSettings*);
-	  ~ADE9078() { delete is; }
-	  struct LastReads lastReads;
-	  void initialize();
+public:
+    //available from within or outside the class
+    ADE9078(int SS, long SPI_freq, InitializationSettings*);
+    ~ADE9078() { delete is; }
+    struct LastReads lastReads;
+    void initialize();
 
-	  uint8_t getVersion();
-	  double getPowerFactorA(); // only for A? Don't see for B/C
-	  // double getPeriod();    // not done. can probably implement with USER_PERIOD_32
-	  uint32_t getPhaseCalibA(); // B/C? - Implement for all phases
+    uint8_t getVersion();
+    double getPowerFactorA(); // only for A? Don't see for B/C
+    // double getPeriod();    // not done. can probably implement with USER_PERIOD_32
+    uint32_t getPhaseCalibA(); // B/C? - Implement for all phases
 
-	  uint32_t getInstVoltageA();
-	  uint32_t getInstVoltageB();
-	  uint32_t getInstVoltageC();
-      void readVoltage();
+    uint32_t getInstVoltageA();
+    uint32_t getInstVoltageB();
+    uint32_t getInstVoltageC();
+    void readVoltage();
 
-	  double getAVrms();
-	  double getBVrms();
-	  double getCVrms();
-      void readVrms();
+    double getAVrms();
+    double getBVrms();
+    double getCVrms();
+    void readVrms();
 
-	  uint32_t getInstCurrentA();
-	  uint32_t getInstCurrentB();
-	  uint32_t getInstCurrentC();
-      void  readInstCurrent();
+    uint32_t getInstCurrentA();
+    uint32_t getInstCurrentB();
+    uint32_t getInstCurrentC();
+    void  readInstCurrent();
 
-	  double getIrmsA();
-	  double getIrmsB();
-	  double getIrmsC();
-      void readIrms();
+    double getIrmsA();
+    double getIrmsB();
+    double getIrmsC();
+    void readIrms();
 
-	  uint32_t getVpeak();
-	  uint32_t getIpeak();
-      void readPeak();
+    void readFilterBasedCurrent();
 
-	  double readWattHoursA();
-      double readWattHoursB();
-      double readWattHoursC();
-      void readWattHours();
+    uint32_t getVpeak();
+    uint32_t getIpeak();
+    void readPeak();
 
-	  double getInstApparentPowerA();
-	  double getInstApparentPowerB();
-	  double getInstApparentPowerC();
-      void readInstApparentPower();
+    double readWattHoursA();
+    double readWattHoursB();
+    double readWattHoursC();
+    void readWattHours();
 
-	  double getInstActivePowerA();
-	  double getInstActivePowerB();
-	  double getInstActivePowerC();
-      void readInstActivePower();
+    void readFundamentalReactivePower();
+    void readPowerFactor();
+    void readPeriod();
 
-	  double getInstReactivePowerA();
-	  double getInstReactivePowerB();
-	  double getInstReactivePowerC();
-      void readInstReactivePower();
+    double getInstApparentPowerA();
+    double getInstApparentPowerB();
+    double getInstApparentPowerC();
+    void readInstApparentPower();
 
-	  uint32_t getPHNOLOAD();
+    double getInstActivePowerA();
+    double getInstActivePowerB();
+    double getInstActivePowerC();
+    void readInstActivePower();
 
-	  double read32BitAndScale(uint16_t address);
+    double getInstReactivePowerA();
+    double getInstReactivePowerB();
+    double getInstReactivePowerC();
+    void readInstReactivePower();
 
-	  byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
-	  uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
-	  uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
-	  uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
-	  void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
-	  void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
-	  uint32_t spiRead32CRC(uint16_t address,bool &ValidCRC); //Function to allow CRC checking for 32 bit returns
-	  uint16_t spiRead16CRC(uint16_t address, bool &ValidCRC); //Function to allow CRC checking for 16 bit returns
+    uint32_t getPHNOLOAD();
 
-  private:
-	   //used within the class
-	  int _SS;
-	  int _SPI_freq;
-	  InitializationSettings* is;
-	  //Use SPI settings according to selected chipset in use
-	  #ifdef AVRESP8266
-	  SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE0);
-	  #endif
-	  #ifdef ESP32ARCH
-	  //#define ESP32SPIDefaultSettings VSPI,SPI_CLOCK_DIV16,SPI_MODE0,SPI_MSBFIRST //"ESP32SPIDefaultSettings" is used as macro holder for default settings
-	  //SPISettings defaultSPISettings = SPISettings(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);, elected to hardcode right now
-	  #endif
+    double read32BitAndScale(uint16_t address);
+
+    byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
+    uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
+    uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
+    uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
+    void spiWrite16(uint16_t address, uint16_t data); // Write, outbound function: address, data
+    void spiWrite32(uint16_t address, uint32_t data); // Write, outbound function: address, data
+    uint32_t spiRead32CRC(uint16_t address,bool &ValidCRC); //Function to allow CRC checking for 32 bit returns
+    uint16_t spiRead16CRC(uint16_t address, bool &ValidCRC); //Function to allow CRC checking for 16 bit returns
+
+private:
+       //used within the class
+      int _SS;
+      int _SPI_freq;
+      InitializationSettings* is;
+      //Use SPI settings according to selected chipset in use
+      #ifdef AVRESP8266
+      SPISettings defaultSPISettings = SPISettings(_SPI_freq, MSBFIRST, SPI_MODE0);
+      #endif
+      #ifdef ESP32ARCH
+      //#define ESP32SPIDefaultSettings VSPI,SPI_CLOCK_DIV16,SPI_MODE0,SPI_MSBFIRST //"ESP32SPIDefaultSettings" is used as macro holder for default settings
+      //SPISettings defaultSPISettings = SPISettings(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST);, elected to hardcode right now
+      #endif
 
 
 };

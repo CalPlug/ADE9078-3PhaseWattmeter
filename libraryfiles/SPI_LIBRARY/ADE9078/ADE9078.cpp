@@ -15,7 +15,7 @@ December 2018 - Library First Release (December 2018) - Library Latest Release f
 Copyright (C) The Regents of the University of California, 2019
 
   Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
-  
+
    Released into the public domain.
 */
 
@@ -149,7 +149,7 @@ void load_data(char* data) //passes all read fields back by reference
 }
 
 
-void wipe_data() 
+void wipe_data()
 {
   Serial.println("Wipe EEPROM Values called");
   char* sep = "#";
@@ -174,19 +174,19 @@ void EEPROMInit() { //function called once on a virgin micro-controller to set t
   //Default values
   strcpy(Valconfigured, "0"); //indication that the EEPROM is configured with values, use 0, the un-configured, default state
   //Set field values with default calibration values
-  strcpy(ValADDR_AIGAIN, "1");  
-  strcpy(ValADDR_BIGAIN, "1");  
-  strcpy(ValADDR_CIGAIN, "1");  
-  strcpy(ValADDR_NIGAIN, "1");  
-  strcpy(ValADDR_AVGAIN, "1");  
-  strcpy(ValADDR_BVGAIN, "1");  
-  strcpy(ValADDR_CVGAIN, "1");  
-  strcpy(ValADDR_APHCAL0, "1");  
-  strcpy(ValADDR_BPHCAL0, "1");  
-  strcpy(ValADDR_CPHCAL0, "1");  
-  strcpy(ValADDR_APGAIN, "1");  
-  strcpy(ValADDR_BPGAIN, "1");  
-  strcpy(ValADDR_CPGAIN, "1");  
+  strcpy(ValADDR_AIGAIN, "1");
+  strcpy(ValADDR_BIGAIN, "1");
+  strcpy(ValADDR_CIGAIN, "1");
+  strcpy(ValADDR_NIGAIN, "1");
+  strcpy(ValADDR_AVGAIN, "1");
+  strcpy(ValADDR_BVGAIN, "1");
+  strcpy(ValADDR_CVGAIN, "1");
+  strcpy(ValADDR_APHCAL0, "1");
+  strcpy(ValADDR_BPHCAL0, "1");
+  strcpy(ValADDR_CPHCAL0, "1");
+  strcpy(ValADDR_APGAIN, "1");
+  strcpy(ValADDR_BPGAIN, "1");
+  strcpy(ValADDR_CPGAIN, "1");
   wipe_data(); //wipe current EEPROM values, without this the configured value is almost certainly not pre-set properly.
   char* sep = "#";
   strcat(data, Valconfigured);
@@ -217,7 +217,7 @@ void EEPROMInit() { //function called once on a virgin micro-controller to set t
   strcat(data, sep);
   strcat(data, ValADDR_CPGAIN);
   strcat(data, sep);
- 
+
   Serial.println("This is the final string to load into EEPROM:");
   Serial.println(data);
   Serial.println("The length is: ");
@@ -248,8 +248,8 @@ void load_data_allfields() //load the data field by field into the RAM holders -
     {
       Serial.println(data);
       switch (count)
-      { 
-	    //load each value field by field and parse into the RAM holders for each value, the readout must match the loaded data fields!  
+      {
+	    //load each value field by field and parse into the RAM holders for each value, the readout must match the loaded data fields!
 
 	    case 0: strcpy(Valconfigured, data); break;
         case 1: strcpy(ValADDR_AIGAIN, data); break;
@@ -261,14 +261,14 @@ void load_data_allfields() //load the data field by field into the RAM holders -
         case 7: strcpy(ValADDR_CVGAIN, data); break;
         case 8: strcpy(ValADDR_APHCAL0, data); break;
         case 9: strcpy(ValADDR_BPHCAL0, data); break;
-        case 10: strcpy(ValADDR_CPHCAL0, data); break;  
+        case 10: strcpy(ValADDR_CPHCAL0, data); break;
         case 11: strcpy(ValADDR_APGAIN, data); break;
         case 12: strcpy(ValADDR_BPGAIN, data); break;
-        case 13: strcpy(ValADDR_CPGAIN, data); break; 		
+        case 13: strcpy(ValADDR_CPGAIN, data); break;
       }
       count++;
       strcpy(data,"");
-    } 
+    }
     else
     {
       strncat(data, &read_char, 1);  //total of 1 character appended
@@ -276,7 +276,7 @@ void load_data_allfields() //load the data field by field into the RAM holders -
     ++address;
   }
   //when using the recalled values (ouside of this function, the following approaches can be used to make the arrays that hold values as characters into numerical values for use:
-  //atoi() can be used to generate integers needed from char arrays for loading, e.g. integerFromPC = atoi(strtokIndx);     // convert this part to an integer strtokIndx = strtok(NULL, ",");floatFromPC = atof(strtokIndx);     // convert this part to a float (see: http://forum.arduino.cc/index.php?topic=396450) 
+  //atoi() can be used to generate integers needed from char arrays for loading, e.g. integerFromPC = atoi(strtokIndx);     // convert this part to an integer strtokIndx = strtok(NULL, ",");floatFromPC = atof(strtokIndx);     // convert this part to a float (see: http://forum.arduino.cc/index.php?topic=396450)
     //floatFromPC = atof(strtokIndx);     // convert this part to a float
   Serial.println("<--Read data complete, this was read");
 }
@@ -400,9 +400,9 @@ double ADE9078::getCVrms(){
 
 void ADE9078::readVrms()
 {
-    lastReads.vrms.a = decimalize(spiRead32(AVRMS_32), AVrmsGain, AVrmsOffset, 0);
-    lastReads.vrms.b = decimalize(spiRead32(BVRMS_32), BVrmsGain, BVrmsOffset, 0);
-    lastReads.vrms.c = decimalize(spiRead32(CVRMS_32), CVrmsGain, CVrmsOffset, 0);
+    lastReads.vrms.a = int32_t(decimalize(spiRead32(AVRMS_32), AVrmsGain, AVrmsOffset, 0));
+    lastReads.vrms.b = int32_t(decimalize(spiRead32(BVRMS_32), BVrmsGain, BVrmsOffset, 0));
+    lastReads.vrms.c = int32_t(decimalize(spiRead32(CVRMS_32), CVrmsGain, CVrmsOffset, 0));
 }
 
 
@@ -429,9 +429,9 @@ double ADE9078::getIrmsC(){
 
 void ADE9078::readIrms()
 {
-    lastReads.irms.a = decimalize(spiRead32(AIRMS_32), AIrmsGain, AIrmsOffset, 0);
-    lastReads.irms.b = decimalize(spiRead32(BIRMS_32), BIrmsGain, BIrmsOffset, 0);
-    lastReads.irms.c = decimalize(spiRead32(CIRMS_32), CIrmsGain, CIrmsOffset, 0);
+    lastReads.irms.a = int32_t(decimalize(spiRead32(AIRMS_32), AIrmsGain, AIrmsOffset, 0));
+    lastReads.irms.b = int32_t(decimalize(spiRead32(BIRMS_32), BIrmsGain, BIrmsOffset, 0));
+    lastReads.irms.c = int32_t(decimalize(spiRead32(CIRMS_32), CIrmsGain, CIrmsOffset, 0));
 }
 
 
@@ -486,6 +486,40 @@ void ADE9078::readWattHours()
     lastReads.wattHours.c = decimalize(spiRead32(CWATTHR_HI_32), CWattHrGain, CWattHrOffset, 0);
 }
 
+void ADE9078:: readFundamentalReactivePower()
+{
+	lastReads.fundReactPower.a = int32_t (spiRead32(AFVAR_32));
+	lastReads.fundReactPower.b = int32_t (spiRead32(AFVAR_32));
+	lastReads.fundReactPower.c = int32_t (spiRead32(AFVAR_32));
+}
+
+void ADE9078::readFilterBasedCurrent()
+{
+	lastReads.filterBasedCurrent.a = int32_t (spiRead32(AIRMS_32));
+	lastReads.filterBasedCurrent.b = int32_t (spiRead32(BIRMS_32));
+	lastReads.filterBasedCurrent.c = int32_t (spiRead32(CIRMS_32));
+	lastReads.filterBasedCurrent.n = int32_t (spiRead32(NIRMS_32));
+}
+
+void ADE9078::readPowerFactor()
+{
+    // not sure what 9000 code is doing with the values
+    lastReads.powerFactor.regA = int32_t(spiRead32(APF_32));
+    // lastReads.powerFactor.valA =
+    lastReads.powerFactor.regB = int32_t(spiRead32(BPF_32));
+    // lastReads.powerFactor.valB =
+    lastReads.powerFactor.regC = int32_t(spiRead32(CPF_32));
+    // lastReads.powerFactor.valC =
+}
+
+void ADE9078::readPeriod()
+{
+    lastReads.period.a = int32_t(spiRead32(APERIOD_32));
+    lastReads.period.b = int32_t(spiRead32(APERIOD_32));
+    lastReads.period.c = int32_t(spiRead32(APERIOD_32));
+    // 9000 code also calculates some values here?
+}
+
 double ADE9078::getInstApparentPowerA(){
 	uint32_t value=0;
 	value=spiRead32(AVA_32);
@@ -508,9 +542,9 @@ double ADE9078::getInstApparentPowerC(){  //type conversion approach used for th
 
 void ADE9078::readInstApparentPower()
 {
-    lastReads.instApparentPower.a = decimalizeSigned(spiRead32(AVA_32), AAppPowerGain, AAppPowerOffset, 0);
-    lastReads.instApparentPower.b = decimalizeSigned(spiRead32(BVA_32), BAppPowerGain, BAppPowerOffset, 0);
-    lastReads.instApparentPower.c = decimalizeSigned(spiRead32(CVA_32), CAppPowerGain, CAppPowerOffset, 0);
+    lastReads.instApparentPower.a = int32_t(decimalizeSigned(spiRead32(AVA_32), AAppPowerGain, AAppPowerOffset, 0));
+    lastReads.instApparentPower.b = int32_t(decimalizeSigned(spiRead32(BVA_32), BAppPowerGain, BAppPowerOffset, 0));
+    lastReads.instApparentPower.c = int32_t(decimalizeSigned(spiRead32(CVA_32), CAppPowerGain, CAppPowerOffset, 0));
 }
 
 
@@ -534,9 +568,9 @@ double ADE9078::getInstActivePowerC(){ //type conversion approach used for the A
 
 void ADE9078::readInstActivePower()
 {
-    lastReads.instActivePower.a = decimalizeSigned(spiRead32(AWATT_32), AInstPowerGain, AInstPowerOffset, 0);
-    lastReads.instActivePower.b = decimalizeSigned(spiRead32(BWATT_32), BInstPowerGain, BInstPowerOffset, 0);
-    lastReads.instActivePower.c = decimalizeSigned(spiRead32(CWATT_32), CInstPowerGain, CInstPowerOffset, 0);
+    lastReads.instActivePower.a = int32_t(decimalizeSigned(spiRead32(AWATT_32), AInstPowerGain, AInstPowerOffset, 0));
+    lastReads.instActivePower.b = int32_t(decimalizeSigned(spiRead32(BWATT_32), BInstPowerGain, BInstPowerOffset, 0));
+    lastReads.instActivePower.c = int32_t(decimalizeSigned(spiRead32(CWATT_32), CInstPowerGain, CInstPowerOffset, 0));
 }
 
 double ADE9078::getInstReactivePowerA(){ //type conversion approach used for the ADE9000
@@ -559,9 +593,9 @@ double ADE9078::getInstReactivePowerC(){ //type conversion approach used for the
 
 void ADE9078::readInstReactivePower()
 {
-    lastReads.instReactivePower.a = decimalizeSigned(spiRead32(AVAR_32), AInstReactivePowerGain, AInstReactivePowerOffset, 0);
-    lastReads.instReactivePower.b = decimalizeSigned(spiRead32(BVAR_32), BInstReactivePowerGain, BInstReactivePowerOffset, 0);
-    lastReads.instReactivePower.c = decimalizeSigned(spiRead32(CVAR_32), CInstReactivePowerGain, CInstReactivePowerOffset, 0);
+    lastReads.instReactivePower.a = int32_t(decimalizeSigned(spiRead32(AVAR_32), AInstReactivePowerGain, AInstReactivePowerOffset, 0));
+    lastReads.instReactivePower.b = int32_t(decimalizeSigned(spiRead32(BVAR_32), BInstReactivePowerGain, BInstReactivePowerOffset, 0));
+    lastReads.instReactivePower.c = int32_t(decimalizeSigned(spiRead32(CVAR_32), CInstReactivePowerGain, CInstReactivePowerOffset, 0));
 }
 
 uint32_t ADE9078::getVpeak(){
@@ -1032,7 +1066,7 @@ void ADE9078::spiWrite16(uint16_t address, uint16_t data) {
 
   }
 uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the algorithm that reads from a register in the ADE9078. The arguments are the MSB and LSB of the address of the register respectively. The values of the arguments are obtained from the list of functions above.
-//This function provides CRC checking for registers that allow this functionality in non-burst mode. The validity of the return will be passed by a reference argument, Call with address and a valid response check, call as: value = object.spiRead16CRC(Address, CRCcheck); 
+//This function provides CRC checking for registers that allow this functionality in non-burst mode. The validity of the return will be passed by a reference argument, Call with address and a valid response check, call as: value = object.spiRead16CRC(Address, CRCcheck);
     #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print(" ADE9078::spiRead16-CRC function started ");
     #endif
@@ -1078,7 +1112,7 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
     SPI.endTransaction();      // end SPI Transaction
 	#endif
 
-    #ifdef ADE9078_VERBOSE_DEBUG 
+    #ifdef ADE9078_VERBOSE_DEBUG
      Serial.print(" ADE9078::spiRead16-CRC function details: ");
      Serial.print(" Command Header: ");
      Serial.print(commandHeader1, BIN);
@@ -1099,10 +1133,10 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
 	CRCCheckInput[0] = one; //load first value into the array
 	CRCCheckInput[1] = two; //load second value into the array
 	CRCCheckInput[2] = 0; //load terminal value into the array  (previously: CRCCheckInput[2] = NULL;)
-	
+
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)3); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified 
-	
+	returnedCRC = crc16(CRCCheckInput, (short)3); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified
+
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
 	ValidCRC = 1; //value matches, return a 1 to indicate a match has taken place and the returned data is valid
@@ -1111,7 +1145,7 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
 	{
 		ValidCRC = 0; //value does not match, return a 0 to indicate a match has not taken place and the returned data is invalid
 	}
-	
+
    #ifdef ADE9078_CRC_Output
    Serial.print(" Read 16-bit value fed into the CRC Check function[HEX]: ");
    Serial.print(readval_unsigned, BIN);
@@ -1125,8 +1159,8 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
    Serial.print(returnedCRC, BIN);
    Serial.print(" Determined to be a match?: ");
    Serial.println(ValidCRC, DEC);
-   #endif 
-  
+   #endif
+
 	return readval_unsigned;
 }
 
@@ -1197,10 +1231,10 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
    Serial.print(four, BIN);
    Serial.println(" ADE9078::spiRead32-CRC function completed ");
   #endif
-  
+
     //Post-read packing and bitshifting operations for a 32 bit return
   returnedValue = (((uint32_t) one << 24) + ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four);
-  
+
   	CRC_Value = (crcOne << 8); //Push in first CRC value into the 16bit holder
 	CRC_Value = CRC_Value + crcTwo;  //Process LSB for CRC
 	//Load in forward into the CRC check - double check byte order!
@@ -1209,10 +1243,10 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
     CRCCheckInput[2] = three; //load third value into the array
 	CRCCheckInput[3] = four; //load fourth value into the array
 	CRCCheckInput[4] = 0; //load terminal value into the array (previously: CRCCheckInput[4] = NULL;)
-	
+
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified 
-	
+	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified
+
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
 	ValidCRC = 1; //value matches, return a 1 to indicate a match has taken place and the returned data is valid
@@ -1222,7 +1256,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
 		ValidCRC = 0; //value does not match, return a 0 to indicate a match has not taken place and the returned data is invalid
 	}
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 4 bytes (32 bit), this is specified 
+	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 4 bytes (32 bit), this is specified
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
 	ValidCRC = 1; //value matches, return a 1 to indicate a match has taken place and the returned data is valid
@@ -1231,7 +1265,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
 	{
 		ValidCRC = 0; //value does not match, return a 0 to indicate a match has not taken place and the returned data is invalid
 	}
-	
+
    #ifdef ADE9078_CRC_Output
    Serial.print(" Read 32 value fed into the CRC Check function[HEX]: ");
    Serial.print(returnedValue, BIN);
@@ -1245,8 +1279,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
    Serial.print(returnedCRC, BIN);
    Serial.print(" Determined to be a match?: ");
    Serial.println(ValidCRC, DEC);
-   #endif  
-		
+   #endif
+
   return (returnedValue);
 }
-
