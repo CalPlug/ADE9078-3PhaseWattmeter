@@ -1,4 +1,4 @@
- /* ADE9078 Calibration Firmware
+ /* ADE9078 Calibration Firmware  -  Calibrates ADE9078 and loads calibration values into the EEPROM where they can be loaded by other user code
 
 ADE9078 board and library created by: David Brady, Jeff Baez, and Jacky Wan 11/2018
 
@@ -12,12 +12,12 @@ December 2018 - Library First Release (December 2018) - Library Latest Release f
 
 Copyright (C) The Regents of the University of California, 2019
 
-  Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
+  Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it as well as the ADE9000 and the template firmwares provided by this chipset!  Their authors get paid, trust them over us!
 
   Released into the public domain.
  
-Note: this firmware is based directly on the sample provided ADE9000 Calibration firmware.  Please carefully review this example!  The authors greatly appreciate the authors of this example for aloowing us a great structure to use for this example:  
-*Calibrates ADE9078*/
+Note: this firmware is based directly on the sample provided ADE9000 Calibration firmware.  Please carefully review this example!  The authors of this ADE9078 version greatly appreciate the authors of this example for aloowing us a great structure to use for this example:  
+
 /*The calibration inputs are stored in the ADE9078 CalibrationInputs.h file. The phase and parameter being calibrated is input through the serial console*/
 /*Calbration constants are computed and stored in the EEPROM */
 /*Caibration should be done with the end application settings. If any  parameters(GAIN,High pass corner,Integrator settings) are changed, the device should be recalibrated*/

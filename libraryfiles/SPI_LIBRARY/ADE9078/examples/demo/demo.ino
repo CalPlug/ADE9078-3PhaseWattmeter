@@ -220,6 +220,10 @@ ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with
 
 void setup() {
 
+	//Need to add:
+	//1)Read in EEPROM values, check the "Configured bit", if 1, display, calibration values available, load these calibration values to the ADE9078's RAM
+	//2)If 0, then display that no calibration values are present and load default values (Tell user to run calibration firmware)
+	//3) Proceed with load and operation of this demo
   Serial.begin(115200);
   delay(200);
   is->vAGain=1;
