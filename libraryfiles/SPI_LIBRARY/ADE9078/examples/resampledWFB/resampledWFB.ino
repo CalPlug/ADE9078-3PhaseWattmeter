@@ -40,17 +40,17 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 FullResample fullResample;
 
-void copySegments(struct FullResample fr, struct ResampledWFB partial)
+void copySegments(struct FullResample* fr, struct ResampledWFB* partial, int offsetMult)
 {
     for (int i=0; i < WFB_RESAMPLE_SEGMENTS; ++i)
     {
-      fr.Ia[i] = partial.Ia[i];
-      fr.Va[i] = partial.Va[i];
-      fr.Ib[i] = partial.Ib[i];
-      fr.Vb[i] = partial.Vb[i];
-      fr.Ic[i] = partial.Ic[i];
-      fr.Vc[i] = partial.Vc[i];
-      fr.Ia[i] = partial.In[i];
+      fr->Ia[i] = partial->Ia[i+(offsetMult*64)];
+      fr->Va[i] = partial->Va[i+(offsetMult*64)];
+      fr->Ib[i] = partial->Ib[i+(offsetMult*64)];
+      fr->Vb[i] = partial->Vb[i+(offsetMult*64)];
+      fr->Ic[i] = partial->Ic[i+(offsetMult*64)];
+      fr->Vc[i] = partial->Vc[i+(offsetMult*64)];
+      fr->Ia[i] = partial->In[i+(offsetMult*64)];
     }
 }
 
@@ -119,7 +119,7 @@ void loop() {
         uint16_t burstMemoryOffset = i*16*64; // each segment is 16 bytes, we read in sets of 64
         uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
         myADE9078.spiBurstResampledWFB(startingAddress);
-        copySegments(fullResample, myADE9078.lastReads.resampledData);
+        copySegments(&fullResample, &myADE9078.lastReads.resampledData, i);
     }
 
     myADE9078.configureWFB(0); // per datasheet, have to set a certain bit to 0 to restart with stop on full
