@@ -30,6 +30,7 @@ Note: this firmware is based directly on the sample provided ADE9000 Calibration
 #include <ADE9078CalibrationInputs.h>
 #include <math.h>
 #include "LastReads.h"
+#include "ADE9078.h"
 
 //Architecture Control:
 //Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32
@@ -255,27 +256,27 @@ void storeCalConstToEEPROM();
 #define IGAIN_CAL_REG_SIZE 4  
 int32_t xIgain_registers[IGAIN_CAL_REG_SIZE];   //order [AIGAIN, BIGAIN, CIGAIN, NIGAIN]
 int32_t xIgain_register_address[IGAIN_CAL_REG_SIZE]=
-         {ADDR_AIGAIN, ADDR_BIGAIN, ADDR_CIGAIN, ADDR_NIGAIN};   //order [AIGAIN, BIGAIN, CIGAIN, NIGAIN]
+         {AIGAIN_32, BIGAIN_32, CIGAIN_32, NIGAIN_32};   //order [AIGAIN, BIGAIN, CIGAIN, NIGAIN]
 int32_t xIrms_registers[IGAIN_CAL_REG_SIZE];
-int32_t xIrms_registers_address[IGAIN_CAL_REG_SIZE]= {ADDR_AIRMS, ADDR_BIRMS, ADDR_CIRMS, ADDR_NIRMS};
+int32_t xIrms_registers_address[IGAIN_CAL_REG_SIZE]= {AIRMS_32, BIRMS_32, CIRMS_32, NIRMS_32};
 
 #define VGAIN_CAL_REG_SIZE 3
 int32_t xVgain_registers[VGAIN_CAL_REG_SIZE];   //order [AVGAIN, BVGAIN, CVGAIN]
-int32_t xVgain_register_address[VGAIN_CAL_REG_SIZE]={ADDR_AVGAIN, ADDR_BVGAIN, ADDR_CVGAIN};   //order [AVGAIN, BVGAIN, CVGAIN]
+int32_t xVgain_register_address[VGAIN_CAL_REG_SIZE]={AVGAIN_32, BVGAIN_32, CVGAIN_32};   //order [AVGAIN, BVGAIN, CVGAIN]
 int32_t xVrms_registers[VGAIN_CAL_REG_SIZE];
-int32_t xVrms_registers_address[VGAIN_CAL_REG_SIZE]= {ADDR_AVRMS, ADDR_BVRMS, ADDR_CVRMS};
+int32_t xVrms_registers_address[VGAIN_CAL_REG_SIZE]= {AVRMS_32, BVRMS_32, CVRMS_32};
 
 #define PHCAL_CAL_REG_SIZE 3
 int32_t xPhcal_registers[PHCAL_CAL_REG_SIZE];   //order [APHCAL, BPHCAL, CPHCAL]
-int32_t xPhcal_register_address[PHCAL_CAL_REG_SIZE]={ADDR_APHCAL0, ADDR_BPHCAL0, ADDR_CPHCAL0};   //order [APHCAL, BPHCAL, CPHCAL]
+int32_t xPhcal_register_address[PHCAL_CAL_REG_SIZE]={APHCAL0_32, BPHCAL0_32, CPHCAL0_32};   //order [APHCAL, BPHCAL, CPHCAL]
 int32_t xWATTHRHI_registers[PHCAL_CAL_REG_SIZE];  //Active energy registers
-int32_t xWATTHRHI_registers_address[PHCAL_CAL_REG_SIZE]= {ADDR_AWATTHR_HI, ADDR_BWATTHR_HI, ADDR_CWATTHR_HI};
+int32_t xWATTHRHI_registers_address[PHCAL_CAL_REG_SIZE]= {AWATTHR_HI_32, BWATTHR_HI_32, CWATTHR_HI_32};
 int32_t xVARHRHI_registers[PHCAL_CAL_REG_SIZE];
-int32_t xVARHRHI_registers_address[PHCAL_CAL_REG_SIZE]= {ADDR_AVARHR_HI, ADDR_BVARHR_HI, ADDR_CVARHR_HI};
+int32_t xVARHRHI_registers_address[PHCAL_CAL_REG_SIZE]= {AVARHR_HI_32, BVARHR_HI_32, CVARHR_HI_32};
 
 #define PGAIN_CAL_REG_SIZE 3
 int32_t xPgain_registers[PGAIN_CAL_REG_SIZE];   //order [APGAIN, BPGAIN, CPGAIN]
-int32_t xPgain_register_address[PGAIN_CAL_REG_SIZE]={ADDR_APGAIN, ADDR_BPGAIN, ADDR_CPGAIN};   //order [AVGAIN, BVGAIN, CVGAIN, NVGAIN]
+int32_t xPgain_register_address[PGAIN_CAL_REG_SIZE]={APGAIN_32, BPGAIN_32, CPGAIN_32};   //order [AVGAIN, BVGAIN, CVGAIN, NVGAIN]
 //The Power gain calibration reads active energy registers. The content and address arrays are defined in the PHCAL section above
 
 //Global variables
@@ -686,13 +687,13 @@ void ADE9000_pGain_calibrate(int32_t *pgainReg, int32_t *pgainRegAddress, int32_
 void calibrationEnergyRegisterSetup()
 {
   uint16_t epcfgRegister;
-  ade9000.SPI_Write_32(ADDR_MASK0,EGY_INTERRUPT_MASK0);   //Enable EGYRDY interrupt
-  ade9000.SPI_Write_16(ADDR_EGY_TIME,EGYACCTIME);   //accumulate EGY_TIME+1 samples (8000 = 1sec)
-  epcfgRegister =  ade9000.SPI_Read_16(ADDR_EP_CFG);   //Read EP_CFG register
+  ade9000.SPI_Write_32(MASK0_32,EGY_INTERRUPT_MASK0);   //Enable EGYRDY interrupt
+  ade9000.SPI_Write_16(EGY_TIME_16,EGYACCTIME);   //accumulate EGY_TIME+1 samples (8000 = 1sec)
+  epcfgRegister =  ade9000.SPI_Read_16(EP_CFG_16);   //Read EP_CFG register
   epcfgRegister |= CALIBRATION_EGY_CFG;                //Write the settings and enable accumulation
-  ade9000.SPI_Write_16(ADDR_EP_CFG,epcfgRegister);
+  ade9000.SPI_Write_16(EP_CFG_16,epcfgRegister);
   delay(2000); 
-  ade9000.SPI_Write_32(ADDR_STATUS0,0xFFFFFFFF);
+  ade9000.SPI_Write_32(STATUS0_32,0xFFFFFFFF);
   attachInterrupt(digitalPinToInterrupt(IRQ0_INTERRUPT_PIN),updateEnergyRegisterFromInterrupt,INT_MODE);   
 }
 
@@ -701,7 +702,7 @@ void getPGA_gain()
 {
   int16_t pgaGainRegister;
   int16_t temp;  
-  pgaGainRegister = ade9000.SPI_Read_16(ADDR_PGA_GAIN);  //Ensure PGA_GAIN is set correctly in SetupADE9000 function.
+  pgaGainRegister = ade9000.SPI_Read_16(PGA_GAIN_16);  //Ensure PGA_GAIN is set correctly in SetupADE9000 function.
   Serial.print("PGA Gain Register is: ");
   Serial.println(pgaGainRegister,HEX);
   temp =    pgaGainRegister & (0x0003);  //extract gain of current channel
@@ -804,11 +805,11 @@ void updateEnergyRegisterFromInterrupt()
   static int32_t intermediateActiveEgy_Reg[EGY_REG_SIZE]={0};
   static int32_t intermediateReactiveEgy_Reg[EGY_REG_SIZE]={0};
   uint32_t temp;
-  temp = ade9000.SPI_Read_32(ADDR_STATUS0);
+  temp = ade9000.SPI_Read_32(STATUS0_32);
   temp&=EGY_INTERRUPT_MASK0;
   if (temp==EGY_INTERRUPT_MASK0)
   {
-      ade9000.SPI_Write_32(ADDR_STATUS0,0xFFFFFFFF);
+      ade9000.SPI_Write_32(STATUS0_32,0xFFFFFFFF);
       for(i=0;i<EGY_REG_SIZE;i++)
       {
         intermediateActiveEgy_Reg[i]+=ade9000.SPI_Read_32(xWATTHRHI_registers_address[i]);  //accumulate the registers
