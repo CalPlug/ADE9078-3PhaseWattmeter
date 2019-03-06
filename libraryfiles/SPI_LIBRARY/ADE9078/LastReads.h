@@ -1,3 +1,5 @@
+#define WFB_RESAMPLE_SEGMENTS 64
+
 struct InstVoltage
 {
     uint32_t a;
@@ -91,6 +93,20 @@ struct Peak
     uint32_t Ipeak;
 };
 
+struct ResampledWFB
+{
+    int16_t Ia[WFB_RESAMPLE_SEGMENTS];
+    int16_t Va[WFB_RESAMPLE_SEGMENTS];
+
+    int16_t Ib[WFB_RESAMPLE_SEGMENTS];
+    int16_t Vb[WFB_RESAMPLE_SEGMENTS];
+
+    int16_t Ic[WFB_RESAMPLE_SEGMENTS];
+    int16_t Vc[WFB_RESAMPLE_SEGMENTS];
+
+    int16_t In[WFB_RESAMPLE_SEGMENTS];
+};
+
 struct LastReads
 {
     struct InstVoltage instVoltage;
@@ -106,4 +122,5 @@ struct LastReads
     struct PowerFactor powerFactor;
     struct Period period;
     struct Peak peak;
+    struct ResampledWFB resampledData;
 };

@@ -139,7 +139,10 @@ public:
 
     double read32BitAndScale(uint16_t address);
 
-    byte functionBitVal(uint16_t addr, uint8_t byteVal); //function used to separate each byte of an address provided
+    void spiBurstResampledWFB(uint16_t);
+    void configureWFB(int begin);
+    bool isDoneSampling();
+    
     uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
     uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
     uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
