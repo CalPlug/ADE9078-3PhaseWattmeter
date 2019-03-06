@@ -51,6 +51,7 @@ double decimalizeSigned(int32_t input, double factor, double offset, bool absolu
 
 //************************
 
+// Crc found my michael. Apparently generated incorrect outputs- Comment by david, told by jacky
 uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed Bob Felice, 2007 from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926  ALSO  https://forum.arduino.cc/index.php?topic=123467.0
    unsigned char i;
    unsigned int data;
@@ -78,6 +79,34 @@ uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC f
 
        return (crc);
 }
+
+
+// Crc algorithm supplied by jacky. Not compiling
+/*
+uint16_t crc16(byte* byteval)
+{
+    const uint16_t generator = 0x1021;
+    uint16_t crc = 0;
+    enum { maxbyteCount = sizeof byteval / sizeof byteval[0] };
+    for (int j = 0; j<maxbyteCount; j++){
+      crc ^= (uint16_t) (byteval[j] << 8);
+
+    for (int i = 0; i < 8; i++)
+    {
+        if ((crc & 0x8000) != 0)
+        {
+            crc = (uint16_t)((crc << 1) ^ generator);
+        }
+        else
+        {
+            crc <<= 1;
+        }
+    }
+    }
+
+    return crc;
+}
+*/
 
 byte functionBitVal(uint16_t addr, uint8_t byteVal)
 {
