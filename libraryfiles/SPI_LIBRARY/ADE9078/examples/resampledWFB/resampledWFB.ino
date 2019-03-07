@@ -13,7 +13,8 @@
 
 
 //Define ADE9078 object with hardware parameters specified
-#define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
+#define local_SPI_freq 115200  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
+//#define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
 #define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
 
 #define WFB_ALL_SEGMENTS 512
@@ -38,19 +39,28 @@ struct FullResample
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
-FullResample fullResample;
+FullResample* fullResample;
 
-void copySegments(struct FullResample* fr, struct ResampledWFB* partial, int offsetMult)
+void copySegments(int offsetMult)
 {
+    Serial.print("Loop sould go to... ");
+    Serial.println(WFB_RESAMPLE_SEGMENTS);
     for (int i=0; i < WFB_RESAMPLE_SEGMENTS; ++i)
     {
-      fr->Ia[i] = partial->Ia[i+(offsetMult*64)];
-      fr->Va[i] = partial->Va[i+(offsetMult*64)];
-      fr->Ib[i] = partial->Ib[i+(offsetMult*64)];
-      fr->Vb[i] = partial->Vb[i+(offsetMult*64)];
-      fr->Ic[i] = partial->Ic[i+(offsetMult*64)];
-      fr->Vc[i] = partial->Vc[i+(offsetMult*64)];
-      fr->Ia[i] = partial->In[i+(offsetMult*64)];
+      Serial.println(i);
+      int16_t t2 = myADE9078.lastReads.resampledData.Ia[i];
+      int blah = i;
+      fullResample->Ia[blah] = t2;
+      fullResample->Ia[i+(offsetMult*64)] = myADE9078.lastReads.resampledData.Ia[i];
+
+      //Serial.println(t2);
+
+      // fr->Va[i+(offsetMult*64)] = partial->Va[i];
+      // fr->Ib[i+(offsetMult*64)] = partial->Ib[i];
+      // fr->Vb[i+(offsetMult*64)] = partial->Vb[i];
+      // fr->Ic[i+(offsetMult*64)] = partial->Ic[i];
+      // fr->Vc[i+(offsetMult*64)] = partial->Vc[i];
+      // fr->Ia[i+(offsetMult*64)] = partial->In[i];
     }
 }
 
@@ -103,23 +113,50 @@ void loop() {
 
     myADE9078.configureWFB(1); // begin
 
-    int samplingDone = 0;
-    while (samplingDone == 0)
-    {
-      if (myADE9078.isDoneSampling())
-      {
-          samplingDone = 1;
-      }
-    }
+    delay(300);
+    // int samplingDone = 0;
+    // while (samplingDone == 0)
+    // {
+    //   if (myADE9078.isDoneSampling())
+    //   {
+    //       samplingDone = 1;
+    //   }
+    // }
 
     Serial.println("Finished sampling. Reading beginning.");
+
+
 
     for (int i=0; i < readCount; ++i)
     {
         uint16_t burstMemoryOffset = i*16*64; // each segment is 16 bytes, we read in sets of 64
         uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
         myADE9078.spiBurstResampledWFB(startingAddress);
-        copySegments(&fullResample, &myADE9078.lastReads.resampledData, i);
+
+        Serial.print("Outer Loop: ");
+        Serial.println(i);
+
+        memcpy(fullResample, &myADE9078.lastReads.resampledData, 64);
+
+        // for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
+        // {
+        //   Serial.print("Loop position: ");
+        //   Serial.print(i);
+        //   Serial.print(", ");
+        //   Serial.println(seg);
+        //   Serial.print("Segment Offset: ");
+        //   int segOffSet = seg + (i*64);
+        //   Serial.println(segOffSet);
+        //
+        //   int16_t t2 = myADE9078.lastReads.resampledData.Ia[seg];
+        //   //fullResample->Ia[seg+(i*64)] = t2;
+        //   //int16_t t1 = fullResample->Ia[segOffSet];
+        //
+        //   memcpy(, &myADE9078.lastReads.resampledData, 64);
+        //   //fullResample->Ia[segOffSet] = t2;
+        //
+        //   //fullResample->Ia[seg+(i*64)] = myADE9078.lastReads.resampledData.Ia[seg];
+        // }
     }
 
     myADE9078.configureWFB(0); // per datasheet, have to set a certain bit to 0 to restart with stop on full
@@ -131,13 +168,13 @@ void loop() {
     {
         Serial.print(i);
         Serial.print("Ia, Va, Ib, Vb, Ic, Vc, In: ");
-        Serial.print(fullResample.Ia[i]);
-        Serial.print(fullResample.Va[i]);
-        Serial.print(fullResample.Ib[i]);
-        Serial.print(fullResample.Vb[i]);
-        Serial.print(fullResample.Ic[i]);
-        Serial.print(fullResample.Vc[i]);
-        Serial.print(fullResample.In[i]);
+        Serial.print(fullResample->Ia[i]);
+        Serial.print(fullResample->Va[i]);
+        Serial.print(fullResample->Ib[i]);
+        Serial.print(fullResample->Vb[i]);
+        Serial.print(fullResample->Ic[i]);
+        Serial.print(fullResample->Vc[i]);
+        Serial.print(fullResample->In[i]);
         Serial.println();
     }
 }
