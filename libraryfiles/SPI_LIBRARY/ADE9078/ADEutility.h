@@ -83,13 +83,13 @@ uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC f
 
 // Crc algorithm supplied by jacky. Not compiling
 /*
-uint16_t crc16(byte* byteval)
+uint16_t crc16(unsigned char* data_p)
 {
     const uint16_t generator = 0x1021;
     uint16_t crc = 0;
-    enum { maxbyteCount = sizeof byteval / sizeof byteval[0] };
+    enum { maxbyteCount = sizeof data_p / sizeof data_p[0] };
     for (int j = 0; j<maxbyteCount; j++){
-      crc ^= (uint16_t) (byteval[j] << 8);
+      crc ^= (uint16_t) (data_p[j] << 8);
 
     for (int i = 0; i < 8; i++)
     {
