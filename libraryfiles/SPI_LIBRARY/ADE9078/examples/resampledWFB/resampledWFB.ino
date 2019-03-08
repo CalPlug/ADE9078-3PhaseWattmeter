@@ -39,7 +39,7 @@ struct FullResample
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
-FullResample* fullResample;
+FullResample* fullResample = (FullResample*)malloc(sizeof(FullResample));
 
 void copySegments(int offsetMult)
 {
@@ -136,27 +136,24 @@ void loop() {
         Serial.print("Outer Loop: ");
         Serial.println(i);
 
-        memcpy(fullResample, &myADE9078.lastReads.resampledData, 64);
+        for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
+        {
+          Serial.print("Loop position: ");
+          Serial.print(i);
+          Serial.print(", ");
+          Serial.println(seg);
+          Serial.print("Segment Offset: ");
+          int segOffSet = seg + (i*64);
+          Serial.println(segOffSet);
 
-        // for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
-        // {
-        //   Serial.print("Loop position: ");
-        //   Serial.print(i);
-        //   Serial.print(", ");
-        //   Serial.println(seg);
-        //   Serial.print("Segment Offset: ");
-        //   int segOffSet = seg + (i*64);
-        //   Serial.println(segOffSet);
-        //
-        //   int16_t t2 = myADE9078.lastReads.resampledData.Ia[seg];
-        //   //fullResample->Ia[seg+(i*64)] = t2;
-        //   //int16_t t1 = fullResample->Ia[segOffSet];
-        //
-        //   memcpy(, &myADE9078.lastReads.resampledData, 64);
-        //   //fullResample->Ia[segOffSet] = t2;
-        //
-        //   //fullResample->Ia[seg+(i*64)] = myADE9078.lastReads.resampledData.Ia[seg];
-        // }
+          int16_t t2 = myADE9078.lastReads.resampledData.Ia[seg];
+          //fullResample->Ia[seg+(i*64)] = t2;
+          //int16_t t1 = fullResample->Ia[segOffSet];
+
+          fullResample->Ia[segOffSet] = t2;
+
+          //fullResample->Ia[seg+(i*64)] = myADE9078.lastReads.resampledData.Ia[seg];
+        }
     }
 
     myADE9078.configureWFB(0); // per datasheet, have to set a certain bit to 0 to restart with stop on full
