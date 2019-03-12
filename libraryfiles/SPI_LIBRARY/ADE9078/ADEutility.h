@@ -102,6 +102,8 @@ return crc & 0xffff;
 
 // Crc algorithm supplied by jacky. Not compiling
 /*
+Crc source: http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
+
 uint16_t crc16(unsigned char* data_p)
 {
     const uint16_t generator = 0x1021;
