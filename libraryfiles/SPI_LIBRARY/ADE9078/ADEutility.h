@@ -79,7 +79,9 @@ uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC f
 
        return (crc);
 }
-/* New Algorithm From https://stackoverflow.com/questions/21252069/ccitt-crc-16-bit-start-value-0xffff/21263265#21263265
+/* CRC-XMODEM (MSB First)
+Source: http://reveng.sourceforge.net/crc-catalogue/16.htm#crc.cat.crc-16-xmodem
+Implementation Code From https://stackoverflow.com/questions/21252069/ccitt-crc-16-bit-start-value-0xffff/21263265#21263265
 CRC Calculator: https://www.lammertbies.nl/comm/info/crc-calculation.html
 Decimal to Hex Converter: https://cryptii.com/pipes/integer-encoder
 
@@ -87,7 +89,7 @@ uint16_t crc16(unsigned char* data_p, uint16_t length)
 {
     unsigned char i;
     uint16_t data;
-    uint16_t crc = 0xffff;
+    uint16_t crc = 0;     //change 0 to 0xffff for implementation of CRC-CCITT-False Algorithm (more info on sourceforge)
 
  if (length == 0)
     return crc;
@@ -96,7 +98,8 @@ while (length--) {
     for (i=0; i < 8; i++)
         crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
 }
-return crc & 0xffff;
+return crc;             //change crc to crc & 0xffff for implementation of CRC-CCITT-False Algorithm (more info on sourceforge)
+
 }
 /*
 
