@@ -23,36 +23,17 @@
 
 arduinoFFT FFT = arduinoFFT(); //Call object for FFT calculations
 
-#define SAMPLES 512             //FFT Total samples input - Must be a power of 2, 8 times the 64 value buffer, should match waveform buffer all segments value
+#define SAMPLES 64             //FFT Total samples input - Must be a power of 2
 unsigned int sampling_period_us;  //holder for microseconds for FFT
 #define SAMPLING_FREQUENCY 1000 //Hz, match rate to match sampling frequency for input data from data source
- 
-//Read, re-sample, process, report flow control 
+
+//Read, re-sample, process, report flow control
 bool SampleBufferFilled = 0; //Used to indicate when the buffer has been filled and is ready for readout, ready to be read out
 bool FFTCalculationComplete = 0; //Flow control for readout of values
 bool FFTInputBufferFilled = 0; //Flow control for readout of values
 
 const int readCount = WFB_ALL_SEGMENTS/WFB_RESAMPLE_SEGMENTS;
 
-struct FullResample  //buffer for resampled values
-{
-	//Phase A
-    int16_t Ia[WFB_ALL_SEGMENTS];
-    int16_t Va[WFB_ALL_SEGMENTS];
-	int16_t Pa[WFB_ALL_SEGMENTS];
-	//Phase B
-    int16_t Ib[WFB_ALL_SEGMENTS];
-    int16_t Vb[WFB_ALL_SEGMENTS];
-	int16_t Pb[WFB_ALL_SEGMENTS];
-	//Phase c
-    int16_t Ic[WFB_ALL_SEGMENTS];
-    int16_t Vc[WFB_ALL_SEGMENTS];
-	int16_t Pc[WFB_ALL_SEGMENTS];
-	//Neutral
-    int16_t Vn[WFB_ALL_SEGMENTS];
-	int16_t In[WFB_ALL_SEGMENTS];
-	int16_t Pn[WFB_ALL_SEGMENTS];
-};
 
 struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
 	{
@@ -91,36 +72,13 @@ struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
 
 		double vRealPhaseNp[SAMPLES]; //holder for Real (frequency values): Neutral, Power
 		double vImagPhaseNp[SAMPLES];  //holder for Img. (Phase values): Neutral, Power
-	};
+};
 
 
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
-FullResample* fullResample = (FullResample*)malloc(sizeof(FullResample));
-
-void copySegments(int offsetMult)
-{
-    Serial.print("Loop sould go to... ");
-    Serial.println(WFB_RESAMPLE_SEGMENTS);
-    for (int i=0; i < WFB_RESAMPLE_SEGMENTS; ++i)
-    {
-      Serial.println(i);
-      int16_t t2 = myADE9078.lastReads.resampledData.Ia[i];
-      int blah = i;
-      fullResample->Ia[blah] = t2;
-      fullResample->Ia[i+(offsetMult*64)] = myADE9078.lastReads.resampledData.Ia[i];
-
-      //Serial.println(t2);
-
-      // fr->Va[i+(offsetMult*64)] = partial->Va[i];
-      // fr->Ib[i+(offsetMult*64)] = partial->Ib[i];
-      // fr->Vb[i+(offsetMult*64)] = partial->Vb[i];
-      // fr->Ic[i+(offsetMult*64)] = partial->Ic[i];
-      // fr->Vc[i+(offsetMult*64)] = partial->Vc[i];
-      // fr->Ia[i+(offsetMult*64)] = partial->In[i];
-    }
-}
+struct FFTDataHolder* fftData;
 
 void setup() {
 
@@ -163,7 +121,7 @@ void setup() {
   myADE9078.initialize(); //Call initialization of the ADE9078 withe default configuration plus options specified
 	//EEPROMInit()  //call only once on a virgin chip to "partition" EEPROM for the input type expected moving forward
 	//load_data_allfields();  //load EEPROM values
-	
+
 	sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 
 }
@@ -171,317 +129,211 @@ void setup() {
 
 void loop() {
 
-    if (SampleBufferFilled == 0) //check to see if the buffer is empty, if so, sample and fill it
-	{
-		myADE9078.configureWFB(1); // begin waveform buffer  - do you want to call this in the loop each time?
-		delay(300);
-		
-		// int samplingDone = 0;
-		// while (samplingDone == 0)
-		// {
-		//   if (myADE9078.isDoneSampling())
-		//   {
-		//       samplingDone = 1;
-		//   }
-		// }
+    myADE9078.configureWFB(1); // begin waveform buffer  - do you want to call this in the loop each time?
+    delay(300);
 
-		Serial.println("Finished sampling. Reading beginning.");
+    // int samplingDone = 0;
+    // while (samplingDone == 0)
+    // {
+    //   if (myADE9078.isDoneSampling())
+    //   {
+    //       samplingDone = 1;
+    //   }
+    // }
+
+    Serial.println("Finished sampling. Reading beginning.");
 
     for (int i=0; i < readCount; ++i)
     {
         uint16_t burstMemoryOffset = i*16*64; // each segment is 16 bytes, we read in sets of 64
         uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
         myADE9078.spiBurstResampledWFB(startingAddress);
-
+        myADE9078.configureWFB(0); // per datasheet, have to set a certain bit to 0 to restart with stop on full. 23rd bit in status0
         Serial.print("Outer Loop: ");
         Serial.println(i);
 
-        for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
+        for(int i=0; i<SAMPLES; i++)
         {
-          Serial.print("Loop position: ");
-          Serial.print(i);
-          Serial.print(", ");
-          Serial.println(seg);
-          Serial.print("Segment Offset: ");
-          int segOffSet = seg + (i*64);
-          Serial.println(segOffSet);
+            //Copy values read in last sample into the FFT input/Output handler  "Datasource" is a placeholder for the collected sample array
+            fftData->vRealPhaseAv[i] = myADE9078.lastReads.resampledData.Va[i]; //time space sampled values: Phase A, Voltage
+            fftData->vImagPhaseAv[i] = 0;  //holder for Img. (Phase values): Phase A, Voltage
 
-          int16_t t2 = myADE9078.lastReads.resampledData.Ia[seg];
-          //fullResample->Ia[seg+(i*64)] = t2;
-          //int16_t t1 = fullResample->Ia[segOffSet];
+            fftData->vRealPhaseAi[i] = myADE9078.lastReads.resampledData.Ia[i]; //time space sampled values: Phase A, Current
+            fftData->vImagPhaseAi[i] = 0;  //holder for Img. (Phase values): Phase A, Current
 
-          fullResample->Ia[segOffSet] = t2;
+            fftData->vRealPhaseBv[i] = myADE9078.lastReads.resampledData.Vb[i]; //time space sampled values: Phase B, Voltage
+            fftData->vImagPhaseBv[i] = 0;  //holder for Img. (Phase values): Phase B, Voltage
 
-          //fullResample->Ia[seg+(i*64)] = myADE9078.lastReads.resampledData.Ia[seg];
+            fftData->vRealPhaseBi[i] = myADE9078.lastReads.resampledData.Ib[i]; //time space sampled values: Phase B, Current
+            fftData->vImagPhaseBi[i] = 0;  //holder for Img. (Phase values): Phase B, Current
+
+            fftData->vRealPhaseCv[i] = myADE9078.lastReads.resampledData.Vc[i]; //time space sampled values: Phase C, Voltage
+            fftData->vImagPhaseCv[i] = 0;  //holder for Img. (Phase values): Phase C, Voltage
+
+            fftData->vRealPhaseCi[i] = myADE9078.lastReads.resampledData.Vc[i]; //time space sampled values: Phase C, Current
+            fftData->vImagPhaseCi[i] = 0;  //holder for Img. (Phase values): Phase C, Current
+
+            fftData->vRealPhaseNi[i] = myADE9078.lastReads.resampledData.In[i]; //time space sampled values: Neutral, Current
+            fftData->vImagPhaseNi[i] = 0;  //holder for Img. (Phase values): Neutral, Current
         }
-    }
-	SampleBufferFilled = 1;  //indicate the sampling is complete and the buffer is filled
-	    
-	myADE9078.configureWFB(0); // per datasheet, have to set a certain bit to 0 to restart with stop on full
-    // might need to write 23rd bit in STATUS0 to 0?
 
-    Serial.println("Finished reading from ADE chip.");
-	}
-	
-	//This part needs to be integrated, after the value read-in is complete as resampled, they then need to be copied to the FFT structure which handles the I/O for the FFT
-	   /*Copy Sample Buffer to FFT Processing Handlers*/
-	if (SampleBufferFilled == 1) //if buffer filled, copy samples to FFT input buffer
-	{
-		for(int i=0; i<SAMPLES; i++)
-		{
-		//Copy values read in last sample into the FFT input/Output handler  "Datasource" is a placeholder for the collected sample array
-		vRealPhaseAv[i] = datasource[i]; //time space sampled values: Phase A, Voltage
-		vImagPhaseAv[i] = 0;  //holder for Img. (Phase values): Phase A, Voltage
+        /*Calculate FFT from collected values*/
+        //Phase A
+        //Phase A - Voltage
+        FFT.Windowing(fftData->vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
+        FFT.Compute(fftData->vRealPhaseAv, fftData->vImagPhaseAv, SAMPLES, FFT_FORWARD); //Compute FFT
+        FFT.ComplexToMagnitude(fftData->vRealPhaseAv, fftData->vImagPhaseAv, SAMPLES); //Calculate magnitudes
+        //double peak = FFT.MajorPeak(vReal, SAMPLES, SAMPLING_FREQUENCY);  //return dominant frequency, not needed in this example
 
-		vRealPhaseAi[i] = datasource[i]; //time space sampled values: Phase A, Current
-		vImagPhaseAi[i] = 0;  //holder for Img. (Phase values): Phase A, Current
-
-		vRealPhaseAp[i] = datasource[i]; //time space sampled values: Phase A, Power
-		vImagPhaseAp[i] = 0;  //holder for Img. (Phase values): Phase A, Power
-
-		vRealPhaseBv[i] = datasource[i]; //time space sampled values: Phase B, Voltage
-		vImagPhaseBv[i] = 0;  //holder for Img. (Phase values): Phase B, Voltage
-
-		vRealPhaseBi[i] = datasource[i]; //time space sampled values: Phase B, Current
-		vImagPhaseBi[i] = 0;  //holder for Img. (Phase values): Phase B, Current
-
-		vRealPhaseBp[i] = datasource[i]; //time space sampled values: Phase B, Power
-		vImagPhaseBp[i] = 0;  //holder for Img. (Phase values): Phase B, Power
-
-		vRealPhaseCv[i] = datasource[i]; //time space sampled values: Phase C, Voltage
-		vImagPhaseCv[i] = 0;  //holder for Img. (Phase values): Phase C, Voltage
-
-		vRealPhaseCi[i] = datasource[i]; //time space sampled values: Phase C, Current
-		vImagPhaseCi[i] = 0;  //holder for Img. (Phase values): Phase C, Current
-
-		vRealPhaseCp[i] = datasource[i]; //time space sampled values: Phase C, Power
-		vImagPhaseCp[i] = 0;  //holder for Img. (Phase values): Phase C, Power
-
-		vRealPhaseNv[i] = datasource[i]; //time space sampled values: Neutral, Voltage
-		vImagPhaseNv[i] = 0;  //holder for Img. (Phase values): Neutral, Voltage
-
-		vRealPhaseNi[i] = datasource[i]; //time space sampled values: Neutral, Current
-		vImagPhaseNi[i] = 0;  //holder for Img. (Phase values): Neutral, Current
-
-		vRealPhaseNp[i] = datasource[i]; //time space sampled values: Neutral, Power
-		vImagPhaseNp[i] = 0;  //holder for Img. (Phase values): Neutral, Power
-		 
-			}
-		}
-		SampleBufferFilled = 0; //buffer now filled, ready to process FFT, then begin re-sampling on next loop
-		FFTInputBufferFilled = 1; //data transferred to the input buffer and ready to be processed
-	}
+        //Phase A - Current
+        FFT.Windowing(fftData->vRealPhaseAi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
+        FFT.Compute(fftData->vRealPhaseAi, fftData->vImagPhaseAi, SAMPLES, FFT_FORWARD); //Compute FFT
+        FFT.ComplexToMagnitude(fftData->vRealPhaseAi, fftData->vImagPhaseAi, SAMPLES); //Calculate magnitudes
 
 
-	
-	
-	 
-    /*Calculate FFT from collected values*/
-	if (FFTInputBufferFilled == 1) //check to see if input buffer is filled
-	{
-	//Phase A
-	//Phase A - Voltage
-    FFT.Windowing(FFTDataHolder.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseAv, FFTDataHolder.vImagPhaseAv, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseAv, FFTDataHolder.vImagPhaseAv, SAMPLES); //Calculate magnitudes
-    //double peak = FFT.MajorPeak(vReal, SAMPLES, SAMPLING_FREQUENCY);  //return dominant frequency, not needed in this example
-	
-	//Phase A - Current
-    FFT.Windowing(FFTDataHolder.vRealPhaseAi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseAi, FFTDataHolder.vImagPhaseAi, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseAi, FFTDataHolder.vImagPhaseAi, SAMPLES); //Calculate magnitudes
+        //Phase B
+        //Phase B - Voltage
+        FFT.Windowing(fftData->vRealPhaseBv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
+        FFT.Compute(fftData->vRealPhaseBv, fftData->vImagPhaseBv, SAMPLES, FFT_FORWARD); //Compute FFT
+        FFT.ComplexToMagnitude(fftData->vRealPhaseBv, fftData->vImagPhaseBv, SAMPLES); //Calculate magnitudes
 
-	
-	//Phase A - Power
-    FFT.Windowing(FFTDataHolder.vRealPhaseAp, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseAp, FFTDataHolder.vImagPhaseAp, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseAp, FFTDataHolder.vImagPhaseAp, SAMPLES); //Calculate magnitudes
-	
-	//Phase B
-	//Phase B - Voltage
-	FFT.Windowing(FFTDataHolder.vRealPhaseBv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseBv, FFTDataHolder.vImagPhaseBv, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseBv, FFTDataHolder.vImagPhaseBv, SAMPLES); //Calculate magnitudes
-	
-	//Phase B - Current
-    FFT.Windowing(FFTDataHolder.vRealPhaseBi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseBi, FFTDataHolder.vImagPhaseBi, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseBi, FFTDataHolder.vImagPhaseBi, SAMPLES); //Calculate magnitudes
-
-	
-	//Phase B - Power
-    FFT.Windowing(FFTDataHolder.vRealPhaseBp, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseBp, FFTDataHolder.vImagPhaseBp, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseBp, FFTDataHolder.vImagPhaseBp, SAMPLES); //Calculate magnitudes
-	
-	//Phase C
-	//Phase C - Voltage
-	FFT.Windowing(FFTDataHolder.vRealPhaseCv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseCv, FFTDataHolder.vImagPhaseCv, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseCv, FFTDataHolder.vImagPhaseCv, SAMPLES); //Calculate magnitudes
-	
-	//Phase C - Current
-    FFT.Windowing(FFTDataHolder.vRealPhaseCi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseCi, FFTDataHolder.vImagPhaseCi, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseCi, FFTDataHolder.vImagPhaseCi, SAMPLES); //Calculate magnitudes
-
-	
-	//Phase C - Power
-    FFT.Windowing(FFTDataHolder.vRealPhaseCp, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
-    FFT.Compute(FFTDataHolder.vRealPhaseCp, FFTDataHolder.vImagPhaseCp, SAMPLES, FFT_FORWARD); //Compute FFT
-    FFT.ComplexToMagnitude(FFTDataHolder.vRealPhaseCp, FFTDataHolder.vImagPhaseCp, SAMPLES); //Calculate magnitudes
-	
-	SampleBufferFilled = 0; //prior values read-out complete and processed , prepare to take more values
-	FFTCalculationComplete = 1;  //indicate calculation is complete
-	FFTInputBufferFilled = 0; //inputs now converted to outputs after processing
-	}
-	
-
-//Read out collected values
-	//if (SampleBufferFilled == 1)
-	//{
-    //for (int i=0; i < WFB_ALL_SEGMENTS; ++i)
-   // {
-   //     Serial.print(i);
-  //      Serial.print("Ia, Va, Ib, Vb, Ic, Vc, In: ");
-  //      Serial.print(fullResample->Ia[i]);
-  //      Serial.print(fullResample->Va[i]);
-   //     Serial.print(fullResample->Ib[i]);
-  //      Serial.print(fullResample->Vb[i]);
-  //      Serial.print(fullResample->Ic[i]);
-  //      Serial.print(fullResample->Vc[i]);
-  //      Serial.print(fullResample->In[i]);
-  //      Serial.println();
-  //  }
-  //}
-
-  //print results to serial port at the end of the FFT calculation:
-	if (FFTCalculationComplete == 1)
-	{
-		//Phase A printout
-		//Voltage
-		Serial.print("Av:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseAv[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Current
-		Serial.print("Ai:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseAi[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Power
-		Serial.print("Ai:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseAp[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Phase B printout
-		//Voltage
-		Serial.print("Bv:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseBv[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Current
-		Serial.print("Bi:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseBi[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Power
-		Serial.print("Bi:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseBp[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-			
-		//Phase C printout
-		//Voltage
-		Serial.print("Cv:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseCv[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Current
-		Serial.print("Ci:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseCi[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		//Power
-		Serial.print("Ci:");    //Print out the start character set for the output
-		for(int i=0; i<(SAMPLES/2); i++)
-		{
-			/*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-			 
-			Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-			Serial.print(","); //print the intra-value separator for the ordered pair
-			Serial.print(FFTDataHolder.vRealPhaseCp[i], 1);    //View only this line in serial plotter to visualize the bins
-			Serial.print(";"); //print the inter-value separator between ordered pairs
-		}
-		Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-		
-		FFTCalculationComplete = 0; //readout complete, re-initialize flag
-	}
-	
- 
+        //Phase B - Current
+        FFT.Windowing(fftData->vRealPhaseBi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
+        FFT.Compute(fftData->vRealPhaseBi, fftData->vImagPhaseBi, SAMPLES, FFT_FORWARD); //Compute FFT
+        FFT.ComplexToMagnitude(fftData->vRealPhaseBi, fftData->vImagPhaseBi, SAMPLES); //Calculate magnitudes
 
 
+        //Phase C
+        //Phase C - Voltage
+        FFT.Windowing(fftData->vRealPhaseCv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
+        FFT.Compute(fftData->vRealPhaseCv, fftData->vImagPhaseCv, SAMPLES, FFT_FORWARD); //Compute FFT
+        FFT.ComplexToMagnitude(fftData->vRealPhaseCv, fftData->vImagPhaseCv, SAMPLES); //Calculate magnitudes
+
+        //Phase C - Current
+        FFT.Windowing(fftData->vRealPhaseCi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD); //Initialize the FFT type
+        FFT.Compute(fftData->vRealPhaseCi, fftData->vImagPhaseCi, SAMPLES, FFT_FORWARD); //Compute FFT
+        FFT.ComplexToMagnitude(fftData->vRealPhaseCi, fftData->vImagPhaseCi, SAMPLES); //Calculate magnitudes
+
+
+        //Phase A printout
+        //Voltage
+        Serial.print("Av:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+        /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+        Serial.print(","); //print the intra-value separator for the ordered pair
+        Serial.print(fftData->vRealPhaseAv[i], 1);    //View only this line in serial plotter to visualize the bins
+        Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Current
+        Serial.print("Ai:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+        /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+        Serial.print(","); //print the intra-value separator for the ordered pair
+        Serial.print(fftData->vRealPhaseAi[i], 1);    //View only this line in serial plotter to visualize the bins
+        Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Power
+        Serial.print("Ai:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseAp[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Phase B printout
+        //Voltage
+        Serial.print("Bv:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseBv[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Current
+        Serial.print("Bi:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseBi[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Power
+        Serial.print("Bi:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseBp[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Phase C printout
+        //Voltage
+        Serial.print("Cv:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseCv[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Current
+        Serial.print("Ci:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseCi[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+        }
+        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        //Power
+        Serial.print("Ci:");    //Print out the start character set for the output
+        for(int i=0; i<(SAMPLES/2); i++)
+        {
+            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
+
+            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
+            Serial.print(","); //print the intra-value separator for the ordered pair
+            Serial.print(fftData->vRealPhaseCp[i], 1);    //View only this line in serial plotter to visualize the bins
+            Serial.print(";"); //print the inter-value separator between ordered pairs
+            }
+            Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
+
+        }
 }
