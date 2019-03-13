@@ -1,17 +1,17 @@
 
-#define AVrmsGain 1
-#define AVrmsOffset 0
-#define BVrmsGain 1
-#define BVrmsOffset 0
-#define CVrmsGain 1
-#define CVrmsOffset 0
+#define AVrmsGain 	0.000014186
+#define AVrmsOffset 11.67676
+#define BVrmsGain 	0.000015946
+#define BVrmsOffset 9.09546
+#define CVrmsGain 	0.000014650
+#define CVrmsOffset 4.88559
 
-#define AIrmsGain 1
-#define AIrmsOffset 0
-#define BIrmsGain 1
-#define BIrmsOffset 0
-#define CIrmsGain 1
-#define CIrmsOffset 0
+#define AIrmsGain 	0.000002777
+#define AIrmsOffset -0.22222
+#define BIrmsGain 	0.000003007
+#define BIrmsOffset -0.24061
+#define CIrmsGain 	0.000002777
+#define CIrmsOffset -0.20833
 
 #define AWattHrGain 1
 #define AWattHrOffset 0
