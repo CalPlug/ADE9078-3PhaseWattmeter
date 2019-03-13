@@ -242,11 +242,11 @@ void load_data_allfields() //load the data field by field into the RAM holders -
 
 
 /*Function declerations*/
-void ADE9000_calibrate();
-void ADE9000_iGain_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, int);     //Current gain calibration function
-void ADE9000_vGain_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, int);     //Voltage gain calibration function
-void ADE9000_pGain_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, float);   //Power gain calibration function
-void ADE9000_phase_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, int);     //Phase calibration function
+void ADE9078_calibrate();
+void ADE9078_iGain_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, int);     //Current gain calibration function
+void ADE9078_vGain_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, int);     //Voltage gain calibration function
+void ADE9078_pGain_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, float);   //Power gain calibration function
+void ADE9078_phase_calibrate(int32_t *,int32_t *,int32_t *,int32_t *, int);     //Phase calibration function
 void calibrationEnergyRegisterSetup();                                          //Setup of Energy registers used in calibration. Donot Edit
 void getPGA_gain();
 int8_t isRegisterPositive(int32_t);
@@ -287,14 +287,14 @@ int32_t accumulatedActiveEnergy_registers[EGY_REG_SIZE];
 int32_t accumulatedReactiveEnergy_registers[EGY_REG_SIZE];
 uint32_t calibrationDataToEEPROM[CALIBRATION_CONSTANTS_ARRAY_SIZE];
 
-ADE9000Class ade9000;
-#define SPI_SPEED 5000000
-#define CS_PIN 8
-#define PM_1 4
+ADE9078 ade9078;
+#define local_SPI_freq 1000000
+#define local_SS 10
 #define IRQ0_INTERRUPT_PIN 2
 #define INT_MODE FALLING
 #define ACCUMULATION_TIME 5                 //accumulation time in seconds when EGY_TIME=7999, accumulation mode= sample based
 #define EGY_INTERRUPT_MASK0 0x00000001      //Enable EGYRDY interrupt
+
 
 enum CAL_STATE
 {
@@ -311,28 +311,29 @@ enum CAL_STATE
 
 CAL_STATE CUR_STATE = CAL_START;   //current state is start
 
+struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
+
+ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
+
 void setup() {
-  
-  pinMode(PM_1, OUTPUT);    //Set PM1 select pin as output 
-  digitalWrite(PM_1, LOW);   //Set PM1 select pin high 
-  delay(1000);
+
   Serial.begin(115200);
-  ade9000.SPI_Init(SPI_SPEED,CS_PIN);
-  ade9000.SetupADE9000();       /*Setup ADE9000. The setup parameters such as 
+  delay(200);
+  myADE9078.initialize();       /*Setup ADE9078. Refer to ADE9078.cpp file for detail. 
                                 GAIN should not be changed after calibration. Recalibrate if any configuration affecting the digital datapath changes.*/
   calibrationEnergyRegisterSetup();
   getPGA_gain();  
-  Wire.begin(); 
-  ade9000.writeByteToEeprom(ADDR_EEPROM_WRITTEN_BYTE,~(EEPROM_WRITTEN)); //clear calibration done status 
+  //Wire.begin(); 
+  //myADE9078.writeByteToEeprom(ADDR_EEPROM_WRITTEN_BYTE,~(EEPROM_WRITTEN)); //clear calibration done status 
 }
 
 void loop()
 {
   delay(1000);
-  ADE9000_calibrate();
+  ADE9078_calibrate();
 }
 
-void ADE9000_calibrate()
+void ADE9078_calibrate()
 {
   float calPf ;  
   int16_t temp;
@@ -443,8 +444,8 @@ void ADE9000_calibrate()
       break;
     
       case CAL_VI_CALIBRATE:   //Calibrate
-      ADE9000_iGain_calibrate(&xIgain_registers[calChannel],&xIgain_register_address[calChannel], &xIrms_registers[calChannel], &xIrms_registers_address[calChannel], channelCalLength);       //Calculate xIGAIN
-      ADE9000_vGain_calibrate(&xVgain_registers[calChannel], &xVgain_register_address[calChannel], &xVrms_registers[calChannel], &xVrms_registers_address[calChannel], channelCalLength);       //Calculate xVGAIN
+      ADE9078_iGain_calibrate(&xIgain_registers[calChannel],&xIgain_register_address[calChannel], &xIrms_registers[calChannel], &xIrms_registers_address[calChannel], channelCalLength);       //Calculate xIGAIN
+      ADE9078_vGain_calibrate(&xVgain_registers[calChannel], &xVgain_register_address[calChannel], &xVrms_registers[calChannel], &xVrms_registers_address[calChannel], channelCalLength);       //Calculate xVGAIN
       Serial.println("Current gain calibration completed");
       Serial.println("Voltage gain calibration completed");
       CUR_STATE=CAL_PHASE_CALIBRATE;
@@ -464,7 +465,7 @@ void ADE9000_calibrate()
             if(serialReadData == 'Y' || serialReadData == 'y')
               {
                while(Serial.read()>=0); //Flush any extra characters            
-                ADE9000_Phase_calibrate(&xPhcal_registers[calChannel],&xPhcal_register_address[calChannel], &accumulatedActiveEnergy_registers[calChannel], &accumulatedReactiveEnergy_registers[calChannel], channelCalLength);     //Calculate xPHCAL
+                ADE9078_phase_calibrate(&xPhcal_registers[calChannel],&xPhcal_register_address[calChannel], &accumulatedActiveEnergy_registers[calChannel], &accumulatedReactiveEnergy_registers[calChannel], channelCalLength);     //Calculate xPHCAL
                Serial.println("Phase calibration completed");
               }
             else 
@@ -527,14 +528,14 @@ void ADE9000_calibrate()
           }
   
         }      
-      ADE9000_pGain_calibrate(&xPgain_registers[calChannel],&xPgain_register_address[calChannel],&accumulatedActiveEnergy_registers[calChannel],channelCalLength, calPf);
+      ADE9078_pGain_calibrate(&xPgain_registers[calChannel],&xPgain_register_address[calChannel],&accumulatedActiveEnergy_registers[calChannel],channelCalLength, calPf);
       Serial.println("Power gain calibration completed ");
       Serial.println("Calibration completed. Storing calibration constants to EEPROM ");
       CUR_STATE = CAL_STORE;      
       break; 
     
       case CAL_STORE:     //Store Constants to EEPROM
-      storeCalConstToEEPROM();
+      //storeCalConstToEEPROM();
       Serial.println("Calibration constants successfully stored in EEPROM. Exit Application");
       CUR_STATE = CAL_COMPLETE; 
       break;
@@ -560,7 +561,7 @@ void ADE9000_calibrate()
 }
 
 
-void ADE9000_iGain_calibrate(int32_t *igainReg, int32_t *igainRegAddress, int32_t *iRmsReg, int32_t *iRmsRegAddress, int arraySize)
+void ADE9078_iGain_calibrate(int32_t *igainReg, int32_t *igainRegAddress, int32_t *iRmsReg, int32_t *iRmsRegAddress, int arraySize)
 {
   float temp;
   int32_t actualCodes;
@@ -569,13 +570,13 @@ void ADE9000_iGain_calibrate(int32_t *igainReg, int32_t *igainRegAddress, int32_
   int32_t aigain;
   int i;
 
-  temp=ADE9000_RMS_FULL_SCALE_CODES*CURRENT_TRANSFER_FUNCTION*calCurrentPGA_gain*NOMINAL_INPUT_CURRENT *sqrt(2); 
+  temp=ADE9078_RMS_FULL_SCALE_CODES*CURRENT_TRANSFER_FUNCTION*calCurrentPGA_gain*NOMINAL_INPUT_CURRENT *sqrt(2); 
   expectedCodes= (int32_t) temp;  //Round off 
   Serial.print("Expected IRMS Code: "); 
   Serial.println(expectedCodes,HEX);
   for (i=0; i < arraySize ;i++)
     {
-      actualCodes = ade9000.SPI_Read_32(iRmsRegAddress[i]);
+      actualCodes = myADE9078.spiRead32(iRmsRegAddress[i]);
       temp= (((float)expectedCodes/(float)actualCodes)-1)* 134217728;  //calculate the gain.
       igainReg[i] = (int32_t) temp; //Round off
       Serial.print("Channel ");
@@ -587,7 +588,7 @@ void ADE9000_iGain_calibrate(int32_t *igainReg, int32_t *igainRegAddress, int32_
     }
 }
 
-void ADE9000_vGain_calibrate(int32_t *vgainReg, int32_t *vgainRegAddress, int32_t *vRmsReg, int32_t *vRmsRegAddress, int arraySize)
+void ADE9078_vGain_calibrate(int32_t *vgainReg, int32_t *vgainRegAddress, int32_t *vRmsReg, int32_t *vRmsRegAddress, int arraySize)
 {
   float temp;
   int32_t actualCodes;
@@ -595,13 +596,13 @@ void ADE9000_vGain_calibrate(int32_t *vgainReg, int32_t *vgainRegAddress, int32_
   int32_t registerReading;
   int i;
   
-  temp=ADE9000_RMS_FULL_SCALE_CODES*VOLTAGE_TRANSFER_FUNCTION*calVoltagePGA_gain*NOMINAL_INPUT_VOLTAGE*sqrt(2); 
+  temp=ADE9078_RMS_FULL_SCALE_CODES*VOLTAGE_TRANSFER_FUNCTION*calVoltagePGA_gain*NOMINAL_INPUT_VOLTAGE*sqrt(2); 
   expectedCodes= (int32_t) temp;  //Round off
   Serial.print("Expected VRMS Code: "); 
   Serial.println(expectedCodes,HEX);  
   for (i=0; i < arraySize ;i++)
     {
-      actualCodes = ade9000.SPI_Read_32(vRmsRegAddress[i]);
+      actualCodes = myADE9078.spiRead32(vRmsRegAddress[i]);
       temp= (((float)expectedCodes/(float)actualCodes)-1)* 134217728;  //calculate the gain.
       vgainReg[i] = (int32_t) temp; //Round off  
       Serial.print("Channel ");
@@ -613,7 +614,7 @@ void ADE9000_vGain_calibrate(int32_t *vgainReg, int32_t *vgainRegAddress, int32_
     }
 }
 
-void ADE9000_Phase_calibrate(int32_t *phcalReg,int32_t *phcalRegAddress,int32_t *accActiveEgyReg,int32_t *accReactiveEgyReg, int arraySize)
+void ADE9078_phase_calibrate(int32_t *phcalReg,int32_t *phcalRegAddress,int32_t *accActiveEgyReg,int32_t *accReactiveEgyReg, int arraySize)
 {
   Serial.println("Computing phase calibration registers..."); 
   delay((ACCUMULATION_TIME+1)*1000); //delay to ensure the energy registers are accumulated for defined interval
@@ -656,7 +657,7 @@ void ADE9000_Phase_calibrate(int32_t *phcalReg,int32_t *phcalRegAddress,int32_t 
 
 }
 
-void ADE9000_pGain_calibrate(int32_t *pgainReg, int32_t *pgainRegAddress, int32_t *accActiveEgyReg, int arraySize, float pGaincalPF)
+void ADE9078_pGain_calibrate(int32_t *pgainReg, int32_t *pgainRegAddress, int32_t *accActiveEgyReg, int arraySize, float pGaincalPF)
 {
   Serial.println("Computing power gain calibration registers...");
   delay((ACCUMULATION_TIME+1)*1000); //delay to ensure the energy registers are accumulated for defined interval
@@ -664,7 +665,7 @@ void ADE9000_pGain_calibrate(int32_t *pgainReg, int32_t *pgainRegAddress, int32_
   int32_t actualActiveEnergyCode;
   int i;
   float temp;
-  temp = ((float)ADE90xx_FDSP * (float)NOMINAL_INPUT_VOLTAGE * (float)NOMINAL_INPUT_CURRENT * (float)CALIBRATION_ACC_TIME * (float)CURRENT_TRANSFER_FUNCTION *(float)calCurrentPGA_gain* (float)VOLTAGE_TRANSFER_FUNCTION *(float)calVoltagePGA_gain* (float)ADE9000_WATT_FULL_SCALE_CODES * 2 * (float)(pGaincalPF))/(float)(8192);
+  temp = ((float)ADE90xx_FDSP * (float)NOMINAL_INPUT_VOLTAGE * (float)NOMINAL_INPUT_CURRENT * (float)CALIBRATION_ACC_TIME * (float)CURRENT_TRANSFER_FUNCTION *(float)calCurrentPGA_gain* (float)VOLTAGE_TRANSFER_FUNCTION *(float)calVoltagePGA_gain* (float)ADE9078_WATT_FULL_SCALE_CODES * 2 * (float)(pGaincalPF))/(float)(8192);
   expectedActiveEnergyCode = (int32_t)temp;
   Serial.print("Expected Active Energy Code: "); 
   Serial.println(expectedActiveEnergyCode,HEX);    
@@ -687,13 +688,13 @@ void ADE9000_pGain_calibrate(int32_t *pgainReg, int32_t *pgainRegAddress, int32_
 void calibrationEnergyRegisterSetup()
 {
   uint16_t epcfgRegister;
-  ade9000.SPI_Write_32(MASK0_32,EGY_INTERRUPT_MASK0);   //Enable EGYRDY interrupt
-  ade9000.SPI_Write_16(EGY_TIME_16,EGYACCTIME);   //accumulate EGY_TIME+1 samples (8000 = 1sec)
-  epcfgRegister =  ade9000.SPI_Read_16(EP_CFG_16);   //Read EP_CFG register
+  myADE9078.spiWrite32(MASK0_32,EGY_INTERRUPT_MASK0);   //Enable EGYRDY interrupt
+  myADE9078.spiWrite16(EGY_TIME_16,EGYACCTIME);   //accumulate EGY_TIME+1 samples (8000 = 1sec)
+  epcfgRegister =  myADE9078.spiRead16(EP_CFG_16);   //Read EP_CFG register
   epcfgRegister |= CALIBRATION_EGY_CFG;                //Write the settings and enable accumulation
-  ade9000.SPI_Write_16(EP_CFG_16,epcfgRegister);
+  myADE9078.spiWrite16(EP_CFG_16,epcfgRegister);
   delay(2000); 
-  ade9000.SPI_Write_32(STATUS0_32,0xFFFFFFFF);
+  myADE9078.spiWrite32(STATUS0_32,0xFFFFFFFF);
   attachInterrupt(digitalPinToInterrupt(IRQ0_INTERRUPT_PIN),updateEnergyRegisterFromInterrupt,INT_MODE);   
 }
 
@@ -702,7 +703,7 @@ void getPGA_gain()
 {
   int16_t pgaGainRegister;
   int16_t temp;  
-  pgaGainRegister = ade9000.SPI_Read_16(PGA_GAIN_16);  //Ensure PGA_GAIN is set correctly in SetupADE9000 function.
+  pgaGainRegister = myADE9078.spiRead16(PGA_GAIN_16);  //Ensure PGA_GAIN is set correctly in SetupADE9000 function.
   Serial.print("PGA Gain Register is: ");
   Serial.println(pgaGainRegister,HEX);
   temp =    pgaGainRegister & (0x0003);  //extract gain of current channel
@@ -776,17 +777,17 @@ void storeCalConstToEEPROM()
      
   for(i=0;i<CALIBRATION_CONSTANTS_ARRAY_SIZE;i++)
      {
-       ade9000.writeWordToEeprom(ADE9000_Eeprom_CalibrationRegAddress[i],calibrationDataToEEPROM[i]);
+       myADE9078.writeWordToEeprom(ADE9000_Eeprom_CalibrationRegAddress[i],calibrationDataToEEPROM[i]);
        delay(10);         
      }
   for(i=0;i<CALIBRATION_CONSTANTS_ARRAY_SIZE;i++)
      {
-       temp= ade9000.readWordFromEeprom(ADE9000_Eeprom_CalibrationRegAddress[i]);
+       temp= myADE9078.readWordFromEeprom(ADE9000_Eeprom_CalibrationRegAddress[i]);
        delay(10);
        Serial.println(temp,HEX);         
      }      
-  ade9000.writeWordToEeprom(ADDR_CHECKSUM_EEPROM,checksum);           //Save checksum to EEPROM
-  ade9000.writeByteToEeprom(ADDR_EEPROM_WRITTEN_BYTE,EEPROM_WRITTEN); //Save calibration status in EEPROM      
+  myADE9078.writeWordToEeprom(ADDR_CHECKSUM_EEPROM,checksum);           //Save checksum to EEPROM
+  myADE9078.writeByteToEeprom(ADDR_EEPROM_WRITTEN_BYTE,EEPROM_WRITTEN); //Save calibration status in EEPROM      
 
              
 }
@@ -805,15 +806,15 @@ void updateEnergyRegisterFromInterrupt()
   static int32_t intermediateActiveEgy_Reg[EGY_REG_SIZE]={0};
   static int32_t intermediateReactiveEgy_Reg[EGY_REG_SIZE]={0};
   uint32_t temp;
-  temp = ade9000.SPI_Read_32(STATUS0_32);
+  temp = myADE9078.spiRead32(STATUS0_32);
   temp&=EGY_INTERRUPT_MASK0;
   if (temp==EGY_INTERRUPT_MASK0)
   {
-      ade9000.SPI_Write_32(STATUS0_32,0xFFFFFFFF);
+      myADE9078.spiWrite32(STATUS0_32,0xFFFFFFFF);
       for(i=0;i<EGY_REG_SIZE;i++)
       {
-        intermediateActiveEgy_Reg[i]+=ade9000.SPI_Read_32(xWATTHRHI_registers_address[i]);  //accumulate the registers
-        intermediateReactiveEgy_Reg[i]+=ade9000.SPI_Read_32(xVARHRHI_registers_address[i]);   //accumulate the registers
+        intermediateActiveEgy_Reg[i]+=myADE9078.spiRead32(xWATTHRHI_registers_address[i]);  //accumulate the registers
+        intermediateReactiveEgy_Reg[i]+=myADE9078.spiRead32(xVARHRHI_registers_address[i]);   //accumulate the registers
       }
     
       if (count == (ACCUMULATION_TIME-1))  //if the accumulation time is reached, update the final values to registers
