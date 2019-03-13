@@ -43,17 +43,11 @@ struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
 		double vRealPhaseAi[SAMPLES]; //holder for Real (frequency values): Phase A, Current
 		double vImagPhaseAi[SAMPLES];  //holder for Img. (Phase values): Phase A, Current
 
-		double vRealPhaseAp[SAMPLES]; //holder for Real (frequency values): Phase A, Power
-		double vImagPhaseAp[SAMPLES];  //holder for Img. (Phase values): Phase A, Power
-
 		double vRealPhaseBv[SAMPLES]; //holder for Real (frequency values): Phase B, Voltage
 		double vImagPhaseBv[SAMPLES];  //holder for Img. (Phase values): Phase B, Voltage
 
 		double vRealPhaseBi[SAMPLES]; //holder for Real (frequency values): Phase B, Current
 		double vImagPhaseBi[SAMPLES];  //holder for Img. (Phase values): Phase B, Current
-
-		double vRealPhaseBp[SAMPLES]; //holder for Real (frequency values): Phase B, Power
-		double vImagPhaseBp[SAMPLES];  //holder for Img. (Phase values): Phase B, Power
 
 		double vRealPhaseCv[SAMPLES]; //holder for Real (frequency values): Phase C, Voltage
 		double vImagPhaseCv[SAMPLES];  //holder for Img. (Phase values): Phase C, Voltage
@@ -61,17 +55,8 @@ struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
 		double vRealPhaseCi[SAMPLES]; //holder for Real (frequency values): Phase C, Current
 		double vImagPhaseCi[SAMPLES];  //holder for Img. (Phase values): Phase C, Current
 
-		double vRealPhaseCp[SAMPLES]; //holder for Real (frequency values): Phase C, Power
-		double vImagPhaseCp[SAMPLES];  //holder for Img. (Phase values): Phase C, Power
-
-		double vRealPhaseNv[SAMPLES]; //holder for Real (frequency values): Neutral, Voltage
-		double vImagPhaseNv[SAMPLES];  //holder for Img. (Phase values): Neutral, Voltage
-
 		double vRealPhaseNi[SAMPLES]; //holder for Real (frequency values): Neutral, Current
 		double vImagPhaseNi[SAMPLES];  //holder for Img. (Phase values): Neutral, Current
-
-		double vRealPhaseNp[SAMPLES]; //holder for Real (frequency values): Neutral, Power
-		double vImagPhaseNp[SAMPLES];  //holder for Img. (Phase values): Neutral, Power
 };
 
 
@@ -242,19 +227,6 @@ void loop() {
         }
         Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
 
-        //Power
-        Serial.print("Ai:");    //Print out the start character set for the output
-        for(int i=0; i<(SAMPLES/2); i++)
-        {
-            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-
-            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-            Serial.print(","); //print the intra-value separator for the ordered pair
-            Serial.print(fftData->vRealPhaseAp[i], 1);    //View only this line in serial plotter to visualize the bins
-            Serial.print(";"); //print the inter-value separator between ordered pairs
-        }
-        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-
         //Phase B printout
         //Voltage
         Serial.print("Bv:");    //Print out the start character set for the output
@@ -278,19 +250,6 @@ void loop() {
             Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
             Serial.print(","); //print the intra-value separator for the ordered pair
             Serial.print(fftData->vRealPhaseBi[i], 1);    //View only this line in serial plotter to visualize the bins
-            Serial.print(";"); //print the inter-value separator between ordered pairs
-        }
-        Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-
-        //Power
-        Serial.print("Bi:");    //Print out the start character set for the output
-        for(int i=0; i<(SAMPLES/2); i++)
-        {
-            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-
-            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-            Serial.print(","); //print the intra-value separator for the ordered pair
-            Serial.print(fftData->vRealPhaseBp[i], 1);    //View only this line in serial plotter to visualize the bins
             Serial.print(";"); //print the inter-value separator between ordered pairs
         }
         Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
@@ -321,19 +280,6 @@ void loop() {
             Serial.print(";"); //print the inter-value separator between ordered pairs
         }
         Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
-
-        //Power
-        Serial.print("Ci:");    //Print out the start character set for the output
-        for(int i=0; i<(SAMPLES/2); i++)
-        {
-            /*View all these three lines in serial terminal to see which frequencies has which amplitudes*/
-
-            Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1); //print the frequency value
-            Serial.print(","); //print the intra-value separator for the ordered pair
-            Serial.print(fftData->vRealPhaseCp[i], 1);    //View only this line in serial plotter to visualize the bins
-            Serial.print(";"); //print the inter-value separator between ordered pairs
-            }
-            Serial.print("$");    //Use the "$" character followed by a LF as the end character for a line of data
 
         }
 }
