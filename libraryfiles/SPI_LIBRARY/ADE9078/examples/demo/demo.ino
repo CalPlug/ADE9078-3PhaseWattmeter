@@ -258,7 +258,7 @@ void setup() {
   delay(200);
     myADE9078.initialize(); //Call initialization of the ADE9078 withe default configuration plus options specified
 	//EEPROMInit()  //call only once on a virgin chip to "partition" EEPROM for the input type expected moving forward
-	//load_data_allfields();  //load EEPROM values 
+	//load_data_allfields();  //load EEPROM values
 
 }
 
@@ -329,40 +329,40 @@ void loop() {
   // Serial.println(IrmsC);
   // delay(10);
 
-  wattHoursA = myADE9078.readWattHoursA();
-  Serial.print("WattHoursA: ");
-  Serial.println(wattHoursA);
-  delay(10);
-
-  apparentPowerA = myADE9078.getInstApparentPowerA();
-  Serial.print("Apparent Power A (mW): ");
-  Serial.println(apparentPowerA);
-  delay(10);
-
-  apparentPowerB = myADE9078.getInstApparentPowerB();
-  Serial.print("Apparent Power B (mW): ");
-  Serial.println(apparentPowerB);
-  delay(10);
-
-  apparentPowerC = myADE9078.getInstApparentPowerC();
-  Serial.print("Apparent Power C (mW): ");
-  Serial.println(apparentPowerC);
-  delay(10);
-
-  activePowerA = myADE9078.getInstActivePowerA();
-  Serial.print("Active Power A (mW): ");
-  Serial.println(activePowerA);
-  delay(10);
-
-  activePowerB = myADE9078.getInstActivePowerB();
-  Serial.print("Active Power B (mW): ");
-  Serial.println(activePowerB);
-  delay(10);
-
-  activePowerC = myADE9078.getInstActivePowerC();
-  Serial.print("Active Power C (mW): ");
-  Serial.println(activePowerC);
-  delay(10);
+  // wattHoursA = myADE9078.readWattHoursA();
+  // Serial.print("WattHoursA: ");
+  // Serial.println(wattHoursA);
+  // delay(10);
+  //
+  // apparentPowerA = myADE9078.getInstApparentPowerA();
+  // Serial.print("Apparent Power A (mW): ");
+  // Serial.println(apparentPowerA);
+  // delay(10);
+  //
+  // apparentPowerB = myADE9078.getInstApparentPowerB();
+  // Serial.print("Apparent Power B (mW): ");
+  // Serial.println(apparentPowerB);
+  // delay(10);
+  //
+  // apparentPowerC = myADE9078.getInstApparentPowerC();
+  // Serial.print("Apparent Power C (mW): ");
+  // Serial.println(apparentPowerC);
+  // delay(10);
+  //
+  // activePowerA = myADE9078.getInstActivePowerA();
+  // Serial.print("Active Power A (mW): ");
+  // Serial.println(activePowerA);
+  // delay(10);
+  //
+  // activePowerB = myADE9078.getInstActivePowerB();
+  // Serial.print("Active Power B (mW): ");
+  // Serial.println(activePowerB);
+  // delay(10);
+  //
+  // activePowerC = myADE9078.getInstActivePowerC();
+  // Serial.print("Active Power C (mW): ");
+  // Serial.println(activePowerC);
+  // delay(10);
 
   reactivePowerA = myADE9078.getInstReactivePowerA();
   Serial.print("Reactive Power A (mW): ");

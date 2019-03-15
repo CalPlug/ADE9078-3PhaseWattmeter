@@ -30,7 +30,7 @@ Copyright (C) The Regents of the University of California, 2019
 
 //Debug Control:
 //#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output that can challenge device memory!  Reported bytes are typically in HEX
-#define ADE9078_Calibration //Shows the output of the type cast functions to allow the raw values to be seen - very helpful in calibration
+//#define ADE9078_Calibration //Shows the output of the type cast functions to allow the raw values to be seen - very helpful in calibration
 #define ADE9078_CRC_Output //Used to output debug information for the CRC check functions
 
 
@@ -142,7 +142,7 @@ public:
     void spiBurstResampledWFB(uint16_t);
     void configureWFB(int begin);
     bool isDoneSampling();
-    
+
     uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
     uint16_t spiRead16(uint16_t address);  // Read, inbound function: address
     uint32_t spiRead32(uint16_t address);  // Read, inbound function: address
