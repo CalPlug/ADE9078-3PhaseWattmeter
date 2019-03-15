@@ -218,6 +218,9 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
+
+
+
 void setup() {
 
 	//Need to add:
@@ -273,22 +276,59 @@ void loop() {
   double activePowerA, activePowerB, activePowerC;
 
 
-  Serial.print("Version_16: ");
-  Serial.println(myADE9078.getVersion()); // PHNOLOAD_32
-  delay(20);
+  //Serial.print("Version_16: ");
+  //Serial.println(myADE9078.getVersion()); // PHNOLOAD_32
+  //delay(20);
 
-  Serial.print("PHNOLOAD_32: ");
-  Serial.println(myADE9078.getPHNOLOAD()); // PHNOLOAD_32
-  delay(20);
+  //Serial.print("PHNOLOAD_32: ");
+  //Serial.println(myADE9078.getPHNOLOAD()); // PHNOLOAD_32
+  //delay(20);
 
-  myADE9078.readVrms();
-  Serial.print("A, B, C rms (V): ");
-  Serial.print(myADE9078.lastReads.vrms.a);
-  Serial.print(" ");
-  Serial.print(myADE9078.lastReads.vrms.b);
-  Serial.print(" ");
-  Serial.print(myADE9078.lastReads.vrms.c);
-  Serial.print(" ");
+  int32_t VrmsStorageA[64] = {};
+  int32_t VrmsStorageB[64] = {};
+  int32_t VrmsStorageC[64] = {};
+
+  for (int i=0; i < 64; ++i)
+  {
+      myADE9078.readVrms();
+      VrmsStorageA[i] = myADE9078.lastReads.vrms.a;
+      VrmsStorageB[i] = myADE9078.lastReads.vrms.b;
+      VrmsStorageC[i] = myADE9078.lastReads.vrms.c;
+  }
+
+  Serial.print("Av:");
+  for (int i=0; i<64; ++i)
+  {
+      Serial.print(VrmsStorageA[i]);
+      Serial.print(",");
+  }
+  Serial.println("$");
+
+  Serial.print("Bv:");
+  for (int i=0; i<64; ++i)
+  {
+      Serial.print(VrmsStorageB[i]);
+      Serial.print(",");
+  }
+  Serial.println("$");
+
+  // Serial.print("Cv:");
+  // for (int i=0; i<64; ++i)
+  // {
+  //     Serial.print(VrmsStorageC[i]);
+  //     Serial.print(",");
+  // }
+  //  Serial.println("$");
+
+  // myADE9078.readVrms();
+  // Serial.print("A, B, C rms (V): ");
+  // Serial.print(myADE9078.lastReads.vrms.a);
+  // Serial.print(" ");
+  // Serial.print(myADE9078.lastReads.vrms.b);
+  // Serial.print(" ");
+  // Serial.print(myADE9078.lastReads.vrms.c);
+  // Serial.print(" ");
+
 
   // AvRMS = myADE9078.getAVrms();
   // Serial.print("AVrms (V): ");
@@ -305,14 +345,14 @@ void loop() {
   // Serial.println(BvRMS);
   // delay(10);
 
-  myADE9078.readIrms();
-  Serial.print("A, B, C rms (I): ");
-  Serial.print(myADE9078.lastReads.irms.a);
-  Serial.print(" ");
-  Serial.print(myADE9078.lastReads.irms.b);
-  Serial.print(" ");
-  Serial.print(myADE9078.lastReads.irms.c);
-  Serial.print(" ");
+  //myADE9078.readIrms();
+  //Serial.print("A, B, C rms (I): ");
+  //Serial.print(myADE9078.lastReads.irms.a);
+  //Serial.print(" ");
+  //Serial.print(myADE9078.lastReads.irms.b);
+  //Serial.print(" ");
+  //Serial.print(myADE9078.lastReads.irms.c);
+  //Serial.print(" ");
 
   // IrmsA = myADE9078.getIrmsA();
   // Serial.print("IrmsA (mA): ");
@@ -364,20 +404,20 @@ void loop() {
   // Serial.println(activePowerC);
   // delay(10);
 
-  reactivePowerA = myADE9078.getInstReactivePowerA();
-  Serial.print("Reactive Power A (mW): ");
-  Serial.println(reactivePowerA);
-  delay(10);
+  //reactivePowerA = myADE9078.getInstReactivePowerA();
+  //Serial.print("Reactive Power A (mW): ");
+  //Serial.println(reactivePowerA);
+  //delay(10);
 
-  reactivePowerB = myADE9078.getInstReactivePowerB();
-  Serial.print("Reactive Power B (mW): ");
-  Serial.println(reactivePowerA);
-  delay(10);
+  //reactivePowerB = myADE9078.getInstReactivePowerB();
+  //Serial.print("Reactive Power B (mW): ");
+  //Serial.println(reactivePowerA);
+  //delay(10);
 
-  reactivePowerC = myADE9078.getInstReactivePowerC();
-  Serial.print("Reactive Power C (mW): ");
-  Serial.println(reactivePowerA);
-  delay(10);
+  //reactivePowerC = myADE9078.getInstReactivePowerC();
+  //Serial.print("Reactive Power C (mW): ");
+  //Serial.println(reactivePowerA);
+  //delay(10);
 
-  delay(1000); //Delay before repeating the loop
+  //delay(1000); //Delay before repeating the loop
 }
