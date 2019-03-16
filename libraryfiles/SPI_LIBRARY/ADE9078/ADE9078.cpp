@@ -408,9 +408,11 @@ void ADE9078::initialize(){
   // Page 56 of datasheet quick start
   // #1: Ensure power sequence completed
   delay(30);
-  if (!checkBit((int)read32BitAndScale(STATUS1_32), 16)) {
-    Serial.println("WARNING, POWER UP MAY NOT BE FINISHED");
-  }
+
+  // Is always printing right now. Might be an issue?
+  // if (!checkBit((int)read32BitAndScale(STATUS1_32), 16)) {
+  //   Serial.println("WARNING, POWER UP MAY NOT BE FINISHED");
+  // }
    // #2: Configure Gains
    spiWrite32(APGAIN_32, is->powerAGain);
    spiWrite32(BPGAIN_32, is->powerBGain);
@@ -501,12 +503,22 @@ bool ADE9078::isDoneSampling()
 /* Burst read, resampled waveform */
 void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 {
-
-  SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+	Serial.print("Begin BurstResample | ");
+  	SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 	digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
 
-  SPI.transfer16(((startingAddress << 4) & 0xFFF0)+8);  //Send the starting address, read mode
+	Serial.print("StartingAddress: ");
+	Serial.print(startingAddress, HEX);
+	Serial.print(" | ");
+	Serial.print("Transfering commandheader: ");
+	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
+	Serial.print(commandHeader, HEX);
+	Serial.print(" | ");
+	SPI.transfer16(commandHeader);
+  	//SPI.transfer16(((startingAddress << 4) & 0xFFF0)+8);  //Send the starting address, read mode
 
+
+	Serial.print("Begin forloop");
 	for(int i=0; i < WFB_RESAMPLE_SEGMENTS; i++)
 	{
 		  lastReads.resampledData.Ia[i] = SPI.transfer16(0);
@@ -518,6 +530,7 @@ void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 		  lastReads.resampledData.In[i] = SPI.transfer16(0);
       // no transfer16 here for the space? if it doesnt work, maybe add
 	}
+	Serial.println("End for loop");
 
 	digitalWrite(_SS, HIGH);  //Enable data transfer by bringing SS line LOW
 	SPI.endTransaction();
