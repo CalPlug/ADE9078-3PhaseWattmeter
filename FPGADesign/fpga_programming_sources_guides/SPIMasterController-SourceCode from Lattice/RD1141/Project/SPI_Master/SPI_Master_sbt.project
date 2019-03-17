@@ -1,0 +1,57 @@
+[Project]
+Version=Lattice Semiconductor Corporation iCEcube - Release: 2012.06.21457 - Build Date: Jul 24 2012 16:06:18
+ProjectName=SPI_Master
+Vendor=SiliconBlue
+ProjectVFiles=../../source/VHDL/asyn_fifo.vhd,../../source/VHDL/gray_counter.vhd,../../source/VHDL/sclk_gen.vhd,../../source/VHDL/spi_data_path.vhd,../../source/VHDL/spi_master.vhd,../../source/Verilog/SPI_Master_top.v
+ProjectCFiles=
+CurImplementation=SPI_Master_Implmnt
+Implementations=SPI_Master_Implmnt
+StartFromSynthesis=yes
+IPGeneration=false
+
+[SPI_Master_Implmnt]
+DeviceFamily=iCE40
+Device=LP1K
+DevicePackage=CM121
+DevicePower=
+NetlistFile=SPI_Master_Implmnt/SPI_Master.edf
+AdditionalEDIFFile=
+IPEDIFFile=
+DesignLib=SPI_Master_Implmnt/sbt/netlist/oadb-SPI_Master_top
+DesignView=_rt
+DesignCell=SPI_Master_top
+SynthesisSDCFile=SPI_Master_Implmnt/SPI_Master.scf
+UserPinConstraintFile=
+UserSDCFile=
+PhysicalConstraintFile=
+BackendImplPathName=
+Devicevoltage=1.14
+DevicevoltagePerformance=+/-5%(datasheet default)
+DeviceTemperature=70
+TimingAnalysisBasedOn=Worst
+OperationRange=Commercial
+TypicalCustomTemperature=25
+WorstCustomTemperature=70
+BestCustomTemperature=0
+IOBankVoltages=topBank,2.5 bottomBank,2.5 leftBank,2.5 rightBank,2.5
+derValue=1.51644
+TimingPathNumberStick=0
+
+[tool options]
+PlacerEffortLevel=std
+PlacerAutoLutCascade=yes
+PlacerAutoRamCascade=yes
+PlacerPowerDriven=no
+RouteWithTimingDriven=yes
+RouteWithPinPermutation=yes
+BitmapSPIFlashMode=yes
+BitmapRAM4KInit=yes
+BitmapInitRamBank=1111
+BitmapOscillatorFR=low
+BitmapEnableWarmBoot=yes
+BitmapSetSecurity=no
+BitmapSetNoUsedIONoPullup=no
+FloorPlannerShowFanInNets=yes
+FloorPlannerShowFanOutNets=yes
+HookTo3rdPartyTextEditor=
+
