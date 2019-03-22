@@ -9043,12 +9043,12 @@ Source: &lt;a href="http://www.mouser.com/datasheet/2/240/Littelfuse_Fuse_461_Da
 </part>
 <part name="GNDI35" library="supply1" deviceset="GNDI" device=""/>
 <part name="GNDI36" library="supply1" deviceset="GNDI" device=""/>
-<part name="C5" library="Nizanlib" deviceset="0402-CAP" device="" value="18p">
+<part name="C5" library="Nizanlib" deviceset="0402-CAP" device="" value="30p">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value="MC0402N180J500CT"/>
 <attribute name="OC_NEWARK" value="06R4796"/>
 </part>
-<part name="C4" library="Nizanlib" deviceset="0402-CAP" device="" value="18p">
+<part name="C4" library="Nizanlib" deviceset="0402-CAP" device="" value="30p">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value="MC0402N180J500CT"/>
 <attribute name="OC_NEWARK" value="06R4796"/>
@@ -9365,10 +9365,10 @@ Source: &lt;a href="http://www.mouser.com/datasheet/2/240/Littelfuse_Fuse_461_Da
 <part name="R17" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
 <part name="R19" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R20" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R24" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
-<part name="R25" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
-<part name="R26" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R27" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R24" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
+<part name="R25" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
+<part name="R26" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="1k"/>
+<part name="R27" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="1k"/>
 <part name="X3" library="con-phoenix-508" library_urn="urn:adsk.eagle:library:176" deviceset="MSTBA10" device="" package3d_urn="urn:adsk.eagle:package:9619/1"/>
 <part name="X1" library="con-phoenix-350" library_urn="urn:adsk.eagle:library:174" deviceset="1751303" device="" package3d_urn="urn:adsk.eagle:package:9408/1"/>
 <part name="TP1" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="PTR1" device="B1,27" package3d_urn="urn:adsk.eagle:package:27944/1"/>
@@ -9416,7 +9416,7 @@ Interface Connection</text>
 <text x="-796.29" y="477.52" size="2.54" layer="94">Test Pins Output</text>
 <text x="-1038.86" y="416.56" size="2.54" layer="94">Voltage Measurement 
 Interface</text>
-<text x="-1029.97" y="403.86" size="2.1844" layer="94">Voltage 
+<text x="-1031.24" y="403.86" size="2.1844" layer="94">Voltage 
 Measurement 
 Input Header</text>
 <text x="-953.77" y="335.28" size="2.54" layer="94">Voltage Phase A to VAP</text>
@@ -9467,7 +9467,7 @@ and Information Technology
 <text x="-976.63" y="304.8" size="2.54" layer="94">208/480V Max. Service Option</text>
 <text x="-976.63" y="215.9" size="2.54" layer="94">208/480V Max. Service Option</text>
 <text x="-979.17" y="256.54" size="2.54" layer="94">208/480V Max. Service Option</text>
-<text x="-1038.86" y="374.65" size="1.524" layer="92" align="top-left">Note: 
+<text x="-1038.86" y="367.03" size="1.524" layer="92" align="top-left">Note: 
 For fuse inputs (F1, F2, F3, F4),
 use Fuse FF 500 mA, DMI 1000V
 
@@ -9485,7 +9485,7 @@ levels</text>
 <wire x1="-1023.62" y1="424.18" x2="-1002.03" y2="424.18" width="0.2032" layer="93" style="shortdash"/>
 <wire x1="-1040.13" y1="424.18" x2="-1023.62" y2="424.18" width="0.2032" layer="93" style="shortdash"/>
 <wire x1="-1040.13" y1="340.36" x2="-1040.13" y2="424.18" width="0.2032" layer="93" style="shortdash"/>
-<wire x1="-1035.05" y1="414.02" x2="-1035.05" y2="375.92" width="0.2032" layer="93" style="shortdash"/>
+<wire x1="-1036.32" y1="414.02" x2="-1036.32" y2="375.92" width="0.2032" layer="93" style="shortdash"/>
 <wire x1="-1165.86" y1="485.14" x2="-1165.86" y2="88.9" width="0.6096" layer="93" style="longdash"/>
 <wire x1="-1004.57" y1="87.63" x2="-1004.57" y2="152.4" width="0.6096" layer="88"/>
 <wire x1="-1004.57" y1="152.4" x2="-835.66" y2="152.4" width="0.6096" layer="88"/>
@@ -9532,6 +9532,7 @@ Voltage Test</text>
 Voltage Test</text>
 <text x="-991.87" y="222.25" size="1.27" layer="94" align="top-left">Phase C
 Voltage Test</text>
+<text x="-781.05" y="472.44" size="1.524" layer="92" align="top-left">Note: Y2 Crystal Xtal MUST be Grounded</text>
 </plain>
 <instances>
 <instance part="U11" gate="G$1" x="-1094.74" y="471.17" smashed="yes">
@@ -10702,53 +10703,45 @@ Voltage Test</text>
 <attribute name="NAME" x="-1027.43" y="222.504" size="1.778" layer="95" font="vector" align="bottom-center"/>
 <attribute name="VALUE" x="-1027.43" y="219.456" size="1.778" layer="96" font="vector" align="top-center"/>
 </instance>
-<instance part="X3" gate="-2" x="-1016" y="394.97" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1009.396" y="394.081" size="1.778" layer="95"/>
+<instance part="X3" gate="-2" x="-1019.81" y="394.97" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1013.206" y="394.081" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-4" x="-1016" y="391.16" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1009.396" y="390.271" size="1.778" layer="95"/>
+<instance part="X3" gate="-4" x="-1019.81" y="391.16" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1013.206" y="390.271" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-6" x="-1016" y="387.35" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1009.396" y="386.461" size="1.778" layer="95"/>
+<instance part="X3" gate="-6" x="-1019.81" y="387.35" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1013.206" y="386.461" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-8" x="-1016" y="383.54" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1009.396" y="382.651" size="1.778" layer="95"/>
+<instance part="X3" gate="-8" x="-1019.81" y="383.54" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1013.206" y="382.651" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-10" x="-1016" y="379.73" smashed="yes" rot="R180">
-<attribute name="VALUE" x="-1008.38" y="383.54" size="1.778" layer="96" rot="R180"/>
-<attribute name="NAME" x="-1009.396" y="378.841" size="1.778" layer="95"/>
+<instance part="X3" gate="-10" x="-1019.81" y="379.73" smashed="yes" rot="R180">
+<attribute name="VALUE" x="-1016" y="400.05" size="1.778" layer="96" rot="R180"/>
+<attribute name="NAME" x="-1013.206" y="378.841" size="1.778" layer="95"/>
 </instance>
 <instance part="X1" gate="-1" x="-854.71" y="392.43" smashed="yes">
 <attribute name="NAME" x="-853.44" y="391.541" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="391.541" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-2" x="-854.71" y="384.81" smashed="yes">
 <attribute name="NAME" x="-853.44" y="383.921" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="383.921" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-3" x="-854.71" y="354.33" smashed="yes">
 <attribute name="NAME" x="-853.44" y="353.441" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="353.441" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-4" x="-854.71" y="346.71" smashed="yes">
 <attribute name="NAME" x="-853.44" y="345.821" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="345.821" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-5" x="-854.71" y="313.69" smashed="yes">
 <attribute name="NAME" x="-853.44" y="312.801" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="312.801" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-6" x="-854.71" y="306.07" smashed="yes">
 <attribute name="NAME" x="-853.44" y="305.181" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="305.181" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-7" x="-854.71" y="273.05" smashed="yes">
 <attribute name="NAME" x="-853.44" y="272.161" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="272.161" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-8" x="-854.71" y="265.43" smashed="yes">
 <attribute name="NAME" x="-853.44" y="264.541" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-840.74" y="264.541" size="1.778" layer="96"/>
 </instance>
 <instance part="TP1" gate="G$1" x="-1261.11" y="205.74" smashed="yes" rot="R270">
 <attribute name="NAME" x="-1267.46" y="206.756" size="1.778" layer="95"/>
@@ -10774,20 +10767,20 @@ Voltage Test</text>
 <attribute name="VALUE" x="-1005.84" y="193.04" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="F1" gate="G$1" x="-1017.27" y="330.2" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1033.78" y="322.58" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-1033.78" y="325.12" size="1.778" layer="96" rot="R180" align="center-left"/>
+<attribute name="NAME" x="-1032.51" y="327.66" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-1035.05" y="325.12" size="1.778" layer="96" align="center-left"/>
 </instance>
 <instance part="F2" gate="G$1" x="-1017.27" y="289.56" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1033.78" y="281.94" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-1033.78" y="284.48" size="1.778" layer="96" rot="R180" align="center-left"/>
+<attribute name="NAME" x="-1032.51" y="288.29" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-1035.05" y="285.75" size="1.778" layer="96" align="center-left"/>
 </instance>
 <instance part="F3" gate="G$1" x="-1017.27" y="241.3" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1033.78" y="233.68" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-1033.78" y="236.22" size="1.778" layer="96" rot="R180" align="center-left"/>
+<attribute name="NAME" x="-1032.51" y="240.03" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-1035.05" y="237.49" size="1.778" layer="96" align="center-left"/>
 </instance>
 <instance part="F4" gate="G$1" x="-979.17" y="374.65" smashed="yes" rot="R180">
-<attribute name="NAME" x="-995.68" y="367.03" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-995.68" y="369.57" size="1.778" layer="96" rot="R180" align="center-left"/>
+<attribute name="NAME" x="-995.68" y="373.38" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-998.22" y="370.84" size="1.778" layer="96" align="center-left"/>
 </instance>
 </instances>
 <busses>
@@ -12548,8 +12541,8 @@ Voltage Test</text>
 </net>
 <net name="V_PH_A" class="0">
 <segment>
-<wire x1="-1021.08" y1="394.97" x2="-1024.89" y2="394.97" width="0.1524" layer="91"/>
-<label x="-1024.89" y="394.97" size="1.016" layer="95" rot="R180" xref="yes"/>
+<wire x1="-1024.89" y1="394.97" x2="-1026.16" y2="394.97" width="0.1524" layer="91"/>
+<label x="-1026.16" y="394.97" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-2" pin="1"/>
 </segment>
 <segment>
@@ -12560,8 +12553,8 @@ Voltage Test</text>
 </net>
 <net name="V_PH_B" class="0">
 <segment>
-<wire x1="-1021.08" y1="391.16" x2="-1024.89" y2="391.16" width="0.1524" layer="91"/>
-<label x="-1024.89" y="391.16" size="1.016" layer="95" rot="R180" xref="yes"/>
+<wire x1="-1024.89" y1="391.16" x2="-1026.16" y2="391.16" width="0.1524" layer="91"/>
+<label x="-1026.16" y="391.16" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-4" pin="1"/>
 </segment>
 <segment>
@@ -12572,8 +12565,8 @@ Voltage Test</text>
 </net>
 <net name="V_PH_C" class="0">
 <segment>
-<wire x1="-1021.08" y1="387.35" x2="-1024.89" y2="387.35" width="0.1524" layer="91"/>
-<label x="-1024.89" y="387.35" size="1.016" layer="95" rot="R180" xref="yes"/>
+<wire x1="-1024.89" y1="387.35" x2="-1026.16" y2="387.35" width="0.1524" layer="91"/>
+<label x="-1026.16" y="387.35" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-6" pin="1"/>
 </segment>
 <segment>
@@ -12584,8 +12577,8 @@ Voltage Test</text>
 </net>
 <net name="NEUT" class="0">
 <segment>
-<wire x1="-1021.08" y1="383.54" x2="-1024.89" y2="383.54" width="0.1524" layer="91"/>
-<label x="-1024.89" y="383.54" size="1.016" layer="95" rot="R180" xref="yes"/>
+<wire x1="-1024.89" y1="383.54" x2="-1026.16" y2="383.54" width="0.1524" layer="91"/>
+<label x="-1026.16" y="383.54" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-8" pin="1"/>
 </segment>
 <segment>
@@ -12612,9 +12605,9 @@ Voltage Test</text>
 </net>
 <net name="N$45" class="0">
 <segment>
-<wire x1="-1004.57" y1="414.02" x2="-1004.57" y2="375.92" width="0.1524" layer="91" style="shortdash"/>
-<wire x1="-1004.57" y1="375.92" x2="-1033.78" y2="375.92" width="0.1524" layer="91" style="shortdash"/>
-<wire x1="-1004.57" y1="414.02" x2="-1035.05" y2="414.02" width="0.1524" layer="91" style="shortdash"/>
+<wire x1="-1005.84" y1="414.02" x2="-1005.84" y2="375.92" width="0.1524" layer="91" style="shortdash"/>
+<wire x1="-1005.84" y1="375.92" x2="-1035.05" y2="375.92" width="0.1524" layer="91" style="shortdash"/>
+<wire x1="-1005.84" y1="414.02" x2="-1036.32" y2="414.02" width="0.1524" layer="91" style="shortdash"/>
 </segment>
 </net>
 <net name="N$49" class="0">
@@ -13114,8 +13107,8 @@ Voltage Test</text>
 <net name="PGROUND" class="0">
 <segment>
 <pinref part="X3" gate="-10" pin="1"/>
-<wire x1="-1021.08" y1="379.73" x2="-1024.89" y2="379.73" width="0.1524" layer="91"/>
-<label x="-1024.89" y="379.73" size="1.016" layer="95" rot="R180" xref="yes"/>
+<wire x1="-1024.89" y1="379.73" x2="-1026.16" y2="379.73" width="0.1524" layer="91"/>
+<label x="-1026.16" y="379.73" size="1.016" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
 <pinref part="R26" gate="G$1" pin="1"/>

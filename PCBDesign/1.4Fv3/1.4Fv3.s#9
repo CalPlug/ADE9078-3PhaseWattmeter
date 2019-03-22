@@ -9467,7 +9467,7 @@ and Information Technology
 <text x="-976.63" y="304.8" size="2.54" layer="94">208/480V Max. Service Option</text>
 <text x="-976.63" y="215.9" size="2.54" layer="94">208/480V Max. Service Option</text>
 <text x="-979.17" y="256.54" size="2.54" layer="94">208/480V Max. Service Option</text>
-<text x="-1038.86" y="367.03" size="1.524" layer="92" align="top-left">Note: 
+<text x="-1038.86" y="374.65" size="1.524" layer="92" align="top-left">Note: 
 For fuse inputs (F1, F2, F3, F4),
 use Fuse FF 500 mA, DMI 1000V
 
@@ -10703,45 +10703,53 @@ Voltage Test</text>
 <attribute name="NAME" x="-1027.43" y="222.504" size="1.778" layer="95" font="vector" align="bottom-center"/>
 <attribute name="VALUE" x="-1027.43" y="219.456" size="1.778" layer="96" font="vector" align="top-center"/>
 </instance>
-<instance part="X3" gate="-2" x="-1018.54" y="394.97" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1011.936" y="394.081" size="1.778" layer="95"/>
+<instance part="X3" gate="-2" x="-1016" y="394.97" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1009.396" y="394.081" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-4" x="-1018.54" y="391.16" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1011.936" y="390.271" size="1.778" layer="95"/>
+<instance part="X3" gate="-4" x="-1016" y="391.16" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1009.396" y="390.271" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-6" x="-1018.54" y="387.35" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1011.936" y="386.461" size="1.778" layer="95"/>
+<instance part="X3" gate="-6" x="-1016" y="387.35" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1009.396" y="386.461" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-8" x="-1018.54" y="383.54" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1011.936" y="382.651" size="1.778" layer="95"/>
+<instance part="X3" gate="-8" x="-1016" y="383.54" smashed="yes" rot="R180">
+<attribute name="NAME" x="-1009.396" y="382.651" size="1.778" layer="95"/>
 </instance>
-<instance part="X3" gate="-10" x="-1018.54" y="379.73" smashed="yes" rot="R180">
-<attribute name="VALUE" x="-1014.73" y="400.05" size="1.778" layer="96" rot="R180"/>
-<attribute name="NAME" x="-1011.936" y="378.841" size="1.778" layer="95"/>
+<instance part="X3" gate="-10" x="-1016" y="379.73" smashed="yes" rot="R180">
+<attribute name="VALUE" x="-1008.38" y="383.54" size="1.778" layer="96" rot="R180"/>
+<attribute name="NAME" x="-1009.396" y="378.841" size="1.778" layer="95"/>
 </instance>
 <instance part="X1" gate="-1" x="-854.71" y="392.43" smashed="yes">
 <attribute name="NAME" x="-853.44" y="391.541" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="391.541" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-2" x="-854.71" y="384.81" smashed="yes">
 <attribute name="NAME" x="-853.44" y="383.921" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="383.921" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-3" x="-854.71" y="354.33" smashed="yes">
 <attribute name="NAME" x="-853.44" y="353.441" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="353.441" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-4" x="-854.71" y="346.71" smashed="yes">
 <attribute name="NAME" x="-853.44" y="345.821" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="345.821" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-5" x="-854.71" y="313.69" smashed="yes">
 <attribute name="NAME" x="-853.44" y="312.801" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="312.801" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-6" x="-854.71" y="306.07" smashed="yes">
 <attribute name="NAME" x="-853.44" y="305.181" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="305.181" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-7" x="-854.71" y="273.05" smashed="yes">
 <attribute name="NAME" x="-853.44" y="272.161" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="272.161" size="1.778" layer="96"/>
 </instance>
 <instance part="X1" gate="-8" x="-854.71" y="265.43" smashed="yes">
 <attribute name="NAME" x="-853.44" y="264.541" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-840.74" y="264.541" size="1.778" layer="96"/>
 </instance>
 <instance part="TP1" gate="G$1" x="-1261.11" y="205.74" smashed="yes" rot="R270">
 <attribute name="NAME" x="-1267.46" y="206.756" size="1.778" layer="95"/>
@@ -10767,20 +10775,20 @@ Voltage Test</text>
 <attribute name="VALUE" x="-1005.84" y="193.04" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="F1" gate="G$1" x="-1017.27" y="330.2" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1032.51" y="327.66" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-1035.05" y="325.12" size="1.778" layer="96" align="center-left"/>
+<attribute name="NAME" x="-1033.78" y="322.58" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-1033.78" y="325.12" size="1.778" layer="96" rot="R180" align="center-left"/>
 </instance>
 <instance part="F2" gate="G$1" x="-1017.27" y="289.56" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1032.51" y="288.29" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-1035.05" y="285.75" size="1.778" layer="96" align="center-left"/>
+<attribute name="NAME" x="-1033.78" y="281.94" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-1033.78" y="284.48" size="1.778" layer="96" rot="R180" align="center-left"/>
 </instance>
 <instance part="F3" gate="G$1" x="-1017.27" y="241.3" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1032.51" y="240.03" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-1035.05" y="237.49" size="1.778" layer="96" align="center-left"/>
+<attribute name="NAME" x="-1033.78" y="233.68" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-1033.78" y="236.22" size="1.778" layer="96" rot="R180" align="center-left"/>
 </instance>
 <instance part="F4" gate="G$1" x="-979.17" y="374.65" smashed="yes" rot="R180">
-<attribute name="NAME" x="-995.68" y="373.38" size="1.778" layer="95" rot="R180" align="center-left"/>
-<attribute name="VALUE" x="-998.22" y="370.84" size="1.778" layer="96" align="center-left"/>
+<attribute name="NAME" x="-995.68" y="367.03" size="1.778" layer="95" rot="R180" align="center-left"/>
+<attribute name="VALUE" x="-995.68" y="369.57" size="1.778" layer="96" rot="R180" align="center-left"/>
 </instance>
 </instances>
 <busses>
@@ -12541,7 +12549,7 @@ Voltage Test</text>
 </net>
 <net name="V_PH_A" class="0">
 <segment>
-<wire x1="-1023.62" y1="394.97" x2="-1024.89" y2="394.97" width="0.1524" layer="91"/>
+<wire x1="-1021.08" y1="394.97" x2="-1024.89" y2="394.97" width="0.1524" layer="91"/>
 <label x="-1024.89" y="394.97" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-2" pin="1"/>
 </segment>
@@ -12553,7 +12561,7 @@ Voltage Test</text>
 </net>
 <net name="V_PH_B" class="0">
 <segment>
-<wire x1="-1023.62" y1="391.16" x2="-1024.89" y2="391.16" width="0.1524" layer="91"/>
+<wire x1="-1021.08" y1="391.16" x2="-1024.89" y2="391.16" width="0.1524" layer="91"/>
 <label x="-1024.89" y="391.16" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-4" pin="1"/>
 </segment>
@@ -12565,7 +12573,7 @@ Voltage Test</text>
 </net>
 <net name="V_PH_C" class="0">
 <segment>
-<wire x1="-1023.62" y1="387.35" x2="-1024.89" y2="387.35" width="0.1524" layer="91"/>
+<wire x1="-1021.08" y1="387.35" x2="-1024.89" y2="387.35" width="0.1524" layer="91"/>
 <label x="-1024.89" y="387.35" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-6" pin="1"/>
 </segment>
@@ -12577,7 +12585,7 @@ Voltage Test</text>
 </net>
 <net name="NEUT" class="0">
 <segment>
-<wire x1="-1023.62" y1="383.54" x2="-1024.89" y2="383.54" width="0.1524" layer="91"/>
+<wire x1="-1021.08" y1="383.54" x2="-1024.89" y2="383.54" width="0.1524" layer="91"/>
 <label x="-1024.89" y="383.54" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="X3" gate="-8" pin="1"/>
 </segment>
@@ -13107,7 +13115,7 @@ Voltage Test</text>
 <net name="PGROUND" class="0">
 <segment>
 <pinref part="X3" gate="-10" pin="1"/>
-<wire x1="-1023.62" y1="379.73" x2="-1024.89" y2="379.73" width="0.1524" layer="91"/>
+<wire x1="-1021.08" y1="379.73" x2="-1024.89" y2="379.73" width="0.1524" layer="91"/>
 <label x="-1024.89" y="379.73" size="1.016" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>

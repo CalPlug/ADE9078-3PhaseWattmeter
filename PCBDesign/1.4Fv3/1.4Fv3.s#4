@@ -9327,42 +9327,42 @@ Source: &lt;a href="http://www.mouser.com/datasheet/2/240/Littelfuse_Fuse_461_Da
 <part name="R80" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 4.7k"/>
 <part name="R81" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 4.7k"/>
 <part name="R13" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 4.7k"/>
-<part name="R14" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R14" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
 <part name="R15" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R16" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
-<part name="R18" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
+<part name="R16" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5"/>
+<part name="R18" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5"/>
 <part name="R21" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R22" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R22" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
 <part name="R23" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R41" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R42" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
-<part name="R43" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
-<part name="R56" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R41" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
+<part name="R42" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5"/>
+<part name="R43" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5"/>
+<part name="R56" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
 <part name="R53" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R54" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
-<part name="R55" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
-<part name="R60" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R54" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5"/>
+<part name="R55" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5"/>
+<part name="R60" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
 <part name="R62" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R57" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R57" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
 <part name="R61" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R68" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
+<part name="R68" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
 <part name="R70" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R71" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R69" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R67" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5k "/>
-<part name="R66" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
+<part name="R69" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 100"/>
+<part name="R67" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5"/>
+<part name="R66" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5"/>
 <part name="R3" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R4" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R5" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R6" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R7" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R8" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R9" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
-<part name="R10" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
+<part name="R9" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5k"/>
+<part name="R10" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5k"/>
 <part name="R11" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R12" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
-<part name="R2" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
-<part name="R17" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 500"/>
+<part name="R2" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5k"/>
+<part name="R17" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value="5k"/>
 <part name="R19" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R20" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 1k"/>
 <part name="R24" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="RESISTOR" device="0603" package3d_urn="urn:adsk.eagle:package:39650/1" value=" 5k"/>
@@ -9498,11 +9498,12 @@ Jumper settings allow for multiple 3-phase Delta and Wye service configurations 
 Jumper settings is safe in testing, but maybe unsafe in general service as drawn. 
 
 See release notes for jumper setting details.</text>
-<text x="-871.22" y="247.65" size="1.524" layer="92" align="top-left">Note: CT used that was used for testing was the AcuCT - H100 - 200 Split CT. At rated current of 200A, voltage 
-output is expected to be 0.333 Vac at 200 Amps which should lead to differential ADC input of 0.3535 Vrms 
+<text x="-871.22" y="247.65" size="1.524" layer="92" align="top-left">Note: CT used that was used for testing was the AcuCT - H100 - 50 Split CT. At rated current of 50A, voltage 
+output is expected to be 0.333 Vac at 200 Amps which should below the reccommended differential ADC input of 0.3535 Vrms. 
+The CT needs a burden resistance of 10 Ohm. 
 
 Use burden resistors as half-value pairs as specified by the CT used for R10/R11, R29/R30, R36/R37, R6/R7 
-For example, a 100 ohm burden resistor would be a pair of 50 ohm resistors. 
+For example, a 10 ohm burden resistor would be a pair of 5 ohm resistors. 
 If burden resistor is internal, use high resistance centering resistors in place of the burden resistors 
 (typically ~5k or greater) 
 
@@ -9725,12 +9726,12 @@ Voltage Test</text>
 <instance part="VDD4" gate="G$1" x="-1242.06" y="374.65" smashed="yes">
 <attribute name="VALUE" x="-1244.6" y="374.65" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="U6" gate="G$1" x="-1163.32" y="354.33" smashed="yes" rot="R180">
-<attribute name="NAME" x="-1156.335" y="348.615" size="1.778" layer="95" rot="R180"/>
-<attribute name="VALUE" x="-1156.589" y="361.442" size="1.778" layer="96" rot="R180"/>
-<attribute name="OC_NEWARK" x="-1163.32" y="354.33" size="1.778" layer="96" rot="R180" display="off"/>
-<attribute name="MF" x="-1163.32" y="354.33" size="1.778" layer="96" rot="R180" display="off"/>
-<attribute name="MPN" x="-1163.32" y="354.33" size="1.778" layer="96" rot="R180" display="off"/>
+<instance part="U6" gate="G$1" x="-1168.4" y="354.33" smashed="yes">
+<attribute name="NAME" x="-1175.385" y="360.045" size="1.778" layer="95"/>
+<attribute name="VALUE" x="-1175.131" y="347.218" size="1.778" layer="96"/>
+<attribute name="OC_NEWARK" x="-1168.4" y="354.33" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="-1168.4" y="354.33" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="-1168.4" y="354.33" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="J3" gate="G$1" x="-1275.08" y="298.45" smashed="yes">
 <attribute name="VALUE" x="-1275.08" y="283.464" size="1.778" layer="96" font="vector"/>
@@ -10983,12 +10984,6 @@ Voltage Test</text>
 <pinref part="GND7" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="GND8" gate="1" pin="GND"/>
-<wire x1="-1181.1" y1="351.79" x2="-1181.1" y2="349.25" width="0.1524" layer="91"/>
-<pinref part="U6" gate="G$1" pin="COLLERTOR"/>
-<wire x1="-1176.02" y1="351.79" x2="-1181.1" y2="351.79" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="GND1" gate="1" pin="GND"/>
 <pinref part="J3" gate="G$1" pin="2"/>
 <wire x1="-1264.92" y1="290.83" x2="-1249.68" y2="290.83" width="0.1524" layer="91"/>
@@ -11040,6 +11035,12 @@ Voltage Test</text>
 <pinref part="GND15" gate="1" pin="GND"/>
 <wire x1="-1176.02" y1="162.56" x2="-1181.1" y2="162.56" width="0.1524" layer="91"/>
 <wire x1="-1181.1" y1="162.56" x2="-1181.1" y2="160.02" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U6" gate="G$1" pin="CATHODE"/>
+<pinref part="GND8" gate="1" pin="GND"/>
+<wire x1="-1178.56" y1="351.79" x2="-1181.1" y2="351.79" width="0.1524" layer="91"/>
+<wire x1="-1181.1" y1="351.79" x2="-1181.1" y2="349.25" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$23" class="0">
@@ -11193,12 +11194,6 @@ Voltage Test</text>
 <pinref part="GNDI5" gate="G$1" pin="GNDI"/>
 <wire x1="-1132.84" y1="411.48" x2="-1122.68" y2="411.48" width="0.1524" layer="91"/>
 <wire x1="-1122.68" y1="411.48" x2="-1122.68" y2="408.94" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="U6" gate="G$1" pin="ANODE"/>
-<wire x1="-1153.16" y1="351.79" x2="-1148.08" y2="351.79" width="0.1524" layer="91"/>
-<pinref part="GNDI7" gate="G$1" pin="GNDI"/>
-<wire x1="-1148.08" y1="351.79" x2="-1148.08" y2="349.25" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U2" gate="G$1" pin="CATHODE"/>
@@ -11392,6 +11387,12 @@ Voltage Test</text>
 <wire x1="-1109.98" y1="187.96" x2="-1117.6" y2="187.96" width="0.1524" layer="91"/>
 <wire x1="-1117.6" y1="187.96" x2="-1117.6" y2="185.42" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="U6" gate="G$1" pin="EMITTER"/>
+<wire x1="-1155.7" y1="351.79" x2="-1148.08" y2="351.79" width="0.1524" layer="91"/>
+<pinref part="GNDI7" gate="G$1" pin="GNDI"/>
+<wire x1="-1148.08" y1="351.79" x2="-1148.08" y2="349.25" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$15" class="0">
 <segment>
@@ -11554,11 +11555,6 @@ Voltage Test</text>
 </net>
 <net name="RESET_ISO" class="0">
 <segment>
-<pinref part="U6" gate="G$1" pin="CATHODE"/>
-<wire x1="-1153.16" y1="356.87" x2="-1135.38" y2="356.87" width="0.1524" layer="91"/>
-<label x="-1135.38" y="356.87" size="1.016" layer="95" xref="yes"/>
-</segment>
-<segment>
 <pinref part="C1" gate="G$1" pin="2"/>
 <wire x1="-943.61" y1="464.82" x2="-948.69" y2="464.82" width="0.1524" layer="91"/>
 <label x="-951.23" y="464.82" size="1.016" layer="95" rot="R180" xref="yes"/>
@@ -11571,6 +11567,11 @@ Voltage Test</text>
 <pinref part="R13" gate="G$1" pin="1"/>
 <junction x="-948.69" y="464.82"/>
 </segment>
+<segment>
+<pinref part="U6" gate="G$1" pin="COLLERTOR"/>
+<wire x1="-1155.7" y1="356.87" x2="-1145.54" y2="356.87" width="0.1524" layer="91"/>
+<label x="-1145.54" y="356.87" size="1.016" layer="95" xref="yes"/>
+</segment>
 </net>
 <net name="N$17" class="0">
 <segment>
@@ -11578,13 +11579,6 @@ Voltage Test</text>
 <wire x1="-1094.74" y1="379.73" x2="-1094.74" y2="331.47" width="0.1524" layer="91" style="shortdash"/>
 <wire x1="-1094.74" y1="331.47" x2="-1252.22" y2="331.47" width="0.1524" layer="91" style="shortdash"/>
 <wire x1="-1252.22" y1="331.47" x2="-1252.22" y2="379.73" width="0.1524" layer="91" style="shortdash"/>
-</segment>
-</net>
-<net name="N$25" class="0">
-<segment>
-<pinref part="U6" gate="G$1" pin="EMITTER"/>
-<wire x1="-1186.18" y1="356.87" x2="-1176.02" y2="356.87" width="0.1524" layer="91"/>
-<pinref part="R29" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="IRQ0_OUT" class="0">
@@ -13235,6 +13229,13 @@ Voltage Test</text>
 <wire x1="-979.17" y1="374.65" x2="-979.17" y2="356.87" width="0.1524" layer="91"/>
 <junction x="-979.17" y="374.65"/>
 <junction x="-979.17" y="356.87"/>
+</segment>
+</net>
+<net name="N$25" class="0">
+<segment>
+<pinref part="R29" gate="G$1" pin="2"/>
+<pinref part="U6" gate="G$1" pin="ANODE"/>
+<wire x1="-1186.18" y1="356.87" x2="-1178.56" y2="356.87" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
