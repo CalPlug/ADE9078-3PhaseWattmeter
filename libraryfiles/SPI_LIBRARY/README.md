@@ -28,6 +28,7 @@ When installed, this library should look like:
 Arduino/ADE9078              (this library's folder)
 Arduino/ADE9078/ADE9078.cpp     (the library implementation file)
 Arduino/ADE9078/ADE9078.h       (the library description file)
+Arduino/ADE9078/EveryOtherFile  (you'll need the whole ADE9078 directory)
 
 Building
 --------------------------------------------------------------------------------
