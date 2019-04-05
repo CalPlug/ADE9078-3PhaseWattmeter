@@ -1,0 +1,1 @@
+This is an example interface to graph a return from the demo ADE9078 firmware presented with Processing 3.  When run on an Arduino, the serial return is used by this code to graph voltage.  This is a demo applcation that can be extended.
