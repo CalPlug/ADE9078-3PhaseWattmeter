@@ -21,6 +21,35 @@ return crc;             //change crc to crc & 0xffff for implementation of CRC-C
 
 }
 
+//function in current usage (not validated)
+uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed Bob Felice, 2007 from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926, and also: https://forum.arduino.cc/index.php?topic=482539.0
+   unsigned char i;
+   unsigned int data;
+   unsigned int crc;
+   #define POLY 0x8408 //deff. of the polynomial used for the calculation
+
+   crc = 0xffff;
+	       if (length == 0)
+              return (~crc);
+
+       do {
+              for (i = 0, data = (unsigned int)0xff & *data_p++; i < 8; i++, data >>= 1) //alternative notation for nested for loops
+			  {
+                    if ((crc & 0x0001) ^ (data & 0x0001))
+                           crc = (crc >> 1) ^ POLY;
+                    else
+                           crc >>= 1;
+              }
+       } while (--length);
+
+       crc = ~crc;
+
+       data = crc;
+       crc = (crc << 8) | (data >> 8 & 0xFF);
+
+       return (crc);
+}
+
 
 // Crc algorithm supplied by jacky. Not compiling
 /*

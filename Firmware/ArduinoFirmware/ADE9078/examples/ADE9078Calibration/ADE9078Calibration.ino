@@ -16,15 +16,16 @@ Copyright (C) The Regents of the University of California, 2019
 
   Released into the public domain.
  
-Note: this firmware is based directly on the sample provided ADE9000 Calibration firmware.  Please carefully review this example!  The authors of this ADE9078 version greatly appreciate the authors of this example for aloowing us a great structure to use for this example:  
+Note: this firmware is based directly on the sample provided ADE9000 Calibration firmware.  Please carefully review this example!  The authors of this ADE9078 version greatly appreciate the authors of this example for allowing us a great structure to use for this example:  
 
-/*The calibration inputs are stored in the ADE9078 CalibrationInputs.h file. The phase and parameter being calibrated is input through the serial console*/
-/*Calbration constants are computed and stored in the EEPROM */
-/*Caibration should be done with the end application settings. If any  parameters(GAIN,High pass corner,Integrator settings) are changed, the device should be recalibrated*/
+/*The calibration inputs are stored in the ADE9078CalibrationInputs.h file. The phase and parameter being calibrated is input through the serial console*/
+/*Calibration constants are computed and stored in the EEPROM */
+/*Calibration should be done with the end application settings. If any  parameters(GAIN,High pass corner,Integrator settings) are changed, the device should be re-calibrated*/
 /*This application assumues the PGA_GAIN among all current channels is same. Also, the PGA_GAIN among all voltage channels should be same*/  
 //Each PGA gain may have different calibration values associated when changed as a set for all inputs.
 
 #include "Arduino.h" //this includes the arduino library header. It makes all the Arduino functions available in this tab.
+//#include <EEPROM.h>  //Load and save EEPROM calibration values to Arduino Onboard EEPROM (should be declared elsewhere in user code!)
 #include <SPI.h>
 #include "ADE9078registers.h"
 #include <ADE9078CalibrationInputs.h>
@@ -233,9 +234,10 @@ void load_data_allfields() //load the data field by field into the RAM holders -
     }
     ++address;
   }
-  //when using the recalled values (ouside of this function, the following approaches can be used to make the arrays that hold values as characters into numerical values for use:
+  //when using the recalled values (outside of this function, the following approaches can be used to make the arrays that hold values as characters into numerical values for use:
   //atoi() can be used to generate integers needed from char arrays for loading, e.g. integerFromPC = atoi(strtokIndx);     // convert this part to an integer strtokIndx = strtok(NULL, ",");floatFromPC = atof(strtokIndx);     // convert this part to a float (see: http://forum.arduino.cc/index.php?topic=396450)
     //floatFromPC = atof(strtokIndx);     // convert this part to a float
+	//typically the calibration values should be saved as reciprovcals so they are large integers rather than large floats to avoid round-off errors!!
   Serial.println("<--Read data complete, this was read");
 }//*****************************************************
 

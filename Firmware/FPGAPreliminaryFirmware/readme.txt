@@ -1,0 +1,1 @@
+This is a skeleton layout of a Lattice iCE 40 interface over SPI to the ADE9078.  It is not complete at the current time, all basic features have not been implemented.
