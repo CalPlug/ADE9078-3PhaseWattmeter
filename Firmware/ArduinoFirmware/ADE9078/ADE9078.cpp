@@ -41,7 +41,7 @@ uint8_t ADE9078::getVersion(){
 double ADE9078::getPowerFactorA(){
 	int16_t value=0;
 	value=spiRead16(PFA_16);
-	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified
+	double decimal = decimalize(value, 1.0, 0.0,0); //convert to double with calibration factors specified (default values in place)
 	return (decimal);
 }
 
@@ -362,7 +362,7 @@ void ADE9078::initialize(){
    Serial.print(" ADE9078:initialize function started"); //wiring configuration defined in VCONSEL and ICONSEL registers init. in this function
   #endif
 
-    /* //For reference, the following registers are written to on bootup for the ADE9000
+    /* //For reference, the following registers are written to on bootup for the ADE9000 (from ADE9000 Arduino Library Sample Code, note these ICs are similar but do not have identical functionality!)
    SPI_Write_16(ADDR_PGA_GAIN,ADE9000_PGA_GAIN);
  	 SPI_Write_32(ADDR_CONFIG0,ADE9000_CONFIG0);
 	 SPI_Write_16(ADDR_CONFIG1,ADE9000_CONFIG1);
@@ -831,8 +831,11 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
      Serial.print(" ADE9078::spiRead16-CRC function started ");
     #endif
    //Prepare the 12 bit command header from the inbound address provided to the function
-   uint16_t temp_address, readval_unsigned, CRC_Value;
-   uint16_t returnedCRC = 0;
+   //Initialize holders
+   uint16_t temp_address = 0;
+   uint16_t readval_unsigned=0;
+   uint16_t CRC_Value = 0;
+   uint16_t returnedCRC = 0; //Initialize and default with 0
    static unsigned char CRCCheckInput[2]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
@@ -930,9 +933,12 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
   #endif
 
    //Prepare the 12 bit command header from the inbound address provided to the function
-   uint16_t temp_address, CRC_Value;
-   uint16_t returnedCRC = 0;
-   uint32_t returnedValue;
+      //Initialize holders
+   uint16_t temp_address = 0;
+   uint16_t readval_unsigned=0;
+   uint16_t CRC_Value = 0;
+   uint16_t returnedCRC = 0; //Initialize and default with 0
+   uint32_t returnedValue = 0;
    static unsigned char CRCCheckInput[4]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first

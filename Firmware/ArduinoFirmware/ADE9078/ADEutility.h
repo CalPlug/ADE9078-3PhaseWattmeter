@@ -51,12 +51,12 @@ double decimalizeSigned(int32_t input, double factor, double offset, bool absolu
 
 //************************
 
-// Crc found my michael. Apparently generated incorrect outputs- Comment by david, told by jacky
+// CRC CALCULATIO APPROACH, UNVERIFIED POSSIBLY GENERATES incorrect outputs- Comment by david, told by jacky
 uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed Bob Felice, 2007 from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926  ALSO  https://forum.arduino.cc/index.php?topic=123467.0
    unsigned char i;
    unsigned int data;
    unsigned int crc;
-   #define POLY 0x8408 //deff. of the polynomial used for the calculation
+   #define POLY 0x8408 //deff. of the polynomial used for the calculation (see sources)
 
    crc = 0xffff; //initial reset calculation value
 	       if (length == 0)

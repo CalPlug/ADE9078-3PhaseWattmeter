@@ -20,6 +20,8 @@
 #define WFB_ALL_SEGMENTS 512
 #define BURST_MEMORY_BASE 0x800
 
+//Declare object for buffer values to be received
+
 struct FullResample
 {
     int16_t Ia[WFB_ALL_SEGMENTS];
@@ -33,7 +35,7 @@ struct FullResample
 
 const int readCount = WFB_ALL_SEGMENTS/WFB_RESAMPLE_SEGMENTS;
 
-struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
+//struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values  - currently, we are editing the struct declared in the demo file. it's declared/defined on (this line) and that needs to be removed
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
@@ -46,26 +48,26 @@ void setup() {
 	//3) Proceed with load and operation of this demo
   Serial.begin(115200);
   delay(200);
-  is->vAGain=1;
-  is->vBGain=1;
-  is->vCGain=1;
+  myADE9078.is->vAGain=1;
+  myADE9078.is->vBGain=1;
+  myADE9078.is->vCGain=1;
 
-  is->iAGain=1;
-  is->iBGain=1;
-  is->iCGain=1;
-  is->iNGain=1;
+  myADE9078.is->iAGain=1;
+  myADE9078.is->iBGain=1;
+  myADE9078.is->iCGain=1;
+  myADE9078.is->iNGain=1;
 
-  is->powerAGain=1;
-  is->powerBGain=1;
-  is->powerCGain=1;
+  myADE9078.is->powerAGain=1;
+  myADE9078.is->powerBGain=1;
+  myADE9078.is->powerCGain=1;
 
   //Use these settings to configure wiring configuration at stertup
   //FYI: B010=2 in DEC
   //FYI: B100 = 4 in DEC
 
 	//4 Wire Wye configuration - non-Blondel compliant:
-	is->vConsel=0;
-	is->iConsel=0;
+	myADE9078.is->vConsel=0;
+	myADE9078.is->iConsel=0;
 
 	//Delta, Blondel compliant:
 	//is->vConsel=4; //byte value of 100,

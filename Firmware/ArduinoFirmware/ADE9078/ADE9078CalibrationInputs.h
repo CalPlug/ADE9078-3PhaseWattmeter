@@ -1,5 +1,5 @@
 /*Calibration Procedure*/
-/*Setup ADE9000. Set the desired configuration registers in ADE9000API.h file.*/
+/*Setup ADE9078. Set the desired configuration registers in ADE9078registersAPI.h file. - format of this similar to the ADE9000 example this is based on*/
 /*Fill the user inputs, transfer function and conversion constants*/
 /*Follow directions shown on serial monitor */
 
