@@ -9754,8 +9754,8 @@ R_total for 408 = 850k</text>
 <instance part="GND1" gate="1" x="-1249.68" y="288.29" smashed="yes">
 <attribute name="VALUE" x="-1252.22" y="285.75" size="1.778" layer="96"/>
 </instance>
-<instance part="VDD1" gate="G$1" x="-1258.57" y="289.56" smashed="yes">
-<attribute name="VALUE" x="-1261.11" y="290.83" size="1.778" layer="96"/>
+<instance part="VDD1" gate="G$1" x="-1235.71" y="287.02" smashed="yes">
+<attribute name="VALUE" x="-1238.25" y="288.29" size="1.778" layer="96"/>
 </instance>
 <instance part="GND9" gate="1" x="-1181.1" y="306.07" smashed="yes">
 <attribute name="VALUE" x="-1183.64" y="303.53" size="1.778" layer="96"/>
@@ -11124,11 +11124,10 @@ R_total for 408 = 850k</text>
 </segment>
 <segment>
 <pinref part="VDD1" gate="G$1" pin="VDD"/>
-<wire x1="-1258.57" y1="284.48" x2="-1258.57" y2="287.02" width="0.1524" layer="91"/>
+<wire x1="-1262.38" y1="284.48" x2="-1235.71" y2="284.48" width="0.1524" layer="91"/>
 <pinref part="J3" gate="G$1" pin="1"/>
 <wire x1="-1264.92" y1="288.29" x2="-1262.38" y2="288.29" width="0.1524" layer="91"/>
 <wire x1="-1262.38" y1="288.29" x2="-1262.38" y2="284.48" width="0.1524" layer="91"/>
-<wire x1="-1262.38" y1="284.48" x2="-1258.57" y2="284.48" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="VDD7" gate="G$1" pin="VDD"/>

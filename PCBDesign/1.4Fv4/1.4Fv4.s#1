@@ -9503,7 +9503,8 @@ The following circuit is for CT usuage ONLY. For Rog. coil, refer to ADE9078 cir
 
 When measuring current, make sure that PGND is connected to X3-10 header
 
-Do not populate (C11,C12,C21,C28,C30,C43,C46,C47) AND jump RX  XXXX (use 0 ohm jumpers)  for single pole filter for CT inputs.</text>
+Do not populate C11,C12,C21,C28,C30,C43,C46,C47 AND jump R14,R22,R41,R56,R57,R60,R68,R69 
+(use 0 ohm jumpers)  for single pole filter for CT inputs.</text>
 <text x="-999.49" y="146.05" size="1.9304" layer="89" align="top-left">Release Notes: 
 - Updated resistor values for Voltage Measurement Interface
 
