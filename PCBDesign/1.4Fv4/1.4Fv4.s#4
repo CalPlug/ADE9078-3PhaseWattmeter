@@ -9495,7 +9495,7 @@ Jumper settings allow for multiple 3-phase Delta and Wye service configurations 
 Jumper settings is safe in testing, but maybe unsafe in general service as drawn. 
 
 See release notes for jumper setting details.</text>
-<text x="-871.22" y="247.65" size="1.524" layer="92" align="top-left">Note: CT used that was used for testing was the AcuCT - H100 - 50 Split CT. At rated current of 50A, voltage 
+<text x="-871.22" y="246.38" size="1.524" layer="92" align="top-left">Note: CT used that was used for testing was the AcuCT - H100 - 50 Split CT. At rated current of 50A, voltage 
 output is expected to be 0.333 Vac at 200 Amps which should below the reccommended differential ADC input of 0.3535 Vrms. 
 The CT needs a burden resistance of 10 Ohm. 
 
@@ -9503,8 +9503,7 @@ The following circuit is for CT usuage ONLY. For Rog. coil, refer to ADE9078 cir
 
 When measuring current, make sure that PGND is connected to X3-10 header
 
-Do not populate (C11,C12,C21,C28,C30,C43,C46,C47) for single pole filter.
-Opt to use a jumper for the resistors with value 0.</text>
+Do not populate (C11,C12,C21,C28,C30,C43,C46,C47) AND jump RX  XXXX (use 0 ohm jumpers)  for single pole filter for CT inputs.</text>
 <text x="-999.49" y="146.05" size="1.9304" layer="89" align="top-left">Release Notes: 
 - Updated resistor values for Voltage Measurement Interface
 
@@ -9545,6 +9544,10 @@ perferred accuracy.</text>
 For P = 80% for a 20% overvoltage head room,
 R_total for 208 = 366k
 R_total for 408 = 850k</text>
+<text x="-822.96" y="387.35" size="1.524" layer="92" align="top-left">CT Input</text>
+<text x="-824.23" y="349.25" size="1.524" layer="92" align="top-left">CT Input</text>
+<text x="-821.69" y="308.61" size="1.524" layer="92" align="top-left">CT Input</text>
+<text x="-822.96" y="267.97" size="1.524" layer="92" align="top-left">CT Input</text>
 </plain>
 <instances>
 <instance part="U11" gate="G$1" x="-1094.74" y="471.17" smashed="yes">
@@ -9751,11 +9754,11 @@ R_total for 408 = 850k</text>
 <attribute name="MF" x="-1275.08" y="298.45" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="-1275.08" y="298.45" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="GND1" gate="1" x="-1249.68" y="288.29" smashed="yes">
-<attribute name="VALUE" x="-1252.22" y="285.75" size="1.778" layer="96"/>
+<instance part="GND1" gate="1" x="-1242.06" y="288.29" smashed="yes">
+<attribute name="VALUE" x="-1244.6" y="285.75" size="1.778" layer="96"/>
 </instance>
-<instance part="VDD1" gate="G$1" x="-1235.71" y="287.02" smashed="yes">
-<attribute name="VALUE" x="-1238.25" y="288.29" size="1.778" layer="96"/>
+<instance part="VDD1" gate="G$1" x="-1235.71" y="293.37" smashed="yes">
+<attribute name="VALUE" x="-1238.25" y="294.64" size="1.778" layer="96"/>
 </instance>
 <instance part="GND9" gate="1" x="-1181.1" y="306.07" smashed="yes">
 <attribute name="VALUE" x="-1183.64" y="303.53" size="1.778" layer="96"/>
@@ -10997,7 +11000,9 @@ R_total for 408 = 850k</text>
 <segment>
 <pinref part="GND1" gate="1" pin="GND"/>
 <pinref part="J3" gate="G$1" pin="2"/>
-<wire x1="-1264.92" y1="290.83" x2="-1249.68" y2="290.83" width="0.1524" layer="91"/>
+<wire x1="-1264.92" y1="290.83" x2="-1242.06" y2="290.83" width="0.1524" layer="91"/>
+<junction x="-1242.06" y="290.83"/>
+<wire x1="-1243.33" y1="290.83" x2="-1242.06" y2="290.83" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U2" gate="G$1" pin="EMITTER"/>
@@ -11123,13 +11128,6 @@ R_total for 408 = 850k</text>
 <pinref part="R28" gate="G$1" pin="1"/>
 </segment>
 <segment>
-<pinref part="VDD1" gate="G$1" pin="VDD"/>
-<wire x1="-1262.38" y1="284.48" x2="-1235.71" y2="284.48" width="0.1524" layer="91"/>
-<pinref part="J3" gate="G$1" pin="1"/>
-<wire x1="-1264.92" y1="288.29" x2="-1262.38" y2="288.29" width="0.1524" layer="91"/>
-<wire x1="-1262.38" y1="288.29" x2="-1262.38" y2="284.48" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="VDD7" gate="G$1" pin="VDD"/>
 <pinref part="R30" gate="G$1" pin="2"/>
 </segment>
@@ -11152,6 +11150,14 @@ R_total for 408 = 850k</text>
 <segment>
 <pinref part="VDD12" gate="G$1" pin="VDD"/>
 <pinref part="R81" gate="G$1" pin="1"/>
+</segment>
+<segment>
+<pinref part="J3" gate="G$1" pin="1"/>
+<wire x1="-1264.92" y1="288.29" x2="-1262.38" y2="288.29" width="0.1524" layer="91"/>
+<wire x1="-1262.38" y1="288.29" x2="-1262.38" y2="284.48" width="0.1524" layer="91"/>
+<wire x1="-1262.38" y1="284.48" x2="-1235.71" y2="284.48" width="0.1524" layer="91"/>
+<pinref part="VDD1" gate="G$1" pin="VDD"/>
+<wire x1="-1235.71" y1="284.48" x2="-1235.71" y2="290.83" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="GNDI" class="0">
@@ -12711,9 +12717,9 @@ R_total for 408 = 850k</text>
 <pinref part="R68" gate="G$1" pin="1"/>
 <pinref part="R66" gate="G$1" pin="2"/>
 <wire x1="-793.75" y1="276.86" x2="-798.83" y2="276.86" width="0.1524" layer="91"/>
-<wire x1="-798.83" y1="276.86" x2="-817.88" y2="276.86" width="0.1524" layer="91"/>
+<wire x1="-798.83" y1="276.86" x2="-814.07" y2="276.86" width="0.1524" layer="91"/>
 <junction x="-798.83" y="276.86"/>
-<label x="-817.88" y="276.86" size="1.016" layer="95" rot="R180" xref="yes"/>
+<label x="-814.07" y="276.86" size="1.016" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="I_NEUT_N" class="0">
@@ -12726,9 +12732,9 @@ R_total for 408 = 850k</text>
 <pinref part="R69" gate="G$1" pin="1"/>
 <pinref part="R67" gate="G$1" pin="1"/>
 <wire x1="-793.75" y1="256.54" x2="-798.83" y2="256.54" width="0.1524" layer="91"/>
-<wire x1="-798.83" y1="256.54" x2="-816.61" y2="256.54" width="0.1524" layer="91"/>
+<wire x1="-798.83" y1="256.54" x2="-814.07" y2="256.54" width="0.1524" layer="91"/>
 <junction x="-798.83" y="256.54"/>
-<label x="-816.61" y="256.54" size="1.016" layer="95" rot="R180" xref="yes"/>
+<label x="-814.07" y="256.54" size="1.016" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="N$54" class="0">
@@ -12931,16 +12937,20 @@ R_total for 408 = 850k</text>
 <segment>
 <pinref part="D3" gate="G$1" pin="C2"/>
 <wire x1="-1009.65" y1="309.88" x2="-1009.65" y2="307.34" width="0.1524" layer="91"/>
-<wire x1="-1009.65" y1="307.34" x2="-1022.35" y2="309.88" width="0.1524" layer="91"/>
 <pinref part="R12" gate="G$1" pin="1"/>
+<wire x1="-1022.35" y1="309.88" x2="-1019.81" y2="309.88" width="0.1524" layer="91"/>
+<wire x1="-1019.81" y1="309.88" x2="-1019.81" y2="307.34" width="0.1524" layer="91"/>
+<wire x1="-1019.81" y1="307.34" x2="-1009.65" y2="307.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$118" class="0">
 <segment>
-<wire x1="-1009.65" y1="261.62" x2="-1022.35" y2="264.16" width="0.1524" layer="91"/>
 <pinref part="D4" gate="G$1" pin="C2"/>
 <wire x1="-1009.65" y1="261.62" x2="-1009.65" y2="264.16" width="0.1524" layer="91"/>
 <pinref part="R20" gate="G$1" pin="1"/>
+<wire x1="-1022.35" y1="264.16" x2="-1019.81" y2="264.16" width="0.1524" layer="91"/>
+<wire x1="-1019.81" y1="264.16" x2="-1019.81" y2="261.62" width="0.1524" layer="91"/>
+<wire x1="-1019.81" y1="261.62" x2="-1009.65" y2="261.62" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$121" class="0">
