@@ -91,6 +91,7 @@ void mapping(float decimal[], int place,float rect_width, float rect_height){
   vertText(label,(place*width/10) + (place*rect_width)+rect_width, 0.5*height);
 }
 
+
 //The structure of a packet is:
 //for example: finding A_Voltage
 //inString_parts[0] = 'Av'
@@ -132,10 +133,10 @@ void setup(){
   myPort = new Serial(this,usingSerial,9600); //now looking at arduino serial port 1 at 9600Hz
   //don't generate a serialEvent() unless you get a newline character
   myPort.bufferUntil('$');
-  background(128,128,128);
 }
 
 void draw(){
+  background(128,128,128);
   stroke(0);
   strokeWeight(1);
   float rect_width = width/(10*maxfreq);
