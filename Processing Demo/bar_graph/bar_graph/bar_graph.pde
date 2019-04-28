@@ -1,11 +1,11 @@
 //Enoch Chau 2019
 import processing.serial.*;
 
-//**IMPORANT: make sure that max frequency and max values are inline with ADE9078 up or you will have error!
+//**IMPORANT: make sure that max frequency and max values match with ADE9078 or you will have error!
 
-int maxfreq = 6; //assume frequencies can range from 0 to 10 in increments of 0.1
+int maxfreq = 10; //assume frequencies can range from 0 to 10 in increments of 0.1
 int maxvalue = 100;//assume values can range from 0 to 100 in increments of 1
-int errorvalue = 50;//if a frequncy has a value higher than this then there is something wrong with the power consumption
+int errorvalue = 70;//if a frequncy has a value higher than this then there is something wrong with the power consumption
 
 Serial myPort;
 
@@ -20,8 +20,106 @@ float[]decimalAp = new float[maxfreq*2];
 float[]decimalBp = new float[maxfreq*2];
 float[]decimalCp = new float[maxfreq*2];
 
+
+//vertical text
+void vertText(String text, float x, float y){
+  textAlign(CENTER,BOTTOM);
+
+  pushMatrix();
+  translate(x,y);
+  rotate(-HALF_PI);
+  text(text,0,0);
+  popMatrix();
+}
+
+//check for errors, turn the bar red if there is an error
+void errorDetection(float value){
+  if (value > errorvalue){
+    fill(255,0,0);
+  }
+  else{
+    fill(0,255,0);
+  }
+}
+
+//when mapping:
+//we look at decimalAv[0] = frequncy to map to (x-coordinate)
+//assuming that values come in order of frequency, we don't need to use the x-coordinate
+//we then look at decimalAv[1] = value of frequnecy (y-coordinate)
+//------------------------------------------------------------  
+//inputs: decimal_array, placement on screen, rect_width, rect_height
+//for place: Av = 0, Bv = 1, Cv = 2...
+void mapping(float decimal[], int place,float rect_width, float rect_height){
+  int i;
+  for(i=0; i<maxfreq*2;i+=2){
+    errorDetection(decimal[i+1]);
+    rect((decimal[i]*rect_width*maxfreq)+(place*width/10)+(place*rect_width)+rect_width, height - decimal[i+1]*rect_height , rect_width , decimal[i+1]*rect_height);
+    //print(decimal[i]*rect_width*maxfreq);
+    //print(' ');
+  }
+  //println();
+  //draw a black box at the end of each value for cleanliness
+  fill(0);
+  rect(rect_width*maxfreq + (place*width/10) + (place*rect_width)+rect_width, 0, rect_width, height);
+  
+  //text labels for each bar graph
+  fill(255);
+  textSize(32);
+  String label;
+  switch (place){
+    case 0 : label = "A-Voltage";
+      break;
+    case 1 : label = "B-Voltage";
+      break;
+    case 2 : label = "C-Voltage";
+      break;
+    case 3 : label = "A-Current";
+      break;
+    case 4 : label = "B-Current";
+      break;
+    case 5 : label = "C-Current";
+      break;
+    case 6 : label = "A-Power";
+      break;
+    case 7 : label = "B-Power";
+      break;
+    case 8 : label = "C-Power";
+      break;
+    default: label = "place holder";
+      break;
+  }
+  vertText(label,(place*width/10) + (place*rect_width)+rect_width, 0.5*height);
+}
+
+//The structure of a packet is:
+//for example: finding A_Voltage
+//inString_parts[0] = 'Av'
+//inString_parts[1] = '0' (frequency)
+//inString_parts[2] = '1' (value)
+//-----------------------------------------------------
+//checks the header of the input String
+//removes the header using arrayCopy
+//casts the string array to a float array
+void s2f_array(String header, String inString_parts[], String sub_string[], float output_array[]){
+    int i;
+    if(header.equals(inString_parts[0]) == true ){
+    arrayCopy(inString_parts , 1, sub_string, 0, sub_string.length);
+    //for(i=0; i<Av_string.length; i++){
+    //  print("Av_string:");
+    //  println(i);
+    //  println(Av_string[i]);
+    //}
+    for(i=0; i<sub_string.length; i++){
+      output_array[i] = float(sub_string[i]);
+      //print("decimalAv:");
+      //println(i);
+      //println(decimalAv[i]);
+    }
+  }
+}
+
 void setup(){
-  size(1800,900); //make a window that is 1800x900: each value (Av,Bv,Ai,Ap etc.) gets 200pixels x-co_ord & 900pixels y-co_ord
+  size(3000,1000); //make a window: each value (Av,Bv,Ai,Ap etc.) gets (width/9)pixels x-direction & (height)pixels y-direction
   background(0); //set initial background
   
   //list all serial ports
@@ -34,56 +132,49 @@ void setup(){
   myPort = new Serial(this,usingSerial,9600); //now looking at arduino serial port 1 at 9600Hz
   //don't generate a serialEvent() unless you get a newline character
   myPort.bufferUntil('$');
-  background(0);
+  background(128,128,128);
 }
 
 void draw(){
-  int i;
-  stroke(0,255,0);
-  fill(0,255,0);
-  float rect_width = width/(9*maxfreq);
+  stroke(0);
+  strokeWeight(1);
+  float rect_width = width/(10*maxfreq);
+  float rect_height = height/maxvalue;
+  //draw black box at the front of the window
+  fill(0);
+  rect(0, 0, rect_width, height);
   
   //mapping A-Voltage
-  //when mapping:
-  //we look at decimalAv[0] = frequncy to map to (x-coordinate)
-  //assuming that values come in order of frequency, we don't need to use the x-coordinate
-  //we then look at decimalAv[1] = value of frequnecy (y-coordinate)
-  for(i=0; i<maxfreq+1; i+=2){
-    //check for errors, turn the bar red if there is an error
-    //if (decimalAv[i+1] > errorvalue){
-    //  fill(255,0,0); //red
-    //}
-    //else{
-    //  fill(0,255,0);
-    //}
-    rect(i+rect_width , height - decimalAv[i+1]*(height/maxvalue) , rect_width , decimalAv[i+1]*(height/maxvalue));
-    //print("rectangle: ");
-    //println(decimalAv[i]);
-  }
+  mapping(decimalAv,0,rect_width,rect_height);
 
   //mapping B-Voltage
-  for(i=0; i<maxfreq+1; i+=2){
-    rect(i+rect_width+width/9 , height - decimalBv[i+1]*(height/maxvalue) , rect_width , decimalBv[i+1]*(height/maxvalue));
-  }
+  mapping(decimalBv,1,rect_width,rect_height);
   
   //mapping C-Voltage
-  for(i=0; i<maxfreq+1; i+=2){
-    rect(i+rect_width+(2*width)/9 , height - decimalCv[i+1]*(height/maxvalue) , rect_width , decimalCv[i+1]*(height/maxvalue));
-  }
+  mapping(decimalCv,2,rect_width,rect_height);
+
+  //mapping A-Current
+  mapping(decimalAi,3,rect_width,rect_height);
+  
+  //mapping B-Current
+  mapping(decimalBi ,4,rect_width,rect_height);
+  
+  //mapping C-Current
+  mapping(decimalCi,5,rect_width,rect_height);
+  
+  //mapping A-Power
+  mapping(decimalAp,6,rect_width,rect_height);
+  
+  //mapping B-Power
+  mapping(decimalBp ,7,rect_width,rect_height);
+  
+  //mapping C-Power
+  mapping(decimalCp,8,rect_width,rect_height);
 }
 
 void serialEvent (Serial myPort) {  
   int i;
-  String Av = "Av";
-  String Bv = "Bv";
-  String Cv = "Cv";
-  String Ai = "Ai";
-  String Bi = "Bi";
-  String Ci = "Ci";
-  String Ap = "Ap";
-  String Bp = "Bp";
-  String Cp = "Cp";
-  
+
   String[] Av_string = new String[maxfreq*2];
   String[] Bv_string = new String[maxfreq*2];
   String[] Cv_string = new String[maxfreq*2];
@@ -100,68 +191,49 @@ void serialEvent (Serial myPort) {
   //let's assume Ai,Bi,Ci,Av,Bv,Cv,Ap,Bp,Cp
   //i = current; v = voltage; p = power
   
-  //reads the serial port until a new line
+  //reads the serial port until $ (end of packet)
   String inString = myPort.readStringUntil('$');
   
   //check if there is something in the string
   if (inString != null){
-    println(inString);
+    //println(inString);
     
-    //break the string into parts dividing at : , ; $
-    String[] inString_parts = splitTokens(inString, ":,;$");
+    //break the string into parts dividing at : , ; $ \n \r
+    //at the same time it removes those characters from the new string array
+    String[] inString_parts = splitTokens(inString, ":,;$\n\r");
     
     //print each part of the array for debugging
     for(i=0; i<inString_parts.length; i++){
       print(inString_parts[i]);
       print(' ');
     }
-    println();   
+    println();       
 
-    //for example: finding A_Voltage
-    //inString_parts[0] = 'Av'
-    //inString_parts[1] = '0' (frequency)
-    //inString_parts[2] = '1' (value)
-
-    
-    //after checking the first index of inString_parts, use array copy to remove the first index of inString_parts
-    //then copy that array to Av_string
-    if(Av.equals(inString_parts[0]) == true ){
-      arrayCopy(inString_parts , 1, Av_string, 0, Av_string.length);
-      for(i=0; i<Av_string.length; i++){
-        print("Av_string:");
-        println(i);
-        println(Av_string[i]);
-      }
-      for(i=0; i<Av_string.length; i++){
-        decimalAv[i] = float(Av_string[i]);
-        print("decimalAv:");
-        println(i);
-        println(decimalAv[i]);
-      }
-    }
+    //A_voltage
+    s2f_array("Av", inString_parts, Av_string, decimalAv);
     
     //B_voltage
-    if(Bv.equals(inString_parts[0]) == true ){
-      arrayCopy(inString_parts , 1, Bv_string, 0, Bv_string.length);
-      //for(i=0; i<Bv_string.length; i++){
-      //  print("Bv_string:");
-      //  println(i);
-      //  println(Bv_string[i]);
-      //}
-      for(i=0; i<Bv_string.length; i++){
-        decimalBv[i] = float(Bv_string[i]);
-        //print("decimalBv:");
-        //println(i);
-        //println(decimalBv[i]);
-      }
-    }
+    s2f_array("Bv", inString_parts, Bv_string, decimalBv);
     
     //C_voltage
-    if(Cv.equals(inString_parts[0]) == true ){
-      arrayCopy(inString_parts , 1, Cv_string, 0, Cv_string.length);
-      for(i=0; i<Cv_string.length; i++){
-        decimalCv[i] = float(Cv_string[i]);
-      }
-    }
+    s2f_array("Cv", inString_parts, Cv_string, decimalCv);
+    
+    //A_current
+    s2f_array("Ai", inString_parts, Ai_string, decimalAi);
+    
+    //B_current
+    s2f_array("Bi", inString_parts, Bi_string, decimalBi);
+    
+    //C_current
+    s2f_array("Ci", inString_parts, Ci_string, decimalCi);
+    
+    //A_Power
+    s2f_array("Ap", inString_parts, Ap_string, decimalAp);
+    
+    //B_Power
+    s2f_array("Bp", inString_parts, Bp_string, decimalBp);
+    
+    //C_Power
+    s2f_array("Cp", inString_parts, Cp_string, decimalCp);
   }
-}  
+}
