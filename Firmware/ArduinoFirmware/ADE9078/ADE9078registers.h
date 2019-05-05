@@ -257,7 +257,6 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 // Bits: 7 - REVPSUM1 Reset: 0x0 Access: R/W1 - This bit is set to indicate if the CF1 polarity changed sign. See REVPSUM4.
 // Bits: 6 - REVRPC Reset: 0x0 Access: R/W1 - This bit indicates if the Phase C total or fundamental reactive power has changed sign. The PWR_SIGN_SEL bit in the EP_CFG register selects whether total or fundamental reactive power is monitored. This bit is updated when the power values in the xVAR_ACC and xFVAR_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
 // Bits: 5 - REVRPB Reset: 0x0 Access: R/W1 - This bit indicates if the Phase B total or fundamental reactive power has changed sign. See REVRPC.
-// Bits: 5 - REVRPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
 // Bits: 4 - REVRPA Reset: 0x0 Access: R/W1 - This bit indicates if the Phase A total or fundamental reactive power has changed sign. See REVRPC.
 // Bits: 3 - REVAPC Reset: 0x0 Access: R/W1 - This bit indicates if the Phase C total active power has changed sign. This bit is updated when the power values in the xWATT_ACC and xWATT_ACC registers have been updated, after PWR_TIME 4 kSPS samples.
 // Bits: 2 - REVAPB Reset: 0x0 Access: R/W1 - This bit indicates if the Phase B total active power has changed sign. See REVAPC.

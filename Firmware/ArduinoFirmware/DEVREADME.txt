@@ -28,7 +28,7 @@ The demo file probably needs to change so that it edits the struct inside the cl
 
 Let's jump to LastReads.h for a bit
 
-This file just holds a bunc hof structs. It's all the data we're ever going to read. The read functions are all in ADE9078.cpp, and it stores
+This file just holds a bunch of structs. It's all the data we're ever going to read. The read functions are all in ADE9078.cpp, and it stores
 data in these structs. It's called LastReads because when you read again, previous data is overwritten. The demo files access this struct to
 print out.
 
@@ -82,4 +82,3 @@ if you want to use variables in the demo side.
 And one last time, read the datasheet. It'll save you time. You don't have to read all of it. Skim it (like read titles, or first sentences of paragraphs), read the parts
 that seem important. I remember pages.. 50-end were all helpful. Before that, it was more engineering related. Still, skim the whole thing. There's info everywhere, and
 details are important.
-
