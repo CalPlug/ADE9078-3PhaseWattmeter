@@ -239,7 +239,7 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define STATUS0_32 0x402 //Reset: 0x00000000 Access: Read only Description:  Status Register 0
 // Bits: [31:25] RESERVED Reset: 0x0 Access: R
 // Bits: 24 MISMTCH Reset: 0x0 Access: R/W1 - This bit is set to indicate a change in the relationship between ISUMRMS and ISUMLVL
-// Bits: 23 COH_WFB_FULL Reset: 0x0 Access: R/W1 - This bitis set when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
+// Bits: 23 COH_WFB_FULL Reset: 0x0 Access: R/W1 - This bit is set when the waveform buffer is full with resampled data, which is selected when WF_CAP_SEL = 0 in the WFB_CFG register.
 // Bits: 22 WFB_TRIG Reset: 0x0 Access: R/W1 - This bit is set when one of the events configured in WFB_TRIG_CFG occurs
 // Bits: 21 PF_RDY Reset: 0x0 Access: R/W1 - This bit goes high to indicate when the power factor measurements have been updated, every 1.024 seconds.
 // Bits: [20:19] RESERVED Reset: 0x0 Access: R

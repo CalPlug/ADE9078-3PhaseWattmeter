@@ -477,20 +477,29 @@ void ADE9078::initialize(){
 }
 //**************************************************
 
-void ADE9078::configureWFB(int begin)
-{
-	//  0000 0000 0000 0000
-	// 15   11    7    3     shifts to get to location
-		uint16_t wfb_cfg = 0; // first 3 bits are reserved
-		wfb_cfg += (1 << 12); // yes, we are reading I Neutral
-		// next 2 bits reserved
-		// 0001 0011 0000 0000
-		wfb_cfg += (B11 << 9); // use voltage/current waveform samples
-		wfb_cfg += (B00 << 7); // stop when waveform buffer is full
-		wfb_cfg += (0   << 5); // use resampled, not fixed
-		wfb_cfg += (begin   << 4); // begin sampling or maintain?
-		wfb_cfg += (0b0000);   // read all channels
-		spiWrite16(WFB_CFG_16, wfb_cfg);
+// void ADE9078::configureWFB(int begin)
+// {
+// 	//  0000 0000 0000 0000
+// 	// 15   11    7    3     shifts to get to location
+// 		uint16_t wfb_cfg = 0; // first 3 bits are reserved
+// 		wfb_cfg += (1 << 12); // yes, we are reading I Neutral
+// 		// next 2 bits reserved
+// 		// 0001 0011 0000 0000
+// 		wfb_cfg += (B11 << 9); // use voltage/current waveform samples
+// 		wfb_cfg += (B00 << 7); // stop when waveform buffer is full
+// 		wfb_cfg += (0   << 5); // use resampled, not fixed
+// 		wfb_cfg += (begin   << 4); // begin sampling or maintain?
+// 		wfb_cfg += (0b0000);   // read all channels
+// 		spiWrite16(WFB_CFG_16, wfb_cfg);
+// }
+
+void ADE9078::configureWFB(){
+	stopFillingBuffer();
+	readOutWFBSPI();
+	sinc4Output();
+	stopWhenBufferIsFull();
+	readResampledData()
+	burstAllChannels();
 }
 
 bool ADE9078::isDoneSampling()
