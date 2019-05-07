@@ -21,22 +21,22 @@ void ADE9078::readOutWFBSPI(){
   Serial.println("reading out of WFB using SPI");
 }
 
-//Start the WFB
-void ADE9078::startFillingBuffer(){
-  uint16_t addressContent = spiRead16(WFB_CFG_16);
-  addressContent = (addressContent | (0b1 << 4));  //set WF_CAP_EN bit to 1 in the WFB_CFG register to start filling the buffer from Address 0x800.
-  spiWrite16(WFB_CFG_16, addressContent);
-  Serial.println("filling WFB from address 0x800 (first register of page 1)");
-}
-// Stop the WFB
-void ADE9078::stopFillingBuffer(){
-  uint16_t addressContent = spiRead16(WFB_CFG_16);
-  addressContent = (addressContent & ~(0b1 << 4));  //set WF_CAP_EN bit to 0 in the WFB_CFG register
-  spiWrite16(WFB_CFG_16, addressContent);
-  Serial.println("waveform buffer is stopped");
-  Serial.print("last page to be filled was: ")
-  whichPageIsFull();
-}
+// //Start the WFB
+// void ADE9078::startFillingBuffer(){
+//   uint16_t addressContent = spiRead16(WFB_CFG_16);
+//   addressContent = (addressContent | (0b1 << 4));  //set WF_CAP_EN bit to 1 in the WFB_CFG register to start filling the buffer from Address 0x800.
+//   spiWrite16(WFB_CFG_16, addressContent);
+//   Serial.println("filling WFB from address 0x800 (first register of page 1)");
+// }
+// // Stop the WFB
+// void ADE9078::stopFillingBuffer(){
+//   uint16_t addressContent = spiRead16(WFB_CFG_16);
+//   addressContent = (addressContent & ~(0b1 << 4));  //set WF_CAP_EN bit to 0 in the WFB_CFG register
+//   spiWrite16(WFB_CFG_16, addressContent);
+//   Serial.println("waveform buffer is stopped");
+//   Serial.print("last page to be filled was: ")
+//   whichPageIsFull();
+// }
 //see p.67 of datasheet
 //fill WFB with data from Sinc4
 void ADE9078::sinc4Ouput(){
@@ -77,21 +77,21 @@ void ADE9078::stopWhenBufferIsFull(){
 
 //Waveform Buffer Filling Indication—Fixed Data Rate Samples p.68
 //set bits in WFB_PG_IRQEN to get a notification when a page is full
-void ADE9078::isPageFull(int page){
-  uint16_t addressContent = spiRead16(WFB_PG_IRQEN_16);
-  addressContent |= (0b1<<page);
-  spiWrite16(WFB_PG_IRQEN_16, addressContent);
-  Serial.print("You will be notified when this page is full: ");
-  Serial.println(page);
-}
-
-void ADE9078::whichPageIsFull(){
-  uint16_t whichPage = spiRead16(WFB_TRG_STAT_16);
-  whichPage = whichPage & 0xF000; //make all other bits 0 except Bits[15:12]
-  whichPage >> 12;
-  Serial.print("this page is full: ");
-  Serial.println(whichPage);
-}
+// void ADE9078::isPageFull(int page){
+//   uint16_t addressContent = spiRead16(WFB_PG_IRQEN_16);
+//   addressContent |= (0b1<<page);
+//   spiWrite16(WFB_PG_IRQEN_16, addressContent);
+//   Serial.print("You will be notified when this page is full: ");
+//   Serial.println(page);
+// }
+//
+// void ADE9078::whichPageIsFull(){
+//   uint16_t whichPage = spiRead16(WFB_TRG_STAT_16);
+//   whichPage = whichPage & 0xF000; //make all other bits 0 except Bits[15:12]
+//   whichPage >> 12;
+//   Serial.print("this page is full: ");
+//   Serial.println(whichPage);
+// }
 
 //checks PAGE_FULL (bit 17 of STATUS0) and does an inturrupt event
 
@@ -130,7 +130,7 @@ void ADE9078::readResampledData(){
 //see p.71
 void ADE9078::burstAllChannels(){
   uint16_t writeValue = spiRead16(WFB_CFG_16);
-  for (i = 0, i == 3, i++){
+  for (i = 0; i == 3; i++){
     writeValue = writeValue & ~(0b1<<i);
   }
   spiWrite16(WFB_CFG_16, writeValue);

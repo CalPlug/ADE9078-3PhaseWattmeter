@@ -139,8 +139,12 @@ public:
 
     double read32BitAndScale(uint16_t address);
 
+    void startFillingBuffer();
+    void stopFillingBuffer();
+    void isPageFull(int);
+    void whichPageIsFull();
     void spiBurstResampledWFB(uint16_t);
-    void configureWFB(int begin);
+    void configureWFB();
     bool isDoneSampling();
 
     uint8_t spiRead8(uint16_t address);   // Read, inbound function: address, NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078

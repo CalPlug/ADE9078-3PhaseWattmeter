@@ -5,6 +5,7 @@
 #include <ADE9078.h>
 #include <SPI.h>
 #include <EEPROM.h>
+#include "arduinoFFT.h"
 
 
 //Architecture Control:
@@ -13,12 +14,24 @@
 
 
 //Define ADE9078 object with hardware parameters specified
-#define local_SPI_freq 1000000  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
+#define local_SPI_freq 115200  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
 #define local_SS 10  //Set the SS pin for SPI communication as pin 10, typical on Arduino Uno and similar boards
 
 //****WFB settings********
 #define WFB_ALL_SEGMENTS 512
 #define BURST_MEMORY_BASE 0x800
+
+arduinoFFT FFT = arduinoFFT();
+
+#define SAMPLES 64             //FFT Total samples input - Must be a power of 2
+unsigned int sampling_period_us;  //holder for microseconds for FFT
+#define SAMPLING_FREQUENCY 1000 //Hz, match rate to match sampling frequency for input data from data source
+
+//Read, re-sample, process, report flow control
+bool SampleBufferFilled = 0; //Used to indicate when the buffer has been filled and is ready for readout, ready to be read out
+bool FFTCalculationComplete = 0; //Flow control for readout of values
+bool FFTInputBufferFilled = 0; //Flow control for readout of values
+
 
 //****EEPROM Settings******
 #define NUM_ELEMENTS 14 //Define total fields for EEPROM storage that are cleared and used
@@ -218,7 +231,7 @@ void load_data_allfields() //load the data field by field into the RAM holders -
   Serial.println("<--Read data complete, this was read");
 }//*****************************************************
 
-//Declare object for buffer values to be received
+//Declare object for buffer & FFT values to be received
 struct FullResample
 {
     int16_t Ia[WFB_ALL_SEGMENTS];
@@ -228,6 +241,30 @@ struct FullResample
     int16_t Ic[WFB_ALL_SEGMENTS];
     int16_t Vc[WFB_ALL_SEGMENTS];
     int16_t In[WFB_ALL_SEGMENTS];
+};
+
+struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
+	{
+		double vRealPhaseAv[SAMPLES]; //holder for Real (frequency values): Phase A, Voltage
+		double vImagPhaseAv[SAMPLES];  //holder for Img. (Phase values): Phase A, Voltage
+
+		double vRealPhaseAi[SAMPLES]; //holder for Real (frequency values): Phase A, Current
+		double vImagPhaseAi[SAMPLES];  //holder for Img. (Phase values): Phase A, Current
+
+		double vRealPhaseBv[SAMPLES]; //holder for Real (frequency values): Phase B, Voltage
+		double vImagPhaseBv[SAMPLES];  //holder for Img. (Phase values): Phase B, Voltage
+
+		double vRealPhaseBi[SAMPLES]; //holder for Real (frequency values): Phase B, Current
+		double vImagPhaseBi[SAMPLES];  //holder for Img. (Phase values): Phase B, Current
+
+		double vRealPhaseCv[SAMPLES]; //holder for Real (frequency values): Phase C, Voltage
+		double vImagPhaseCv[SAMPLES];  //holder for Img. (Phase values): Phase C, Voltage
+
+		double vRealPhaseCi[SAMPLES]; //holder for Real (frequency values): Phase C, Current
+		double vImagPhaseCi[SAMPLES];  //holder for Img. (Phase values): Phase C, Current
+
+		double vRealPhaseNi[SAMPLES]; //holder for Real (frequency values): Neutral, Current
+		double vImagPhaseNi[SAMPLES];  //holder for Img. (Phase values): Neutral, Current
 };
 
 const int readCount = WFB_ALL_SEGMENTS/WFB_RESAMPLE_SEGMENTS;
@@ -280,26 +317,30 @@ void setup() {
     myADE9078.initialize(); //Call initialization of the ADE9078 withe default configuration plus options specified
 	//EEPROMInit()  //call only once on a virgin chip to "partition" EEPROM for the input type expected moving forward
 	//load_data_allfields();  //load EEPROM values
+  delay(200);
+    //CONFIGURE WFB
+    myADE9078.configureWFB();
 
-  //CONFIGURE WFB
-  myADE9078.configureWFB();
+  sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 }
 
 
 void loop() {
 
+  FFTDataHolder fftData;
   FullResample fullResample;
 
   myADE9078.startFillingBuffer();
 
   while (!myADE9078.isDoneSampling()){
-    delay(5);//wait for the WFB to fill up
+    delay(30);//wait for the WFB to fill up
   }
+  //mode 0 will automatically stop buffer when buffer is full
 
   Serial.println("Finished sampling. Reading beginning.");
 
 
-  for (int i=0; i < 8; ++i)
+  for (int i=0; i < readCount; ++i)
   {
       Serial.println("Outer loop starting");
 
@@ -355,5 +396,5 @@ void loop() {
   }
   Serial.println("Finished reading from ADE chip.");
   myADE9078.stopFillingBuffer();
-  
+
 }

@@ -493,13 +493,73 @@ void ADE9078::initialize(){
 // 		spiWrite16(WFB_CFG_16, wfb_cfg);
 // }
 
+//Start the WFB
+void ADE9078::startFillingBuffer(){
+  uint16_t addressContent = spiRead16(WFB_CFG_16);
+  addressContent = (addressContent | (0b1 << 4));  //set WF_CAP_EN bit to 1 in the WFB_CFG register to start filling the buffer from Address 0x800.
+  spiWrite16(WFB_CFG_16, addressContent);
+  Serial.println("filling WFB from address 0x800 (first register of page 1)");
+}
+// Stop the WFB
+void ADE9078::stopFillingBuffer(){
+  uint16_t addressContent = spiRead16(WFB_CFG_16);
+  addressContent = (addressContent & ~(0b1 << 4));  //set WF_CAP_EN bit to 0 in the WFB_CFG register
+  spiWrite16(WFB_CFG_16, addressContent);
+  Serial.println("waveform buffer is stopped");
+  Serial.print("last page to be filled was: ");
+  whichPageIsFull();
+}
+
+//Waveform Buffer Filling Indication—Fixed Data Rate Samples p.68
+//set bits in WFB_PG_IRQEN to get a notification when a page is full
+void ADE9078::isPageFull(int page){
+  uint16_t addressContent = spiRead16(WFB_PG_IRQEN_16);
+  addressContent |= (0b1<<page);
+  spiWrite16(WFB_PG_IRQEN_16, addressContent);
+  Serial.print("You will be notified when this page is full: ");
+  Serial.println(page);
+}
+
+void ADE9078::whichPageIsFull(){
+  uint16_t whichPage = spiRead16(WFB_TRG_STAT_16);
+  whichPage = whichPage & 0xF000; //make all other bits 0 except Bits[15:12]
+  whichPage >> 12;
+  Serial.print("this page is full: ");
+  Serial.println(whichPage);
+}
+
 void ADE9078::configureWFB(){
-	stopFillingBuffer();
-	readOutWFBSPI();
-	sinc4Output();
-	stopWhenBufferIsFull();
-	readResampledData()
-	burstAllChannels();
+	// stopFillingBuffer();
+	// readOutWFBSPI();
+	// sinc4Output();
+	// stopWhenBufferIsFull();
+	// readResampledData()
+	// burstAllChannels();
+
+	int i;
+	uint16_t writeValue = 0;
+	//stop filling buffer to config buffer
+	writeValue = spiRead16(WFB_CFG_16);
+  writeValue &= ~(0b1 << 4);  //set WF_CAP_EN bit to 0 in the WFB_CFG register
+  spiWrite16(WFB_CFG_16, writeValue);
+
+	//readOutWFBSPI
+	writeValue = (writeValue | (0b1 << 12));
+	//sinc4output
+	writeValue = (writeValue & ~(0b1 << 8));//WF_SRC bit to 00
+  writeValue = (writeValue & ~(0b1 << 9));
+	//mode 0//Stop when buffer is full mode
+	writeValue |= (0b1<<5); //WF_CAP_SEL = 1
+	writeValue &= ~(0b1<<6); //WF_MODE bits = 00
+	writeValue &= ~(0b1<<7);
+	//read resampled data
+	writeValue &= ~(0b1<<5);
+	//burstAllChannels
+	for (i = 0; i == 3; i++){
+		writeValue = writeValue & ~(0b1<<i);
+	}
+	spiWrite16(WFB_CFG_16, writeValue);
+	Serial.println("WFB has been configured");
 }
 
 bool ADE9078::isDoneSampling()
