@@ -120,7 +120,7 @@ void setup() {
 
 void loop() {
   FFTDataHolder fftData;
-  arduinoFFT AvFFT = arduinoFFT(fftData->vRealPHaseAv, fftData->vImagPhaseAv, SAMPLES, double(60));//sampling frequencyh is 60Hz
+  arduinoFFT AvFFT = arduinoFFT(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, double(60));//sampling frequencyh is 60Hz
   // arduinoFFT AiFFT = arduinoFFT(fftData->vRealPhaseAi, fftData->vImagPhaseAi, SAMPLES, double(60));
   //create FFT obect for each reading
 
@@ -158,19 +158,20 @@ void loop() {
         int segOffSet = seg + (i*64);
         Serial.println(segOffSet);
 
-        fftData->vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
-        fftData->vImagPhaseAv[seg] = 0;
+        fftData.vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
+        fftData.vImagPhaseAv[seg] = 0;
         Serial.print("Va: ");
-        Serial.println(fftData->vRealPhaseAv[seg]);
+        Serial.println(fftData.vRealPhaseAv[seg]);
 
         // fftData->vRealPHaseAi[seg] = myADE9078.lastReads.resampledData.Ia[seg];
         // fftData->vImagPhaseAi[seg] = 0;
       }
 
       //AV FFT operations
-      AvFFT.Windowing(vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-      AvFFT.Compute(vRealPhaseAv, vImagPhaseAv, SAMPLES, FFT_FORWARD);
-      AvFFT.ComplexToMagnitude(vRealPhaseAv, vImagPhaseAv, SAMPLES);
+      Serial.print("FFT:");
+      AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+      AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
+      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
       Serial.print("Av:");
       for(int i=0; i<(SAMPLES/2); i++){
         Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
