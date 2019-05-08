@@ -34,16 +34,6 @@ bool FFTInputBufferFilled = 0; //Flow control for readout of values
 
 
 //Declare object for buffer & FFT values to be received
-struct FullResample
-{
-    int16_t Ia[WFB_ALL_SEGMENTS];
-    int16_t Va[WFB_ALL_SEGMENTS];
-    int16_t Ib[WFB_ALL_SEGMENTS];
-    int16_t Vb[WFB_ALL_SEGMENTS];
-    int16_t Ic[WFB_ALL_SEGMENTS];
-    int16_t Vc[WFB_ALL_SEGMENTS];
-    int16_t In[WFB_ALL_SEGMENTS];
-};
 
 struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
 	{
@@ -74,6 +64,7 @@ const int readCount = WFB_ALL_SEGMENTS/WFB_RESAMPLE_SEGMENTS; //==8
 struct InitializationSettings* is = new InitializationSettings; //define structure for initialized values
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
+
 
 
 
@@ -128,9 +119,10 @@ void setup() {
 
 
 void loop() {
-
   FFTDataHolder fftData;
-  FullResample fullResample;
+  arduinoFFT AvFFT = arduinoFFT(fftData->vRealPHaseAv, fftData->vImagPhaseAv, SAMPLES, double(60));//sampling frequencyh is 60Hz
+  // arduinoFFT AiFFT = arduinoFFT(fftData->vRealPhaseAi, fftData->vImagPhaseAi, SAMPLES, double(60));
+  //create FFT obect for each reading
 
   myADE9078.startFillingBuffer();
 
@@ -154,12 +146,9 @@ void loop() {
       Serial.print("Outer Loop: ");
       Serial.println(i);
 
-      //memcpy
+      //write from last reads into the fftData
       for (int seg=0; seg < 64; ++seg)
       {
-        // int s = sizeof(FullResample);
-        // Serial.print("Size of FullResample: ");
-        // Serial.println(s); // should print 7168, and it is.
 
         Serial.print("Loop position: ");
         Serial.print(i);
@@ -169,33 +158,27 @@ void loop() {
         int segOffSet = seg + (i*64);
         Serial.println(segOffSet);
 
-        // myADE9078.readIrms();
-        // Serial.print("A, B, C rms (I): ");
-        // Serial.print(myADE9078.lastReads.irms.a);
-        // Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.irms.b);
-        // Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.irms.c);
-        // Serial.print(" ");
+        fftData->vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
+        fftData->vImagPhaseAv[seg] = 0;
+        Serial.print("Va: ");
+        Serial.println(fftData->vRealPhaseAv[seg]);
 
-
-        Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
-        Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
-        Serial.print(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
-        Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
-        Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
-        Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-        Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-        Serial.println(myADE9078.lastReads.resampledData.In[seg]);
-
-        // fullResample.Ia[segOffSet] = myADE9078.lastReads.resampledData.Ia[seg];
-        // fullResample->Va[segOffSet] = myADE9078.lastReads.resampledData.Va[seg];
-        // fullResample->Ib[segOffSet] = myADE9078.lastReads.resampledData.Ib[seg];
-        // fullResample->Vb[segOffSet] = myADE9078.lastReads.resampledData.Vb[seg];
-        // fullResample->Ic[segOffSet] = myADE9078.lastReads.resampledData.Ic[seg];
-        // fullResample->Vc[segOffSet] = myADE9078.lastReads.resampledData.Vc[seg];
-        // fullResample->In[segOffSet] = myADE9078.lastReads.resampledData.In[seg];
+        // fftData->vRealPHaseAi[seg] = myADE9078.lastReads.resampledData.Ia[seg];
+        // fftData->vImagPhaseAi[seg] = 0;
       }
+
+      //AV FFT operations
+      AvFFT.Windowing(vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+      AvFFT.Compute(vRealPhaseAv, vImagPhaseAv, SAMPLES, FFT_FORWARD);
+      AvFFT.ComplexToMagnitude(vRealPhaseAv, vImagPhaseAv, SAMPLES);
+      Serial.print("Av:");
+      for(int i=0; i<(SAMPLES/2); i++){
+        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
+        Serial.print(",");
+        Serial.println(fftData.vRealPhaseAv[i], 1);
+        Serial.print(";");
+      }
+      Serial.println("$");
   }
   Serial.println("Finished reading from ADE chip.");
 

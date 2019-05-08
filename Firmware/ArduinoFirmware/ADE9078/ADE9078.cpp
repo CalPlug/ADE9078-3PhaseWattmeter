@@ -558,6 +558,8 @@ void ADE9078::configureWFB(){
 	for (i = 0; i == 3; i++){
 		writeValue = writeValue & ~(0b1<<i);
 	}
+	Serial.print("writing to WFB_CFG: ");
+	Serial.println(writeValue);
 	spiWrite16(WFB_CFG_16, writeValue);
 	Serial.println("WFB has been configured");
 }
@@ -566,7 +568,7 @@ bool ADE9078::isDoneSampling()
 {
 		uint16_t status = spiRead32(STATUS0_32);
 		// 23rd bit needs to be 1 to be true
-		return checkBit(status, 23);
+		return checkBit(status, 17);
 }
 
 /* Burst read, resampled waveform */
