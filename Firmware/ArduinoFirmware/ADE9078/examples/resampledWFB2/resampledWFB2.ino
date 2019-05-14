@@ -134,9 +134,9 @@ void loop() {
 
   myADE9078.startFillingBuffer();
 
-  while (!myADE9078.isDoneSampling()){
-    delay(1);//wait for the WFB to fill up
-  }
+  // while (!myADE9078.isDoneSampling()){
+  //   delay(1);//wait for the WFB to fill up
+  // }
 
   myADE9078.stopFillingBuffer();
 

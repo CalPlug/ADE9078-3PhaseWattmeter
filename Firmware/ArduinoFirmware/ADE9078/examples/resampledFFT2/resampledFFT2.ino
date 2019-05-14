@@ -40,23 +40,23 @@ struct FFTDataHolder  //this is the holder for the inputs and the FFT returns
 		double vRealPhaseAv[SAMPLES]; //holder for Real (frequency values): Phase A, Voltage
 		double vImagPhaseAv[SAMPLES];  //holder for Img. (Phase values): Phase A, Voltage
 
-		double vRealPhaseAi[SAMPLES]; //holder for Real (frequency values): Phase A, Current
-		double vImagPhaseAi[SAMPLES];  //holder for Img. (Phase values): Phase A, Current
-
-		double vRealPhaseBv[SAMPLES]; //holder for Real (frequency values): Phase B, Voltage
-		double vImagPhaseBv[SAMPLES];  //holder for Img. (Phase values): Phase B, Voltage
-
-		double vRealPhaseBi[SAMPLES]; //holder for Real (frequency values): Phase B, Current
-		double vImagPhaseBi[SAMPLES];  //holder for Img. (Phase values): Phase B, Current
-
-		double vRealPhaseCv[SAMPLES]; //holder for Real (frequency values): Phase C, Voltage
-		double vImagPhaseCv[SAMPLES];  //holder for Img. (Phase values): Phase C, Voltage
-
-		double vRealPhaseCi[SAMPLES]; //holder for Real (frequency values): Phase C, Current
-		double vImagPhaseCi[SAMPLES];  //holder for Img. (Phase values): Phase C, Current
-
-		double vRealPhaseNi[SAMPLES]; //holder for Real (frequency values): Neutral, Current
-		double vImagPhaseNi[SAMPLES];  //holder for Img. (Phase values): Neutral, Current
+		// double vRealPhaseAi[SAMPLES]; //holder for Real (frequency values): Phase A, Current
+		// double vImagPhaseAi[SAMPLES];  //holder for Img. (Phase values): Phase A, Current
+		//
+		// double vRealPhaseBv[SAMPLES]; //holder for Real (frequency values): Phase B, Voltage
+		// double vImagPhaseBv[SAMPLES];  //holder for Img. (Phase values): Phase B, Voltage
+		//
+		// double vRealPhaseBi[SAMPLES]; //holder for Real (frequency values): Phase B, Current
+		// double vImagPhaseBi[SAMPLES];  //holder for Img. (Phase values): Phase B, Current
+		//
+		// double vRealPhaseCv[SAMPLES]; //holder for Real (frequency values): Phase C, Voltage
+		// double vImagPhaseCv[SAMPLES];  //holder for Img. (Phase values): Phase C, Voltage
+		//
+		// double vRealPhaseCi[SAMPLES]; //holder for Real (frequency values): Phase C, Current
+		// double vImagPhaseCi[SAMPLES];  //holder for Img. (Phase values): Phase C, Current
+		//
+		// double vRealPhaseNi[SAMPLES]; //holder for Real (frequency values): Neutral, Current
+		// double vImagPhaseNi[SAMPLES];  //holder for Img. (Phase values): Neutral, Current
 };
 
 const int readCount = WFB_ALL_SEGMENTS/WFB_RESAMPLE_SEGMENTS; //==8
@@ -65,8 +65,20 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
+//tells you how much ram you have left
+int freeRam () {
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
 
+void resetLastReads(){
+	int i;
+	for (i=0; i< WFB_RESAMPLE_SEGMENTS; i++){
+			myADE9078.lastReads.resampledData.Va[i] = 0;
+	}
 
+}
 
 
 void setup() {
@@ -113,8 +125,11 @@ void setup() {
   delay(200);
     //CONFIGURE WFB
     myADE9078.configureWFB();
+		//myADE9078.burstAvOnly();
     myADE9078.isPageFull(15);
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
+
+
 }
 
 
@@ -124,63 +139,74 @@ void loop() {
   // arduinoFFT AiFFT = arduinoFFT(fftData->vRealPhaseAi, fftData->vImagPhaseAi, SAMPLES, double(60));
   //create FFT obect for each reading
 
-  myADE9078.startFillingBuffer();
-
-  while (!myADE9078.isDoneSampling()){
-    delay(1);//wait for the WFB to fill up
-  }
-
-  myADE9078.stopFillingBuffer();
-
-  Serial.println("Finished sampling. Reading beginning.");
+  //if (myADE9078.isDoneSampling() == 1){
+	myADE9078.startFillingBuffer();
+	//delay(30);
+	//myADE9078.stopFillingBuffer();
 
 
-  for (int i=0; i < readCount; ++i)//readcount = 8
-  {
-      Serial.println("Outer loop starting");
+	  Serial.println("Finished sampling. Reading beginning.");
 
-      uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
-      uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
-      myADE9078.spiBurstResampledWFB(startingAddress);
 
-      Serial.print("Outer Loop: ");
-      Serial.println(i);
+	  // for (int i=0; i < readCount; ++i)//readcount = 8
+	  // {
+	      // Serial.println("Outer loop starting");
+				//
+	      // uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
+				Serial.print("RAM LEFT: ");
+				Serial.println(freeRam());
 
-      //write from last reads into the fftData
-      for (int seg=0; seg < 64; ++seg)
-      {
+				uint16_t startingAddress = BURST_MEMORY_BASE;// + burstMemoryOffset;
+	      myADE9078.spiBurstResampledWFB(startingAddress);
 
-        Serial.print("Loop position: ");
-        Serial.print(i);
-        Serial.print(", ");
-        Serial.println(seg);
-        Serial.print("Segment Offset: ");
-        int segOffSet = seg + (i*64);
-        Serial.println(segOffSet);
+				Serial.print("RAM LEFT: ");
+				Serial.println(freeRam());
+				//
+	      // Serial.print("Outer Loop: ");
+	      // Serial.println(i);
 
-        fftData.vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
-        fftData.vImagPhaseAv[seg] = 0;
-        Serial.print("Va: ");
-        Serial.println(fftData.vRealPhaseAv[seg]);
+	      //write from last reads into the fftData
+	      for (int seg=0; seg < 64; seg++)
+	      {
 
-        // fftData->vRealPHaseAi[seg] = myADE9078.lastReads.resampledData.Ia[seg];
-        // fftData->vImagPhaseAi[seg] = 0;
-      }
+	        // Serial.print("Loop position: ");
+	        // Serial.print(i);
+	        // Serial.print(", ");
+	        // Serial.println(seg);
+	        // Serial.print("Segment Offset: ");
+	        // int segOffSet = seg + (i*64);
+	        // Serial.println(segOffSet);
 
-      //AV FFT operations
-      Serial.print("FFT:");
-      AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-      AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
-      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
-      Serial.print("Av:");
-      for(int i=0; i<(SAMPLES/2); i++){
-        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
-        Serial.print(",");
-        Serial.println(fftData.vRealPhaseAv[i], 1);
-        Serial.print(";");
-      }
-      Serial.println("$");
-  }
-  Serial.println("Finished reading from ADE chip.");
+	        fftData.vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
+	        fftData.vImagPhaseAv[seg] = 0;
+					myADE9078.lastReads.resampledData.Va[seg] = 0;
 
+	        Serial.print("Av: ");
+					Serial.print(seg);
+					Serial.print("\t");
+	        Serial.println(fftData.vRealPhaseAv[seg]);
+
+	        // fftData->vRealPHaseAi[seg] = myADE9078.lastReads.resampledData.Ia[seg];
+	        // fftData->vImagPhaseAi[seg] = 0;
+	      }
+				Serial.print("RAM LEFT: ");
+				Serial.println(freeRam());
+	      //AV FFT operations
+	      Serial.print("FFT:");
+	      AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+	      AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
+	      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
+
+				Serial.print("Av:");
+	      for(int i=0; i<(SAMPLES/2); i++){
+	        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
+	        Serial.print(",");
+	        Serial.print(fftData.vRealPhaseAv[i], 1);
+	        Serial.println(";");
+	      }
+	      Serial.println("$");
+	  //}
+	  Serial.println("Finished reading from ADE chip.");
+
+	//}
 }

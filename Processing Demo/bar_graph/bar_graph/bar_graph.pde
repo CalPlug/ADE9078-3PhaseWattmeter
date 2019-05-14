@@ -4,8 +4,8 @@
 import processing.serial.*;
 //If the program is getting serialEvent errors, just keep restarting it until it works. I think it has something to do with sending in corrupted data.
 //**IMPORANT: make sure that max frequency and max values match with ADE9078 output or you will have error!
-int maxfreq = 10; //assume frequencies can range from 0 to 1 in increments of 0.1
-int maxvalue = 100;//assume values can range from 0 to 100 in increments of 1
+int maxfreq = 500; //assume frequencies can range from 0 to 1 in increments of 0.1
+int maxvalue = 20000;//assume values can range from 0 to 100 in increments of 1
 
 //define the error thresholds
 float errorThreshAv = 30;
@@ -22,7 +22,7 @@ float errorThreshCp = 34;
 float errorThreshPsum = 120;
 
 //**if you change window dimension, make sure to change scale to make everything line up
-float width_scale = 13.2;
+float width_scale = 14;
 float height_scale = 3;
 
 Serial myPort;
@@ -233,7 +233,7 @@ void setup(){
   String usingSerial = Serial.list()[0];
   
   //initilize serial port
-  myPort = new Serial(this,usingSerial,9600); //now looking at arduino serial port 1 at 9600Hz
+  myPort = new Serial(this,usingSerial,115200); //now looking at arduino serial port 1 at 115200Hz
   
   //set all arrays to zero
   arraySetup();
