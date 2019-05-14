@@ -17,18 +17,22 @@ void mapping(float decimal[],float rectWidth, float rectHeight){
   for(i=0; i<decimal.length;i+=2){
     rect((decimal[i]*rectWidth*maxFreq)+(width)+(rectWidth)+rectWidth, height - decimal[i+1]*rectHeight , rectWidth , decimal[i+1]*rectHeight);
   }
-  //draw a black box at the end of each value for cleanliness
-  fill(0);
-  rect(width + (rectWidth), 0, rectWidth, height);
 }
 
 void s2f_array(String header, String inString_parts[], String sub_string[], float output_array[]){
     int i;
+    //print("AIEHGLHSG");
     if(header.equals(inString_parts[0]) == true ){
-    arrayCopy(inString_parts , 1, sub_string, 0, sub_string.length);
-    for(i=0; i<sub_string.length; i++){
-      output_array[i] = float(sub_string[i]);
-    }
+      arrayCopy(inString_parts , 1, sub_string, 0, sub_string.length);
+      for(i=0; i<sub_string.length; i++){
+        //print(sub_string[i]);
+        if (sub_string[i].equals("ovf") == true){
+          output_array[i] = 0.0;
+        }
+        else{
+          output_array[i] = float(sub_string[i]);
+        }
+      }
   }
 }
 

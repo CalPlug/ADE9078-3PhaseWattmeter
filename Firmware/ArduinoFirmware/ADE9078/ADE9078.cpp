@@ -498,16 +498,16 @@ void ADE9078::startFillingBuffer(){
   uint16_t addressContent = spiRead16(WFB_CFG_16);
   addressContent = (addressContent | (0b1 << 4));  //set WF_CAP_EN bit to 1 in the WFB_CFG register to start filling the buffer from Address 0x800.
   spiWrite16(WFB_CFG_16, addressContent);
-  Serial.println("wfb fill start");
+  //Serial.println("wfb fill start");
 }
 // Stop the WFB
 void ADE9078::stopFillingBuffer(){
   uint16_t addressContent = spiRead16(WFB_CFG_16);
   addressContent = (addressContent & ~(0b1 << 4));  //set WF_CAP_EN bit to 0 in the WFB_CFG register
   spiWrite16(WFB_CFG_16, addressContent);
-  Serial.println("wfb stopped");
-  Serial.print("last page filled: ");
-  whichPageIsFull();
+  // Serial.println("wfb stopped");
+  // Serial.print("last page filled: ");
+  //whichPageIsFull();
 }
 
 //Waveform Buffer Filling Indication—Fixed Data Rate Samples p.68
@@ -559,9 +559,9 @@ void ADE9078::configureWFB(){
 	}
 
 	//Serial.print("writing to WFB_CFG: ");
-	Serial.println(writeValue,BIN);
+	//Serial.println(writeValue,BIN);
 	spiWrite16(WFB_CFG_16, writeValue);
-	Serial.println("WFB configured");
+	//Serial.println("WFB configured");
 }
 
 void ADE9078::burstAvOnly(){
@@ -595,7 +595,7 @@ int ADE9078::isDoneSampling()
 		}
 		return check;
 }
-
+//David's original function
 /* Burst read, resampled waveform */
 // void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 // {
@@ -632,117 +632,125 @@ int ADE9078::isDoneSampling()
 // 	SPI.endTransaction();
 //
 // }
+
 /* Burst read, resampled waveform */
 void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 {
-	Serial.print("Begin BurstResample | ");
-
-	Serial.print("StartingAddress: ");
-	Serial.print(startingAddress, HEX);
-	Serial.print(" | ");
-	Serial.print("Transfering commandheader: ");
-	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
-	Serial.print(commandHeader, HEX);
-	Serial.println(" | ");
-
-	uint16_t buffer[512];//2048/16 [totalbits]/[bits i want to read at a time]
-	uint16_t size = 1;
-	int i;
-
-	//idk if this works, idk how spi on esp32 works, this just my guess
-	#ifdef ESP32ARCH
-	spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
-	spiAttachSCK(spy, -1);
-	spiAttachMOSI(spy, -1);
-	spiAttachMISO(spy, -1);
-	digitalWrite(_SS, LOW); //Bring SS LOW (Active)
-	spiTransferByte(spy, commandHeader);
-	spiTransferByte(spy,((startingAddress << 4) & 0xFFF0)+8);
-
-	for (i=0; i<WFB_RESAMPLE_SEGMENTS*8; i+=8){
-		buffer[i] = spiTransferWord(spy, WRITE);
-		buffer[i+1] = spiTransferWord(spy, WRITE);
-		buffer[i+2] = spiTransferWord(spy, WRITE);
-		buffer[i+3] = spiTransferWord(spy, WRITE);
-		buffer[i+4] = spiTransferWord(spy, WRITE);
-		buffer[i+5] = spiTransferWord(spy, WRITE);
-		buffer[i+6] = spiTransferWord(spy, WRITE);
-		buffer[i+7] = spiTransferWord(spy, WRITE);
-		// Serial.println(buffer[i]);
-		// Serial.println(buffer[i+1]);
-		// Serial.println(buffer[i+2]);
-		// Serial.println(buffer[i+3]);
-		// Serial.println(buffer[i+4]);
-		// Serial.println(buffer[i+5]);
-		// Serial.println(buffer[i+6]);
-		// Serial.println(buffer[i+7]);
-	}
-
-	for (i=0; i<WFB_RESAMPLE_SEGMENTS*8; i+=8){
-
-				lastReads.resampledData.Ia[i] = buffer[i];
-				lastReads.resampledData.Va[i] = buffer[i+1];
-				lastReads.resampledData.Ib[i] = buffer[i+2];
-				lastReads.resampledData.Vb[i] = buffer[i+3];
-				lastReads.resampledData.Ic[i] = buffer[i+4];
-				lastReads.resampledData.Vc[i] = buffer[i+5];
-				lastReads.resampledData.In[i] = buffer[i+6];
-	}
-
-
-	digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
-	spiStopBus(spy);
-	#endif
-
-	#ifdef AVRESP8266
-	SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+	// Serial.print("Begin BurstResample | ");
+  	SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 	digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
-	SPI.transfer16(commandHeader);
-  SPI.transfer16(((startingAddress << 4) & 0xFFF0)+8);  //Send the starting address, read mode
 
+	// Serial.print("StartingAddress: ");
+	// Serial.print(startingAddress, HEX);
+	// Serial.print(" | ");
+	// Serial.print("Transfering commandheader: ");
+	//0x8018; - placeholder, ignore
+	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
+	// Serial.print(commandHeader, HEX);
+	// Serial.print(" | ");
+	SPI.transfer16(commandHeader);
+
+
+	//Serial.print("Begin forloop");
+	for(int i=0; i < WFB_RESAMPLE_SEGMENTS; i++)
+	{
+			// Serial.print(i);
+			// Serial.println("--------------------");
+			// Serial.print("Ia\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			// Serial.print("Va\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			// Serial.print("Ib\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			// Serial.print("Vb\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			//
+			// Serial.print("Ic\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			// Serial.print("Vc\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			// Serial.print("In\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+			// Serial.print("Empty\t");
+			// Serial.println(SPI.transfer16(dummyWrite),BIN);
+
+		  lastReads.resampledData.Ia[i] = SPI.transfer16(dummyWrite);
+		  lastReads.resampledData.Va[i] = SPI.transfer16(dummyWrite);
+		  lastReads.resampledData.Ib[i] = SPI.transfer16(dummyWrite);
+		  lastReads.resampledData.Vb[i] = SPI.transfer16(dummyWrite);
+		  lastReads.resampledData.Ic[i] = SPI.transfer16(dummyWrite);
+		  lastReads.resampledData.Vc[i] = SPI.transfer16(dummyWrite);
+		  lastReads.resampledData.In[i] = SPI.transfer16(dummyWrite);
+
+			lastReads.resampledData.Empty[i] = SPI.transfer16(dummyWrite);//this is for the space
+	}
+	//Serial.println("End for loop");
+
+	digitalWrite(_SS, HIGH);  //Enable data transfer by bringing SS line LOW
+	SPI.endTransaction();
+
+}
 
 //look at p.70 in the data sheet, we are splitting up 32bits into two 16 bit parts
-
 //for resampled data
 //2048 32-bit memory locations
 //8192 (2048*32) total number of bits coming out of the ADE9078
 //512 (8192/16bits per sample) total number of samples
 //64 (512/8) samples per value (i.e. Av)
 //WFB_RESAMPLE_SEGMENTS == 64
-
-//here we iterate through the entire 512 16-bit samples
-	for (i=0; i<WFB_RESAMPLE_SEGMENTS*8; i+=8){
-		SPI.transfer(buffer[i],size);
-		SPI.transfer(buffer[i+1],size);
-		SPI.transfer(buffer[i+2],size);
-		SPI.transfer(buffer[i+3],size);
-		SPI.transfer(buffer[i+4],size);
-		SPI.transfer(buffer[i+5],size);
-		SPI.transfer(buffer[i+6],size);
-		// Serial.println(buffer[i]);
-		 Serial.println(buffer[i+1]);
-		// Serial.println(buffer[i+2]);
-		// Serial.println(buffer[i+3]);
-		// Serial.println(buffer[i+4]);
-		// Serial.println(buffer[i+5]);
-		// Serial.println(buffer[i+6]);
-		// Serial.println(buffer[i+7]);
-	}
-
-	for (i=0; i<WFB_RESAMPLE_SEGMENTS*8; i+=8){
-					lastReads.resampledData.Ia[i] = buffer[i];
-					lastReads.resampledData.Va[i] = buffer[i+1];
-					lastReads.resampledData.Ib[i] = buffer[i+2];
-					lastReads.resampledData.Vb[i] = buffer[i+3];
-					lastReads.resampledData.Ic[i] = buffer[i+4];
-					lastReads.resampledData.Vc[i] = buffer[i+5];
-					lastReads.resampledData.In[i] = buffer[i+6];
-		}
-
-	digitalWrite(_SS, HIGH);  //Enable data transfer by bringing SS line LOW
-	SPI.endTransaction();
-	#endif
-}
+/* Burst read, resampled waveform */
+// void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
+// {
+// 	Serial.print("Begin BurstResample | ");
+//
+// 	Serial.print("StartingAddress: ");
+// 	Serial.print(startingAddress, HEX);
+// 	Serial.print(" | ");
+// 	Serial.print("Transfering commandheader: ");
+// 	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
+// 	Serial.print(commandHeader, HEX);
+// 	Serial.println(" | ");
+//
+// 	//we are reading 2048 bits in packets of 16 bits and doing that in 8 loops
+// 	//64 samples per loop
+// 	uint16_t size = 1;
+// 	int i;
+// 	int j;
+//
+// 	//actually you gotta rewrite this part
+// 	//idk if this works, idk how spi on esp32 works, this just my guess
+// 	// #ifdef ESP32ARCH
+// 	// spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE0, SPI_MSBFIRST); //Setup ESP32 SPI bus
+// 	// spiAttachSCK(spy, -1);
+// 	// spiAttachMOSI(spy, -1);
+// 	// spiAttachMISO(spy, -1);
+// 	// digitalWrite(_SS, LOW); //Bring SS LOW (Active)
+// 	// spiTransferByte(spy, commandHeader);
+// 	// spiTransferByte(spy,((startingAddress << 4) & 0xFFF0)+8);
+// 	//**DATA TRANSFER STUFFS
+// 	// digitalWrite(_SS, HIGH);  //Bring SS HIGH (inactive)
+// 	// spiStopBus(spy);
+// 	// #endif
+//
+// 	#ifdef AVRESP8266
+// 	SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
+// 	digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
+// 	SPI.transfer16(commandHeader);
+// 	for (i = 0; i<WFB_RESAMPLE_SEGMENTS; i++){
+// 		SPI.transfer(lastReads.resampledData.Ia[j],size);
+// 		SPI.transfer(lastReads.resampledData.Va[j],size);
+// 		SPI.transfer(lastReads.resampledData.Ib[j],size);
+// 		SPI.transfer(lastReads.resampledData.Vb[j],size);
+// 		SPI.transfer(lastReads.resampledData.Ic[j],size);
+// 		SPI.transfer(lastReads.resampledData.Vc[j],size);
+// 		SPI.transfer(lastReads.resampledData.In[j],size);
+// 		SPI.transfer(*0,size);//this is an empty register
+// 	}
+//
+// 	digitalWrite(_SS, HIGH);  //Enable data transfer by bringing SS line LOW
+// 	SPI.endTransaction();
+// 	#endif
+// }
 
 
 //NOTE: This is an example function, 8 Bit registers for returned values are not used in the ADE9078
