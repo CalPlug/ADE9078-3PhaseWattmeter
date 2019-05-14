@@ -6,12 +6,12 @@
 #define CVrmsGain 	0.000014650
 #define CVrmsOffset 4.88559
 
-#define AIrmsGain 	0.000002777
-#define AIrmsOffset -0.22222
-#define BIrmsGain 	0.000003007
-#define BIrmsOffset -0.24061
-#define CIrmsGain 	0.000002777
-#define CIrmsOffset -0.20833
+#define AIrmsGain 	0.00000541212
+#define AIrmsOffset 6.0764
+#define BIrmsGain 	0.00000541212
+#define BIrmsOffset 6.0764
+#define CIrmsGain 	0.00000541212
+#define CIrmsOffset 6.0764
 
 #define AWattHrGain 1
 #define AWattHrOffset 0
