@@ -27,7 +27,8 @@ arduinoFFT FFT = arduinoFFT();
 
 #define SAMPLES 64             //FFT Total samples input - Must be a power of 2
 unsigned int sampling_period_us;  //holder for microseconds for FFT
-#define SAMPLING_FREQUENCY 1000 //Hz, match rate to match sampling frequency for input data from data source
+#define SAMPLING_FREQUENCY 60 //Hz, match rate to match sampling frequency for input data from data source
+//WERE USING A 60Hz source
 
 //Read, re-sample, process, report flow control
 bool SampleBufferFilled = 0; //Used to indicate when the buffer has been filled and is ready for readout, ready to be read out
@@ -130,68 +131,68 @@ void setup() {
 
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 
-
+	myADE9078.configureWFB();
+	myADE9078.stopFillingBuffer();
 }
 
 
 void loop() {
 	FFTDataHolder fftData;
-	arduinoFFT AvFFT = arduinoFFT(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, double(60));//sampling frequencyh is 60Hz
-	arduinoFFT AiFFT = arduinoFFT(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, double(60));
+
 	//create FFT obect for each reading
-	
-	Serial.println(loopCount);
+	arduinoFFT AvFFT = arduinoFFT(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, SAMPLING_FREQUENCY);
+	arduinoFFT AiFFT = arduinoFFT(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, SAMPLING_FREQUENCY);
 
-
-  //if (myADE9078.isDoneSampling() == 1){
-	myADE9078.stopFillingBuffer();
-	myADE9078.configureWFB();
-	Serial.print("configure wfb");
-	Serial.println(loopCount);
 	myADE9078.startFillingBuffer();
-	delay(30);
+
+  int check = 1;
+  Serial.println("check");
+  while (check != 1){
+  	delay(33);
+  	//Serial.println(wait);
+  	//wait++;
+  	check = myADE9078.isDoneSampling();
+    Serial.println(check);
+  }
+
+  myADE9078.stopFillingBuffer();
 
 
+	Serial.println("done sampling, start reading");
 
-	  //Serial.println("Finished sampling. Reading beginning.");
 
+	  for (int i=0; i < readCount; ++i)//readcount = 8
+	  {
+	      Serial.println("Outer loop starting");
 
-	  // for (int i=0; i < readCount; ++i)//readcount = 8
-	  // {
-	      // Serial.println("Outer loop starting");
-				//
-	      // uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
-				// Serial.print("RAM LEFT: ");
-				// Serial.println(freeRam());
-
-				uint16_t startingAddress = BURST_MEMORY_BASE;// + burstMemoryOffset;
+	      uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
+				uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
 	      myADE9078.spiBurstResampledWFB(startingAddress);
-				Serial.print("burst resampled wfb");
-				Serial.println(loopCount);
-				// Serial.print("RAM LEFT: ");
-				// Serial.println(freeRam());
-				//
-	      // Serial.print("Outer Loop: ");
-	      // Serial.println(i);
+
+				Serial.println("burst resampled wfb");
+
+	      Serial.print("Outer Loop: ");
+	      Serial.println(i);
 
 	      //write from last reads into the fftData
-	      for (int seg=0; seg < 64; seg++)
+	      for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
 	      {
 
-	        // Serial.print("Loop position: ");
-	        // Serial.print(i);
-	        // Serial.print(", ");
-	        // Serial.println(seg);
-	        // Serial.print("Segment Offset: ");
-	        // int segOffSet = seg + (i*64);
-	        // Serial.println(segOffSet);
+	        Serial.print("Loop position: ");
+	        Serial.print(i);
+	        Serial.print(", ");
+	        Serial.println(seg);
+	        Serial.print("Segment Offset: ");
+	        int segOffSet = seg + (i*64);
+	        Serial.println(segOffSet);
 
-					// Serial.print(seg);
-					// Serial.println("------------------------");
-					// Serial.print("Ia: ");
-					// Serial.println(myADE9078.lastReads.resampledData.Ia[seg],BIN);
-					// Serial.print("Va: ");
-					// Serial.println(myADE9078.lastReads.resampledData.Va[seg],BIN);
+					Serial.print(seg);
+					Serial.println("------------------------");
+					Serial.print("Av: ");
+					Serial.println(myADE9078.lastReads.resampledData.Va[seg],BIN);
+					Serial.print("Ai: ");
+					Serial.println(myADE9078.lastReads.resampledData.Ia[seg],BIN);
+
 					// Serial.print("Ib: ");
 					// Serial.println(myADE9078.lastReads.resampledData.Ib[seg],BIN);
 					// Serial.print("Vb: ");
@@ -207,29 +208,22 @@ void loop() {
 
 	        fftData.vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
 	        fftData.vImagPhaseAv[seg] = 0;
-					//myADE9078.lastReads.resampledData.Va[seg] = 0;
-
-	        // Serial.print("Av: ");
-					// Serial.print(seg);
-					// Serial.print("\t");
-	        // Serial.println(fftData.vRealPhaseAv[seg]);
 
 	        fftData.vRealPhaseAi[seg] = myADE9078.lastReads.resampledData.Ia[seg];
 	        fftData.vImagPhaseAi[seg] = 0;
 	      }
-				// Serial.print("RAM LEFT: ");
-				// Serial.println(freeRam());
 
 				//AV FFT operations
-	      //Serial.print("FFT:");
+
 	      AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
 	      AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
 	      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
 
-				AvFFT.Windowing(fftData.vRealPhaseAi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-	      AvFFT.Compute(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, FFT_FORWARD);
-	      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES);
+				AiFFT.Windowing(fftData.vRealPhaseAi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+	      AiFFT.Compute(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, FFT_FORWARD);
+	      AiFFT.ComplexToMagnitude(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES);
 
+				Serial.print("FFT:");
 				Serial.print("Av:");
 	      for(int i=0; i<(SAMPLES/2); i++){
 	        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
@@ -247,12 +241,6 @@ void loop() {
 	        Serial.print(";");
 	      }
 	      Serial.println("$");
-	  //}
-	  //Serial.println("Finished reading from ADE chip.");
-
-	//}
-	Serial.println(loopCount);
-	loopCount++;
-	Serial.print("RAM LEFT: ");
-	Serial.println(freeRam());
+	  }
+	  Serial.println("Finished reading from ADE chip.");
 }

@@ -553,7 +553,7 @@ If multipoint gain and phase compensation is enabled, with MTEN = 1 in the CONFI
 #define WFB_TRG_STAT_16 0x4A3 //Reset: 0x0000 Access: R/W Description: This register indicates the last page that was filled in the waveform buffer and the location of trigger events.
 // Bits: [15:12] Bitname: WFB_LAST_PAGE Reset: 0x0 Access: R/W Description: These bits indicate which page of the waveform buffer was filled last, when filling with fixed rate data samples
 // Bits: 11 Bitname: RESERVED Reset: 0x0 Access: R Description: Reserved
-// Bits: [10:0]  Bitname: UPERIOD_SEL Reset: 0x0 Access: R Description: This hilds the address of the last sample put into the waveform buffer after a trigger event occured, which is within a sample or two of when the actual trigger event occurred.
+// Bits: [10:0]  Bitname: WFB_TRIG_ADDR Reset: 0x0 Access: R Description: This holds the address of the last sample put into the waveform buffer after a trigger event occurred, which is within a sample or two of when the actual trigger event occurred.
 #define CONFIG5_16 0x4A4 //Reset: 0x0063 Access: R/W Description: Reset: 0x0063 Access: R/W Description: Configuration Register 5
 #define CRC_RSLT_16 0x4A8 //Reset: 0x0000 Access: R Description: This register holds the CRC of configuration registers.
 #define CRC_SPI_16 0x4A9 //Reset: 0x0000 Access: R Description: This register holds the 16-bit CRC of the data sent out on the MOSI pin during the last SPI register read.
