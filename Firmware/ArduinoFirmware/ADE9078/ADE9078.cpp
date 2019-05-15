@@ -505,6 +505,14 @@ void ADE9078::stopFillingBuffer(){
   uint16_t addressContent = spiRead16(WFB_CFG_16);
   addressContent = (addressContent & ~(0b1 << 4));  //set WF_CAP_EN bit to 0 in the WFB_CFG register
   spiWrite16(WFB_CFG_16, addressContent);
+	//reset the buffer check in COH_WFB_FULL bit of STATUS0
+	uint16_t bufferCheckReset = spiRead32(STATUS0_32);
+	// Serial.print("buff check read\t");
+	// Serial.print(bufferCheckReset,BIN);
+	bufferCheckReset = (bufferCheckReset & ~(0b1 << 23));
+	// Serial.print("buff check writ\t");
+	// Serial.println(bufferCheckReset,BIN);
+	spiWrite32(STATUS0_32, bufferCheckReset);
   // Serial.println("wfb stopped");
   // Serial.print("last page filled: ");
   //whichPageIsFull();
@@ -547,7 +555,7 @@ void ADE9078::configureWFB(){
 	//enable INeutral
 	//writeValue = (writeValue | (0b1 << 12));
 	//disable INeutral; we aren't using it in our setup
-	writeValue = (writeValue & ~(-b1<<12));
+	writeValue = (writeValue & ~(-0b1<<12));
 
 	//sinc4output
 	writeValue = (writeValue & ~(0b1 << 8));//WF_SRC bit to 00
@@ -589,10 +597,11 @@ int ADE9078::isDoneSampling()
 {
 		int check = 0;
 		uint32_t status = spiRead32(STATUS0_32);
+		//Serial.println(status,BIN);
 		// 23th bit tells you that the buffer is full
-		status &= (0b1 << 23);
-		check = (status >> 23);
-		Serial.print(check);
+		status = (status >> 23);
+		check = (status & 0b1);
+		//Serial.print(check);
 		return check;
 }
 //David's original function
@@ -644,7 +653,7 @@ void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 	Serial.print(startingAddress, HEX);
 	Serial.print(" | ");
 	Serial.print("Transfering commandheader: ");
-	0x8018; - placeholder, ignore
+
 	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
 	Serial.print(commandHeader, HEX);
 	Serial.print(" | ");
@@ -701,10 +710,10 @@ void ADE9078::spiBurstResampledWFB_Avonly(uint16_t startingAddress)
 	Serial.print(startingAddress, HEX);
 	Serial.print(" | ");
 	Serial.print("Transfering commandheader: ");
-	0x8018; - placeholder, ignore
+
 	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
 	Serial.print(commandHeader, HEX);
-	Serial.print(" | ");
+	Serial.println(" | ");
 	SPI.transfer16(commandHeader);
 
 

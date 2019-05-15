@@ -6,34 +6,37 @@ import processing.serial.*;
 Serial myPort;
 
 float maxFreq = 500;
-float maxValue = 100000;
-int maxFreqINT = 500;
-int maxValueINT = 100000;
+float maxValue = 1000000000;
+int sampleSize = 64;
 
-float[]decimalAv = new float[maxFreqINT*2];
+float[]decimalAv = new float[sampleSize];
 
 void mapping(float decimal[],float rectWidth, float rectHeight){
   int i;
   for(i=0; i<decimal.length;i+=2){
-    rect((decimal[i]*rectWidth*maxFreq)+(width)+(rectWidth)+rectWidth, height - decimal[i+1]*rectHeight , rectWidth , decimal[i+1]*rectHeight);
+    rect((decimal[i]*width)+(rectWidth)+rectWidth, height - decimal[i+1]*rectHeight , /*rectWidth*/10 , decimal[i+1]*rectHeight);
   }
 }
 
-void s2f_array(String header, String inString_parts[], String sub_string[], float output_array[]){
+void s2f_array(String header, String inString_parts[], float output_array[]){
     int i;
-    //print("AIEHGLHSG");
+    print("check run function\n");
     if(header.equals(inString_parts[0]) == true ){
-      arrayCopy(inString_parts , 1, sub_string, 0, sub_string.length);
-      for(i=0; i<sub_string.length; i++){
-        //print(sub_string[i]);
-        if (sub_string[i].equals("ovf") == true){
-          output_array[i] = 0.0;
-        }
-        else{
-          output_array[i] = float(sub_string[i]);
-        }
+      print("check first array value\n");
+      for (i = 0; i<output_array.length; i++){
+        //if (inString_parts[i+1].equals("ovf") == true){
+          //output_array[i] = maxValue;
+        //}
+        //else{
+          print(i);
+          print("\n");
+          output_array[i] = float(inString_parts[i+1]);
+          print(output_array[i]);
+          print("\n");
+        //}
       }
-  }
+      print("check cast to float");
+    }
 }
 
 void zeroArray(float array[]){
@@ -59,15 +62,13 @@ void draw(){
   float rectWidth = width/maxFreq;
   float rectHeight = height/maxValue;
   fill(0, 191, 255);
-  
-  mapping(decimalAv,rectWidth,rectHeight);  
+  rect(200,200,100,100);
+  //mapping(decimalAv,rectWidth,rectHeight);
 }
 
 void serialEvent(Serial myPort){
   int i;
-  
-  String[] Av_string = new String[maxFreqINT*2];
-  
+    
   String inString = myPort.readStringUntil('$');
   println(inString);
   
@@ -79,7 +80,7 @@ void serialEvent(Serial myPort){
       print(' ');
     }
     println();  
-    s2f_array("Av", inStringParts, Av_string, decimalAv);
+    s2f_array("Av", inStringParts, decimalAv);
     
     for (i=0; i<decimalAv.length; i++){
       print(decimalAv[i]);

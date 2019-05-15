@@ -97,7 +97,6 @@ void setup() {
 	//load_data_allfields();  //load EEPROM values
   delay(200);
 
-
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 }
 
@@ -110,7 +109,7 @@ void loop() {
   myADE9078.burstAvOnly();
 
   myADE9078.startFillingBuffer();
-
+  //int wait = 0;//takes about 40-41ms to fill buffer
   bool check = 0;
   //Serial.println("check");
   while (check != 1){
@@ -124,53 +123,63 @@ void loop() {
 
   myADE9078.stopFillingBuffer();
 
-  Serial.println("done sampling, start reading");
+  //Serial.println("done sampling, start reading");
 
-  myADE9078.spiBurstResampledWFB(BURST_MEMORY_BASE);
 
-  //memcpy
-  for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
+  for (int i=0; i < readCount; ++i)//readcount = 8
   {
-    // int s = sizeof(FullResample);
-    // Serial.print("Size of FullResample: ");
-    // Serial.println(s); // should print 7168, and it is.
+      // Serial.println("Outer loop starting");
 
-    Serial.print("Loop position: ");
-    Serial.print(i);
-    Serial.print(", ");
-    Serial.println(seg);
-    Serial.print("Segment Offset: ");
-    int segOffSet = seg + (i*64);
-    Serial.println(segOffSet);
+      uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
+      uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
+      myADE9078.spiBurstResampledWFB_Avonly(startingAddress);
 
-    // myADE9078.readIrms();
-    // Serial.print("A, B, C rms (I): ");
-    // Serial.print(myADE9078.lastReads.irms.a);
-    // Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.irms.b);
-    // Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.irms.c);
-    // Serial.print(" ");
+      // Serial.print("Outer Loop: ");
+      // Serial.println(i);
 
+      //memcpy
+      for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
+      {
+        // int s = sizeof(FullResample);
+        // Serial.print("Size of FullResample: ");
+        // Serial.println(s); // should print 7168, and it is.
 
-    //Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
-    //Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
-    Serial.println(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-    // Serial.println(myADE9078.lastReads.resampledData.In[seg]);
+        int segOffSet = seg + (i*64);
+        // Serial.print("Loop position: ");
+        // Serial.print(i);
+        // Serial.print(", ");
+        // Serial.println(seg);
+        // Serial.print("Segment Offset: ");
+        // Serial.println(segOffSet);
 
-    // fullResample.Ia[segOffSet] = myADE9078.lastReads.resampledData.Ia[seg];
-    // fullResample->Va[segOffSet] = myADE9078.lastReads.resampledData.Va[seg];
-    // fullResample->Ib[segOffSet] = myADE9078.lastReads.resampledData.Ib[seg];
-    // fullResample->Vb[segOffSet] = myADE9078.lastReads.resampledData.Vb[seg];
-    // fullResample->Ic[segOffSet] = myADE9078.lastReads.resampledData.Ic[seg];
-    // fullResample->Vc[segOffSet] = myADE9078.lastReads.resampledData.Vc[seg];
-    // fullResample->In[segOffSet] = myADE9078.lastReads.resampledData.In[seg];
+        // myADE9078.readIrms();
+        // Serial.print("A, B, C rms (I): ");
+        // Serial.print(myADE9078.lastReads.irms.a);
+        // Serial.print(" ");
+        // Serial.print(myADE9078.lastReads.irms.b);
+        // Serial.print(" ");
+        // Serial.print(myADE9078.lastReads.irms.c);
+        // Serial.print(" ");
+
+        Serial.print("Av\t");
+        //Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
+        //Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
+        Serial.println(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
+        // Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
+        // Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
+        // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
+        // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
+        // Serial.println(myADE9078.lastReads.resampledData.In[seg]);
+
+        // fullResample.Ia[segOffSet] = myADE9078.lastReads.resampledData.Ia[seg];
+        // fullResample->Va[segOffSet] = myADE9078.lastReads.resampledData.Va[seg];
+        // fullResample->Ib[segOffSet] = myADE9078.lastReads.resampledData.Ib[seg];
+        // fullResample->Vb[segOffSet] = myADE9078.lastReads.resampledData.Vb[seg];
+        // fullResample->Ic[segOffSet] = myADE9078.lastReads.resampledData.Ic[seg];
+        // fullResample->Vc[segOffSet] = myADE9078.lastReads.resampledData.Vc[seg];
+        // fullResample->In[segOffSet] = myADE9078.lastReads.resampledData.In[seg];
+      }
   }
-
   Serial.println("Finished reading from ADE chip.");
 
 }

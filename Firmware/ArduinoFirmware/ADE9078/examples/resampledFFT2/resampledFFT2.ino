@@ -131,8 +131,7 @@ void setup() {
 
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 
-	myADE9078.configureWFB();
-	myADE9078.stopFillingBuffer();
+
 }
 
 
@@ -142,16 +141,18 @@ void loop() {
 	//create FFT obect for each reading
 	arduinoFFT AvFFT = arduinoFFT(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, SAMPLING_FREQUENCY);
 	arduinoFFT AiFFT = arduinoFFT(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, SAMPLING_FREQUENCY);
+	myADE9078.configureWFB();
 
 	myADE9078.startFillingBuffer();
 
-  int check = 1;
-  Serial.println("check");
+	bool check = 0;
+  //Serial.println("check");
   while (check != 1){
-  	delay(33);
-  	//Serial.println(wait);
-  	//wait++;
+  	delay(1);
+  	// Serial.println(wait);
+  	// wait++;
   	check = myADE9078.isDoneSampling();
+    Serial.print("wait status: ");
     Serial.println(check);
   }
 

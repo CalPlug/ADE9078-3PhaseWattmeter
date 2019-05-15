@@ -25,7 +25,7 @@ arduinoFFT FFT = arduinoFFT();
 
 #define SAMPLES 64             //FFT Total samples input - Must be a power of 2
 unsigned int sampling_period_us;  //holder for microseconds for FFT
-#define SAMPLING_FREQUENCY 1000 //Hz, match rate to match sampling frequency for input data from data source
+#define SAMPLING_FREQUENCY 60 //Hz, match rate to match sampling frequency for input data from data source
 
 //Read, re-sample, process, report flow control
 bool SampleBufferFilled = 0; //Used to indicate when the buffer has been filled and is ready for readout, ready to be read out
@@ -97,7 +97,6 @@ void setup() {
 	//load_data_allfields();  //load EEPROM values
   delay(200);
     //CONFIGURE WFB
-    myADE9078.configureWFB();
 
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 }
@@ -106,16 +105,18 @@ void setup() {
 void loop() {
 
   FullResample fullResample;
+  myADE9078.configureWFB();
 
   myADE9078.startFillingBuffer();
 
-  int check = 1;
-  Serial.println("check");
+  bool check = 0;
+  //Serial.println("check");
   while (check != 1){
-  	delay(33);
-  	//Serial.println(wait);
-  	//wait++;
+  	delay(1);
+  	// Serial.println(wait);
+  	// wait++;
   	check = myADE9078.isDoneSampling();
+    Serial.print("wait status: ");
     Serial.println(check);
   }
 
@@ -126,14 +127,14 @@ void loop() {
 
   for (int i=0; i < readCount; ++i)//readcount = 8
   {
-      Serial.println("Outer loop starting");
+      // Serial.println("Outer loop starting");
 
       uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
       uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
       myADE9078.spiBurstResampledWFB(startingAddress);
 
-      Serial.print("Outer Loop: ");
-      Serial.println(i);
+      // Serial.print("Outer Loop: ");
+      // Serial.println(i);
 
       //memcpy
       for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
@@ -142,13 +143,13 @@ void loop() {
         // Serial.print("Size of FullResample: ");
         // Serial.println(s); // should print 7168, and it is.
 
-        Serial.print("Loop position: ");
-        Serial.print(i);
-        Serial.print(", ");
-        Serial.println(seg);
-        Serial.print("Segment Offset: ");
+        // Serial.print("Loop position: ");
+        // Serial.print(i);
+        // Serial.print(", ");
+        // Serial.println(seg);
+        // Serial.print("Segment Offset: ");
+        // Serial.println(segOffSet);
         int segOffSet = seg + (i*64);
-        Serial.println(segOffSet);
 
         // myADE9078.readIrms();
         // Serial.print("A, B, C rms (I): ");
@@ -160,14 +161,14 @@ void loop() {
         // Serial.print(" ");
 
 
-        //Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
-        //Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
+        Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
+        Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
         Serial.println(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-        // Serial.println(myADE9078.lastReads.resampledData.In[seg]);
+        Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
+        Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
+        Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
+        Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
+        Serial.println(myADE9078.lastReads.resampledData.In[seg]);
 
         // fullResample.Ia[segOffSet] = myADE9078.lastReads.resampledData.Ia[seg];
         // fullResample->Va[segOffSet] = myADE9078.lastReads.resampledData.Va[seg];
