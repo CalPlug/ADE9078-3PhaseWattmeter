@@ -5,10 +5,7 @@
 #include <ADE9078.h>
 #include <ADE9078Calibrations.h>
 #include <SPI.h>
-#include <EEPROM.h>
 #include "arduinoFFT.h"
-
-int loopCount = 0;
 
 //Architecture Control:
 //Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32
@@ -21,7 +18,7 @@ int loopCount = 0;
 
 //****WFB settings********
 #define WFB_ALL_SEGMENTS 512
-#define BURST_MEMORY_BASE 0x800
+#define BURST_MEMORY_BASE 0x801//well, its supposed to be 0x800 but that doesn't work that well for some reason
 
 arduinoFFT FFT = arduinoFFT();
 
@@ -75,16 +72,6 @@ int freeRam () {
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-// void resetLastReads(){
-// 	int i;
-// 	for (i=0; i< WFB_RESAMPLE_SEGMENTS; i++){
-// 			myADE9078.lastReads.resampledData.Va[i] = 0;
-// 	}
-//
-// }
-
-/****FFT*////
-
 
 void setup() {
 
@@ -129,9 +116,8 @@ void setup() {
 	//load_data_allfields();  //load EEPROM values
   delay(200);
 
+	myADE9078.configureWFB();
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
-
-
 }
 
 
@@ -141,9 +127,10 @@ void loop() {
 	//create FFT obect for each reading
 	arduinoFFT AvFFT = arduinoFFT(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, SAMPLING_FREQUENCY);
 	arduinoFFT AiFFT = arduinoFFT(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, SAMPLING_FREQUENCY);
-	myADE9078.configureWFB();
 
-	myADE9078.startFillingBuffer();
+	myADE9078.stopFillingBuffer();
+  myADE9078.resetFullBufferBit();
+  myADE9078.startFillingBuffer();
 
 	bool check = 0;
   //Serial.println("check");
@@ -155,8 +142,6 @@ void loop() {
     Serial.print("wait status: ");
     Serial.println(check);
   }
-
-  myADE9078.stopFillingBuffer();
 
 
 	Serial.println("done sampling, start reading");
@@ -190,9 +175,9 @@ void loop() {
 					Serial.print(seg);
 					Serial.println("------------------------");
 					Serial.print("Av: ");
-					Serial.println(myADE9078.lastReads.resampledData.Va[seg],BIN);
+					Serial.println(myADE9078.lastReads.resampledData.Va[seg]);
 					Serial.print("Ai: ");
-					Serial.println(myADE9078.lastReads.resampledData.Ia[seg],BIN);
+					Serial.println(myADE9078.lastReads.resampledData.Ia[seg]);
 
 					// Serial.print("Ib: ");
 					// Serial.println(myADE9078.lastReads.resampledData.Ib[seg],BIN);
@@ -215,18 +200,18 @@ void loop() {
 	      }
 
 				//AV FFT operations
+				AvFFT.Windowing(FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+	      AvFFT.Compute(FFT_FORWARD);
+	      AvFFT.ComplexToMagnitude();
+				//AI FFT operations
+				AiFFT.Windowing(FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+				AiFFT.Compute(FFT_FORWARD);
+				AiFFT.ComplexToMagnitude();
 
-	      AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-	      AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
-	      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
-
-				AiFFT.Windowing(fftData.vRealPhaseAi, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-	      AiFFT.Compute(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES, FFT_FORWARD);
-	      AiFFT.ComplexToMagnitude(fftData.vRealPhaseAi, fftData.vImagPhaseAi, SAMPLES);
 
 				Serial.print("FFT:");
 				Serial.print("Av:");
-	      for(int i=0; i<(SAMPLES/2); i++){
+	      for(int i=0; i<(SAMPLES); i++){
 	        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
 	        Serial.print(",");
 	        Serial.print(fftData.vRealPhaseAv[i], 1);
@@ -235,7 +220,7 @@ void loop() {
 	      Serial.println("$");
 
 				Serial.print("Ai:");
-	      for(int i=0; i<(SAMPLES/2); i++){
+	      for(int i=0; i<(SAMPLES); i++){
 	        Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
 	        Serial.print(",");
 	        Serial.print(fftData.vRealPhaseAi[i], 1);

@@ -107,7 +107,6 @@ void loop() {
   FullResample fullResample;
   //CONFIGURE WFB
   myADE9078.configureWFB();
-  myADE9078.burstAvOnly();
 
   myADE9078.startFillingBuffer();
 

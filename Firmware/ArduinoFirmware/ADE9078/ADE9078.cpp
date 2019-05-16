@@ -493,26 +493,37 @@ void ADE9078::initialize(){
 // 		spiWrite16(WFB_CFG_16, wfb_cfg);
 // }
 
+//this resets the bit in STATUS0_32 called COH_WFB_FULL so we can once again be notified if the thing is full
+void ADE9078::resetFullBufferBit(){
+	uint32_t addressContent = spiRead32(STATUS0_32);
+	// Serial.print("buff check read\t");
+	// Serial.print(addressContent,BIN);
+	addressContent = (addressContent & ~(0b1 << 23));
+	// Serial.print("buff check writ\t");
+	// Serial.println(addressContent,BIN);
+	spiWrite32(STATUS0_32, addressContent);
+}
 //Start the WFB
 void ADE9078::startFillingBuffer(){
   uint16_t addressContent = spiRead16(WFB_CFG_16);
   addressContent = (addressContent | (0b1 << 4));  //set WF_CAP_EN bit to 1 in the WFB_CFG register to start filling the buffer from Address 0x800.
-  spiWrite16(WFB_CFG_16, addressContent);
+
+	// Serial.print("WFB_CFG enable\t");
+	// Serial.println(addressContent,BIN);
+
+	spiWrite16(WFB_CFG_16, addressContent);
   //Serial.println("wfb fill start");
 }
 // Stop the WFB
 void ADE9078::stopFillingBuffer(){
   uint16_t addressContent = spiRead16(WFB_CFG_16);
   addressContent = (addressContent & ~(0b1 << 4));  //set WF_CAP_EN bit to 0 in the WFB_CFG register
-  spiWrite16(WFB_CFG_16, addressContent);
-	//reset the buffer check in COH_WFB_FULL bit of STATUS0
-	uint16_t bufferCheckReset = spiRead32(STATUS0_32);
-	// Serial.print("buff check read\t");
-	// Serial.print(bufferCheckReset,BIN);
-	bufferCheckReset = (bufferCheckReset & ~(0b1 << 23));
-	// Serial.print("buff check writ\t");
-	// Serial.println(bufferCheckReset,BIN);
-	spiWrite32(STATUS0_32, bufferCheckReset);
+
+	// Serial.print("WFB_CFG disable\t");
+	// Serial.println(addressContent,BIN);
+
+	spiWrite16(WFB_CFG_16, addressContent);
+
   // Serial.println("wfb stopped");
   // Serial.print("last page filled: ");
   //whichPageIsFull();
@@ -539,13 +550,6 @@ void ADE9078::stopFillingBuffer(){
 // }
 
 void ADE9078::configureWFB(){
-	// stopFillingBuffer();
-	// readOutWFBSPI();
-	// sinc4Output();
-	// stopWhenBufferIsFull();
-	// readResampledData()
-	// burstAllChannels();
-
 	int i;
 	uint16_t writeValue = spiRead16(WFB_CFG_16);
 	//stop filling buffer to config buffer
@@ -645,6 +649,43 @@ int ADE9078::isDoneSampling()
 /* Burst read, resampled waveform */
 void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 {
+	#ifdef ESP32ARCH
+	spy = spiStartBus(VSPI, SPI_CLOCK_DIV16, SPI_MODE3, SPI_MSBFIRST);
+	spiAttachSCK(spy, -1);
+	spiAttachMOSI(spy, -1);
+	spiAttachMISO(spy, -1);
+	digitalWrite(_SS, LOW); //Bring SS LOW (Active)
+
+	Serial.print("StartingAddress: ");
+	Serial.print(startingAddress, HEX);
+	Serial.print(" | ");
+	Serial.print("Transfering commandheader: ");
+
+	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
+	Serial.print(commandHeader, HEX);
+	Serial.println(" | ");
+	spiTransferWord(spy, commandHeader);
+
+	for(int i=0; i < WFB_RESAMPLE_SEGMENTS; i++)
+	{
+			lastReads.resampledData.Ia[i] = spiTransferWord(spy, WRITE);
+			lastReads.resampledData.Va[i] = spiTransferWord(spy, WRITE);
+			lastReads.resampledData.Ib[i] = spiTransferWord(spy, WRITE);
+			lastReads.resampledData.Vb[i] = spiTransferWord(spy, WRITE);
+			lastReads.resampledData.Ic[i] = spiTransferWord(spy, WRITE);
+			lastReads.resampledData.Vc[i] = spiTransferWord(spy, WRITE);
+			//blank cells are skipped internally
+			//In is disabled in the WFB_CFG
+			//lastReads.resampledData.In[i] = SPI.transfer16(dummyWrite);
+
+	}
+	//Serial.println("End for loop");
+
+	digitalWrite(_SS, HIGH);  //Enable data transfer by bringing SS line LOW
+	spiStopBus(spy);
+	#endif
+
+	#ifdef AVRESP8266
 	Serial.print("Begin BurstResample | ");
   	SPI.beginTransaction(defaultSPISettings);  // Clock is high when inactive. Read at rising edge: SPIMODE3.
 	digitalWrite(_SS, LOW);  //Enable data transfer by bringing SS line LOW
@@ -656,7 +697,7 @@ void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 
 	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
 	Serial.print(commandHeader, HEX);
-	Serial.print(" | ");
+	Serial.println(" | ");
 	SPI.transfer16(commandHeader);
 
 
@@ -697,6 +738,7 @@ void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 
 	digitalWrite(_SS, HIGH);  //Enable data transfer by bringing SS line LOW
 	SPI.endTransaction();
+	#endif
 }
 
 /* Burst read, resampled waveform */
@@ -714,6 +756,9 @@ void ADE9078::spiBurstResampledWFB_Avonly(uint16_t startingAddress)
 	uint16_t commandHeader = ((startingAddress << 4)& 0xFFF0) + 8;
 	Serial.print(commandHeader, HEX);
 	Serial.println(" | ");
+
+	//Serial.println("command header about to be sent");
+
 	SPI.transfer16(commandHeader);
 
 
@@ -724,9 +769,11 @@ void ADE9078::spiBurstResampledWFB_Avonly(uint16_t startingAddress)
 			// Serial.println("--------------------");
 			// Serial.print("Va\t");
 			// Serial.println(SPI.transfer16(dummyWrite),BIN);
-
+			Serial.print("resampled seg");
+			Serial.println(i);
 		  lastReads.resampledData.Va[i] = SPI.transfer16(dummyWrite);
 			//blank cells are skipped internally
+
 
 
 	}

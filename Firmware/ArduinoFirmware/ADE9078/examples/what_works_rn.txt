@@ -1,0 +1,9 @@
+work off of WFB2: this one actually works properly
+
+resampledWFB2: works
+resampledWFBAvonly: works
+
+resampledWFB2_FFT: the one were testing to see if FFT works while reading resampled data
+*likely cause: memory issue
+
+resampledWFB2: just regular wfb - works

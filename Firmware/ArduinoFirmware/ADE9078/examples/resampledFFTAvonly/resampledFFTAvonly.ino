@@ -19,7 +19,7 @@
 
 //****WFB settings********
 #define WFB_ALL_SEGMENTS 512
-#define BURST_MEMORY_BASE 0x801//well, its supposed to be 0x800 but that doesn't work that well for some reason
+#define BURST_MEMORY_BASE 0x801//well, its supposed to be 0x800 but that doesn't work for some reason
 
 arduinoFFT FFT = arduinoFFT();
 
@@ -64,7 +64,12 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
-
+//tells you how much ram you have left
+int freeRam () {
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
 
 void setup() {
 
@@ -108,7 +113,7 @@ void setup() {
 	//EEPROMInit()  //call only once on a virgin chip to "partition" EEPROM for the input type expected moving forward
 	//load_data_allfields();  //load EEPROM values
   delay(200);
-
+	myADE9078.configureWFB();
   sampling_period_us = round(1000000*(1.0/SAMPLING_FREQUENCY));  //calculate the sampling period in microseconds for the FFT, relative to 1 MHZ
 }
 
@@ -117,24 +122,19 @@ void loop() {
   FFTDataHolder fftData;
   arduinoFFT AvFFT = arduinoFFT(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, SAMPLING_FREQUENCY);
 
-    //CONFIGURE WFB
-  myADE9078.configureWFB();
-  myADE9078.burstAvOnly();
-
+	myADE9078.stopFillingBuffer();
+  myADE9078.resetFullBufferBit();
   myADE9078.startFillingBuffer();
-  //int wait = 0;//takes about 40-41ms to fill buffer
-  bool check = 0;
-  //Serial.println("check");
+
+//check to see if it's done sampling
+	bool check = 0;
   while (check != 1){
   	delay(1);
-  	// Serial.println(wait);
-  	// wait++;
   	check = myADE9078.isDoneSampling();
-    Serial.print("wait status: ");
-    Serial.println(check);
+    // Serial.print("wait status: ");
+    // Serial.println(check);
   }
 
-  myADE9078.stopFillingBuffer();
 
   //Serial.println("done sampling, start reading");
 
@@ -146,7 +146,6 @@ void loop() {
       uint16_t burstMemoryOffset = i* 4 * 64; // each segment is 16 bytes, we read in sets of 64
       uint16_t startingAddress = BURST_MEMORY_BASE + burstMemoryOffset;
       myADE9078.spiBurstResampledWFB_Avonly(startingAddress);
-
       // Serial.print("Outer Loop: ");
       // Serial.println(i);
 
@@ -180,19 +179,19 @@ void loop() {
         fftData.vRealPhaseAv[seg] = myADE9078.lastReads.resampledData.Va[seg];
         fftData.vImagPhaseAv[seg] = 0;
       }
-      AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-      AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
-      AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
+      // AvFFT.Windowing(fftData.vRealPhaseAv, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+      // AvFFT.Compute(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES, FFT_FORWARD);
+      // AvFFT.ComplexToMagnitude(fftData.vRealPhaseAv, fftData.vImagPhaseAv, SAMPLES);
 
-      Serial.print("FFT:");
-      Serial.print("Av:");
+      // Serial.print("FFT:");
+      // Serial.print("Av:");
       for(int i=0; i<(SAMPLES/2); i++){
-        //Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
-        //Serial.print(",");
+        // Serial.print((i * 1.0 * SAMPLING_FREQUENCY) / SAMPLES, 1);
+        // Serial.print(",");
         Serial.println(fftData.vRealPhaseAv[i], 1);
-        //Serial.print(";");
+        // Serial.print(";");
       }
-      //Serial.println("$");
+      // Serial.println("$");
   }
 
   Serial.println("Finished reading from ADE chip.");
