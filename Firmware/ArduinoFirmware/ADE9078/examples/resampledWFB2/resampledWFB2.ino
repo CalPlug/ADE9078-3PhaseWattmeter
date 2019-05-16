@@ -5,9 +5,6 @@
 #include <ADE9078.h>
 #include <SPI.h>
 #include "arduinoFFT.h"
-//#include "SPI.h" //for esp32
-
-
 
 //Architecture Control:
 //Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32

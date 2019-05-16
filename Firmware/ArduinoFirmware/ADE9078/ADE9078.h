@@ -25,8 +25,8 @@ Copyright (C) The Regents of the University of California, 2019
 
 //Architecture Control:
 //Select the architecture in use, one but not both!  Do this in your main program file, here are examples for the defines:
-//#define ESP32ARCH //This architecture is for the ESP32
-#define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
+#define ESP32ARCH //This architecture is for the ESP32
+//#define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
 
 //Debug Control:
 //#define ADE9078_VERBOSE_DEBUG //This line turns on verbose debug via serial monitor (Normally off or //'ed).  Use sparingly and in a test program to debug operation!  Turning this on can take a lot of memory and the delay from USB printing out every statement is taxing temporally!  This is non-specific and for all functions, beware, it's a lot of output that can challenge device memory!  Reported bytes are typically in HEX
@@ -39,7 +39,7 @@ Copyright (C) The Regents of the University of California, 2019
 #include "ADE9078registers.h"
 #include "LastReads.h"
 
-#define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
+//#define AVRESP8266  //this architecture is for AVR/Arduino boards and the ESP8266
 
 
 //Define Constants:

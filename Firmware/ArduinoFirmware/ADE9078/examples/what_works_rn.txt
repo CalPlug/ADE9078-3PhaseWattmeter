@@ -1,3 +1,8 @@
+5/16
+use resampledWFB2_FFT with ESP32. See the README to make sure it works properly.
+resampledWFB2 and resampledWFB are fairly similar
+
+5/15
 work off of WFB2: this one actually works properly
 
 resampledWFB2: works

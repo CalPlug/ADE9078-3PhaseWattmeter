@@ -5,37 +5,29 @@ import processing.serial.*;
 
 Serial myPort;
 
-float maxFreq = 500;
-float maxValue = 1000000000;
+float maxFreq = 64;
+float maxValue = 2000;
 int sampleSize = 64;
 
-float[]decimalAv = new float[sampleSize];
+float[]decimalAv = new float[2*sampleSize];
+
 
 void mapping(float decimal[],float rectWidth, float rectHeight){
   int i;
   for(i=0; i<decimal.length;i+=2){
-    rect((decimal[i]*width)+(rectWidth)+rectWidth, height - decimal[i+1]*rectHeight , /*rectWidth*/10 , decimal[i+1]*rectHeight);
+    rect((i/2)*rectWidth, height - decimal[i+1]*rectHeight , rectWidth , decimal[i+1]*rectHeight);
   }
 }
 
 void s2f_array(String header, String inString_parts[], float output_array[]){
     int i;
-    print("check run function\n");
     if(header.equals(inString_parts[0]) == true ){
-      print("check first array value\n");
       for (i = 0; i<output_array.length; i++){
-        //if (inString_parts[i+1].equals("ovf") == true){
-          //output_array[i] = maxValue;
-        //}
-        //else{
-          print(i);
-          print("\n");
           output_array[i] = float(inString_parts[i+1]);
           print(output_array[i]);
-          print("\n");
-        //}
+          print(" ");
       }
-      print("check cast to float");
+      print("\n");
     }
 }
 
@@ -62,8 +54,7 @@ void draw(){
   float rectWidth = width/maxFreq;
   float rectHeight = height/maxValue;
   fill(0, 191, 255);
-  rect(200,200,100,100);
-  //mapping(decimalAv,rectWidth,rectHeight);
+  mapping(decimalAv,rectWidth,rectHeight);
 }
 
 void serialEvent(Serial myPort){

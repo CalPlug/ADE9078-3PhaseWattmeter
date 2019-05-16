@@ -4,8 +4,8 @@
 import processing.serial.*;
 //If the program is getting serialEvent errors, just keep restarting it until it works. I think it has something to do with sending in corrupted data.
 //**IMPORANT: make sure that max frequency and max values match with ADE9078 output or you will have error!
-int maxfreq = 500; //assume frequencies can range from 0 to 1 in increments of 0.1
-int maxvalue = 20000;//assume values can range from 0 to 100 in increments of 1
+int maxfreq = 64; //the number of samples
+int maxvalue = 1000000000;//assume values can range from x to y
 
 //define the error thresholds
 float errorThreshAv = 30;
@@ -127,7 +127,7 @@ void text_label(int place,float rect_width){
       break;
     case 11 : label = "Neutral Power";
       break;
-    default: label = "place holder"; //to avoid errors
+    default: label = "ERROR"; //to avoid errors
       break;
   }
   vertText(label,(place*width/width_scale) + (place*rect_width)+rect_width+2, 0.5*height);
@@ -144,7 +144,7 @@ void mapping(float decimal[], int place,float rect_width, float rect_height){
   float error_value = 0;
   for(i=0; i<decimal.length;i+=2){
     error_value = errorDetection(decimal[i+1],place);
-    rect((decimal[i]*rect_width*maxfreq)+(place*width/width_scale)+(place*rect_width)+rect_width, height - decimal[i+1]*rect_height , rect_width , decimal[i+1]*rect_height);
+    rect((i*rect_width*maxfreq)+(place*width/width_scale)+(place*rect_width)+rect_width, height - decimal[i+1]*rect_height , rect_width , decimal[i+1]*rect_height);
   }
   //draw a black box at the end of each value for cleanliness
   fill(0);
