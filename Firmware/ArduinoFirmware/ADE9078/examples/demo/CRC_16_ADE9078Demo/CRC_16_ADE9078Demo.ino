@@ -24,11 +24,11 @@ void setup() {
   CRCRETURN = crc16(feedarray16, sizeof(feedarray16)); // feed in a 16 bit number (two bytes) then calculate CRC
 
   Serial.print("Provided 16 bit CRC Checksum: ");
-  uint16_t readinCRCholder = (return1forCRC1 << 8 + return2forCRC1); //shift in MSB then add LSF to provide common value to print out
-  Serial.println(readinCRCholder); 
+  uint16_t readinCRCholder = ((return1forCRC1 << 8) | (return2forCRC1)); //shift in MSB then add LSF to provide common value to print out
+  Serial.println(readinCRCholder, HEX); 
 
   Serial.print("Calculated 16 bit CRC Output: ");
-  Serial.println(CRCRETURN);
+  Serial.println(CRCRETURN, HEX);
 
 uint16_t return1forCRC1test16 = (CRCRETURN & 0b0000000011111111); //save the lower byte bit bitmasking to clear upper byte
 uint16_t return2forCRC1test16 = (CRCRETURN >> 8); //save the upper byte by bitshifting down
@@ -65,6 +65,12 @@ if (return1forCRC1test16 == return2forCRC1)
   uint16_t return1forCRC1test32 = (CRCRETURN & 0b0000000011111111); //save the lower byte bit bitmasking to clear upper byte
   uint16_t return2forCRC1test32 = (CRCRETURN >> 8); //save the upper byte by bitshifting down
 
+  Serial.print("Provided 16 bit CRC Checksum: ");
+  readinCRCholder = ((return1forCRC1 << 8) | (return2forCRC1)); //shift in MSB then add LSF to provide common value to print out
+  Serial.println(readinCRCholder, HEX); 
+
+  Serial.print("Calculated 16 bit CRC Output: ");
+  Serial.println(CRCRETURN, HEX);
 
   if (return2forCRC1test32 == return1forCRC2)
   {
