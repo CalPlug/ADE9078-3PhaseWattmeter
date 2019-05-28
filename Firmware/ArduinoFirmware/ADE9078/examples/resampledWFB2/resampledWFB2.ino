@@ -132,10 +132,6 @@ void loop() {
       //memcpy
       for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
       {
-        // int s = sizeof(FullResample);
-        // Serial.print("Size of FullResample: ");
-        // Serial.println(s); // should print 7168, and it is.
-
         // Serial.print("Loop position: ");
         // Serial.print(i);
         // Serial.print(", ");
@@ -144,20 +140,8 @@ void loop() {
         // Serial.println(segOffSet);
         int segOffSet = seg + (i*64);
 
-        // myADE9078.readIrms();
-        // Serial.print("A, B, C rms (I): ");
-        // Serial.print(myADE9078.lastReads.irms.a);
-        // Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.irms.b);
-        // Serial.print(" ");
-        // Serial.print(myADE9078.lastReads.irms.c);
-        // Serial.print(" ");
-
-
         Serial.println("Ia,Va, Ib,Vb, Ic,Vc, In: ");
-        // Serial.print("Ia\t");
         Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
-        //Serial.print("Va\t");
         Serial.print(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
         Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
         Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");

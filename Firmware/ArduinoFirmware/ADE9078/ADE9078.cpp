@@ -4,7 +4,7 @@
 
 ADE9078 board and library created by: David Brady, Jeff Baez, and Jacky Wan 11/2018
 
-Code major development by David Brady, later contributions by Enoch Chau
+Code major development by David Brady
 
 PCB design done by Esteban Granizo and Peter Nguyen (12/2018)
 
@@ -14,9 +14,13 @@ December 2018 - Library First Release (December 2018) - Library Latest Release f
 
 Copyright (C) The Regents of the University of California, 2019
 
-  Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
+Note: Please refer to the Analog Devices ADE9078 datasheet - much of this library was based directly on the statements and methods provided in it!  Their authors get paid, trust them over us!
 
-   Released into the public domain.
+Released into the public domain.
+*/
+
+/*Later Contributions May 2019
+Continuing code developent by Enoch Chau
 */
 
 #include "Arduino.h"

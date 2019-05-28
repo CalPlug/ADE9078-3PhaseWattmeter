@@ -1,6 +1,6 @@
 //Resampled Wave form buffer for ADE9078 to read and report values (ADE9078_TEST)
 //California Plug Load Research Center - 2019
-
+//Enoch Chau 2019
 
 #include <ADE9078.h>
 #include <SPI.h>
