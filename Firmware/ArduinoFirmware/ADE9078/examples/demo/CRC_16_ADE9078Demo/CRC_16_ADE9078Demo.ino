@@ -1,4 +1,4 @@
-//Example ADE9078 CRC Check algorithm test
+//Example ADE9078 CRC Check algorithm test code by Avinash Pai and Michael Klopfer with contributions cited.
 
 void setup() {
   Serial.begin (9600);
