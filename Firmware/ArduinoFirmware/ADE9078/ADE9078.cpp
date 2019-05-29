@@ -975,7 +975,7 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
    uint16_t readval_unsigned=0;
    uint16_t CRC_Value = 0;
    uint16_t returnedCRC = 0; //Initialize and default with 0
-   static unsigned char CRCCheckInput[2]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
+   static char CRCCheckInput[2]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
@@ -1015,29 +1015,25 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
 	#endif
 
     #ifdef ADE9078_VERBOSE_DEBUG
-     Serial.print(" ADE9078::spiRead16-CRC function details: ");
+     Serial.println(" ADE9078::spiRead16-CRC function details: ");
      Serial.print(" Command Header: ");
      Serial.print(commandHeader1, BIN);
      Serial.print(commandHeader2, BIN);
-     Serial.print(" Address Byte 1(MSB)[HEX]: ");
      Serial.print(" Returned bytes (1(MSB) and 2) [HEX]: ");
      Serial.print(one, HEX); //print MSB
      Serial.print(" ");
-     Serial.print(two, HEX);  //print LSB
+     Serial.println(two, HEX);  //print LSB
      Serial.println(" ADE9078::spiRead16-CRC function completed ");
     #endif
 
-	readval_unsigned = (one << 8);  //Process MSB  (Alternate bitshift algorithm)
-    readval_unsigned = readval_unsigned + two;  //Process LSB
-	CRC_Value = (crcOne << 8); //Push in first CRC value into the 16bit holder
-	CRC_Value = CRC_Value + crcTwo;  //Process LSB for CRC
+	readval_unsigned = (one << 8) | (two);  //Process MSB  (Alternate bitshift algorithm)
+	CRC_Value = (crcOne << 8) | (crcTwo); //Push in first CRC value into the 16bit holder
 	//Load in forward into the CRC check - double check byte order!
 	CRCCheckInput[0] = one; //load first value into the array
 	CRCCheckInput[1] = two; //load second value into the array
-	CRCCheckInput[2] = 0; //load terminal value into the array  (previously: CRCCheckInput[2] = NULL;)
 
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)3); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified
+	returnedCRC = crc16(CRCCheckInput, 2); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified
 
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
@@ -1050,15 +1046,15 @@ uint16_t ADE9078::spiRead16CRC(uint16_t address, bool &ValidCRC) { //This is the
 
    #ifdef ADE9078_CRC_Output
    Serial.print(" Read 16-bit value fed into the CRC Check function[HEX]: ");
-   Serial.print(readval_unsigned, BIN);
+   Serial.println(readval_unsigned, HEX);
    Serial.print(" ADE9087 Read CRC Value Byte 1[HEX]: ");
-   Serial.print(crcOne, BIN);
+   Serial.println(crcOne, HEX);
    Serial.print(" ADE9087 Read CRC Value Byte 2[HEX]: ");
-   Serial.print(crcTwo, BIN);
+   Serial.println(crcTwo, HEX);
    Serial.print(" ADE9087 Read CRC Value Combined[HEX]: ");
-   Serial.print(CRC_Value, BIN);
-   Serial.print(" Value returned from the 16 BIT CCITT CRC check function[HEX]: ");
-   Serial.print(returnedCRC, BIN);
+   Serial.println(CRC_Value, HEX);
+   Serial.println(" Value returned from the 16 BIT CCITT CRC check function[HEX]: ");
+   Serial.print(returnedCRC, HEX);
    Serial.print(" Determined to be a match?: ");
    Serial.println(ValidCRC, DEC);
    #endif
@@ -1078,7 +1074,7 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
    uint16_t CRC_Value = 0;
    uint16_t returnedCRC = 0; //Initialize and default with 0
    uint32_t returnedValue = 0;
-   static unsigned char CRCCheckInput[4]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
+   static char CRCCheckInput[4]; //define the holder for the input to the CRC check function, unsigned char array used for holding input and arranging bit order
    temp_address = (((address << 4) & 0xFFF0)+8); //shift address  to align with cmd packet, convert the 16 bit address into the 12 bit command header. + 8 for isRead versus write
    byte commandHeader1 = functionBitVal(temp_address, 1); //lookup and return first byte (MSB) of the 12 bit command header, sent first
    byte commandHeader2 = functionBitVal(temp_address, 0); //lookup and return second byte (LSB) of the 12 bit command header, sent second
@@ -1121,47 +1117,34 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
   #endif
 
   #ifdef ADE9078_VERBOSE_DEBUG
-   Serial.print(" Returned bytes 1-4, 1 is MSB [HEX]: ");
    Serial.print(" ADE9078::spiRead32-CRC function details: ");
    Serial.print(" Command Header: ");
    Serial.print(commandHeader1, BIN);
    Serial.print(commandHeader2, BIN);
-   Serial.print(" Returned bytes (1(MSB) to 4)[BINARY]: ");
-   Serial.print(one, BIN);
+   Serial.print(" Returned bytes (1(MSB) to 4)[HEX]: ");
+   Serial.print(one, HEX);
    Serial.print(" ");
-   Serial.print(two, BIN);
+   Serial.print(two, HEX);
    Serial.print(" ");
-   Serial.print(three, BIN);
+   Serial.print(three, HEX);
    Serial.print(" ");
-   Serial.print(four, BIN);
+   Serial.println(four, HEX);
    Serial.println(" ADE9078::spiRead32-CRC function completed ");
   #endif
 
     //Post-read packing and bitshifting operations for a 32 bit return
   returnedValue = (((uint32_t) one << 24) + ((uint32_t) two << 16) + ((uint32_t) three << 8) + (uint32_t) four);
 
-  	CRC_Value = (crcOne << 8); //Push in first CRC value into the 16bit holder
-	CRC_Value = CRC_Value + crcTwo;  //Process LSB for CRC
+  	CRC_Value = (crcOne << 8) | (crcTwo); //Push in first CRC value into the 16bit holder
 	//Load in forward into the CRC check - double check byte order!
 	CRCCheckInput[0] = one; //load first value into the array
 	CRCCheckInput[1] = two; //load second value into the array
     CRCCheckInput[2] = three; //load third value into the array
 	CRCCheckInput[3] = four; //load fourth value into the array
-	CRCCheckInput[4] = 0; //load terminal value into the array (previously: CRCCheckInput[4] = NULL;)
 
 	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified
+	returnedCRC = crc16(CRCCheckInput, 4); // enter CRC value into the check algorithm MSB first, the length is 2 bytes (16 bit), this is specified
 
-	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
-	{
-	ValidCRC = 1; //value matches, return a 1 to indicate a match has taken place and the returned data is valid
-	}
-	else
-	{
-		ValidCRC = 0; //value does not match, return a 0 to indicate a match has not taken place and the returned data is invalid
-	}
-	//Check the CRC value to see if the return and the CRC match on the received side, pad into a 32 bit return as part of a 32 bit character, MSB is first fed into the CRC algorithm, per page 64 of the datasheet, assume padding to 32 bits with 0's per algorithm approach
-	returnedCRC = crc16(CRCCheckInput, (short)4); // enter CRC value into the check algorithm MSB first, the length is 4 bytes (32 bit), this is specified
 	if (returnedCRC == CRC_Value) //check the returned CRC value to see if it matches the input CRC value
 	{
 	ValidCRC = 1; //value matches, return a 1 to indicate a match has taken place and the returned data is valid
@@ -1173,15 +1156,15 @@ uint32_t ADE9078::spiRead32CRC(uint16_t address, bool &ValidCRC) { //This is the
 
    #ifdef ADE9078_CRC_Output
    Serial.print(" Read 32 value fed into the CRC Check function[HEX]: ");
-   Serial.print(returnedValue, BIN);
+   Serial.println(returnedValue, HEX);
    Serial.print(" ADE9087 Read CRC Value Byte 1[HEX]: ");
-   Serial.print(crcOne, BIN);
+   Serial.println(crcOne, HEX);
    Serial.print(" ADE9087 Read CRC Value Byte 2[HEX]: ");
-   Serial.print(crcTwo, BIN);
+   Serial.println(crcTwo, HEX);
    Serial.print(" ADE9087 Read CRC Value Combined[HEX]: ");
-   Serial.print(CRC_Value, BIN);
+   Serial.println(CRC_Value, HEX);
    Serial.print(" Value returned from the 16 BIT CCITT CRC check function[HEX]: ");
-   Serial.print(returnedCRC, BIN);
+   Serial.println(returnedCRC, HEX);
    Serial.print(" Determined to be a match?: ");
    Serial.println(ValidCRC, DEC);
    #endif

@@ -1,9 +1,10 @@
-//Example ADE9078 CRC Check algorithm test code by Avinash Pai and Michael Klopfer with contributions cited.
+//Example ADE9078 CRC Check algorithm test
 
 void setup() {
   Serial.begin (9600);
 
-  uint16_t CRCRETURN = 0; //Holder for the return from the CRC function
+  uint16_t CRCRETURN1 = 0;//Holder for the return from the CRC function [16-bit example]
+  uint16_t CRCRETURN2 = 0;//Holder for the return from the CRC function [32-bit example]
 
   //16 bit return example with the 16 bit CRC example
   uint16_t return1for16bit = 0x00; //first returned byte from SPI, the MSB value
@@ -21,36 +22,38 @@ void setup() {
   //feedarray16 [2] = 0x00; //optional padding  for 16 bit
   //feedarray16 [3] = 0x00; //optional padding for 16 bit
   
-  CRCRETURN = crc16(feedarray16, sizeof(feedarray16)); // feed in a 16 bit number (two bytes) then calculate CRC
+  CRCRETURN1 = crc16(feedarray16, sizeof(feedarray16)); // feed in a 16 bit number (two bytes) then calculate CRC
 
   Serial.print("Provided 16 bit CRC Checksum: ");
-  uint16_t readinCRCholder = ((return1forCRC1 << 8) | (return2forCRC1)); //shift in MSB then add LSF to provide common value to print out
-  Serial.println(readinCRCholder, HEX); 
+  uint16_t readinCRCholder1 = (return1forCRC1 << 8) | (return2forCRC1); //shift in MSB then add LSF to provide common value to print out
+  Serial.println(readinCRCholder1, HEX); 
 
   Serial.print("Calculated 16 bit CRC Output: ");
-  Serial.println(CRCRETURN, HEX);
+  Serial.println(CRCRETURN1, HEX);
 
-uint16_t return1forCRC1test16 = (CRCRETURN & 0b0000000011111111); //save the lower byte bit bitmasking to clear upper byte
-uint16_t return2forCRC1test16 = (CRCRETURN >> 8); //save the upper byte by bitshifting down
+uint16_t return1forCRC1test16 = (CRCRETURN1 & 0b0000000011111111); //save the lower byte bit bitmasking to clear upper byte
+uint16_t return2forCRC1test16 = (CRCRETURN1 >> 8); //save the upper byte by bitshifting down
 
 if (return2forCRC1test16 == return1forCRC1)
 {
-//match found on upper CRC byte, tell the user something 
+//match found on upper CRC byte, tell the user something
+  Serial.println("Lower CRC byte Match!");
 }
 
 if (return1forCRC1test16 == return2forCRC1)
 {
-//match found on upper CRC byte, tell the user something 
+//match found on upper CRC byte, tell the user something
+  Serial.println("Upper CRC byte Match!");
 }
 
   //32 bit return example with the 16 bit CRC example
-  uint16_t return1for32bit = 0x00; //first returned byte from SPI, the MSB value
-  uint16_t return2for32bit = 0x00; //first returned byte from SPI, the top middle value
-  uint16_t return3for32bit = 0x00; //first returned byte from SPI, the lower middle value
-  uint16_t return4for32bit = 0x00; //first returned byte from SPI, the LSB value
+  uint16_t return1for32bit = 0xFF; //first returned byte from SPI, the MSB value
+  uint16_t return2for32bit = 0xFF; //first returned byte from SPI, the top middle value
+  uint16_t return3for32bit = 0xFF; //first returned byte from SPI, the lower middle value
+  uint16_t return4for32bit = 0xFF; //first returned byte from SPI, the LSB value
 
-  uint16_t return1forCRC2 = 0x00; //first returned byte from SPI, the MSB value
-  uint16_t return2forCRC2 = 0x00; //first returned byte from SPI, the LSB value
+  uint16_t return1forCRC2 = 0x1D; //first returned byte from SPI, the MSB value
+  uint16_t return2forCRC2 = 0x0F; //first returned byte from SPI, the LSB value
 
   char feedarray32 [4]; //holder for four values (a 32 bit input, then terminated with a null character)
 
@@ -60,28 +63,29 @@ if (return1forCRC1test16 == return2forCRC1)
   feedarray32 [2] = return3for32bit;
   feedarray32 [3] = return4for32bit;
   
-  CRCRETURN = crc16(feedarray32, sizeof(feedarray32)); // feed in a 16 bit number (two bytes) then calculate CRC
+  CRCRETURN2 = crc16(feedarray32, sizeof(feedarray32)); // feed in a 16 bit number (two bytes) then calculate CRC
 
-  uint16_t return1forCRC1test32 = (CRCRETURN & 0b0000000011111111); //save the lower byte bit bitmasking to clear upper byte
-  uint16_t return2forCRC1test32 = (CRCRETURN >> 8); //save the upper byte by bitshifting down
+  Serial.print("Provided 32 bit CRC Checksum: ");
+  uint16_t readinCRCholder2 = (return1forCRC2 << 8) | (return2forCRC2); //shift in MSB then add LSF to provide common value to print out
+  Serial.println(readinCRCholder2, HEX); 
 
-  Serial.print("Provided 16 bit CRC Checksum: ");
-  readinCRCholder = ((return1forCRC1 << 8) | (return2forCRC1)); //shift in MSB then add LSF to provide common value to print out
-  Serial.println(readinCRCholder, HEX); 
+  Serial.print("Calculated 32 bit CRC Output: ");
+  Serial.println(CRCRETURN2, HEX);
+  
+  uint16_t return1forCRC1test32 = (CRCRETURN2 & 0b0000000011111111); //save the lower byte bit bitmasking to clear upper byte
+  uint16_t return2forCRC1test32 = (CRCRETURN2 >> 8); //save the upper byte by bitshifting down
 
-  Serial.print("Calculated 16 bit CRC Output: ");
-  Serial.println(CRCRETURN, HEX);
 
   if (return2forCRC1test32 == return1forCRC2)
   {
   //match found on upper CRC byte, tell the user something 
-  Serial.println("Lower CRC byte Mactch!");
+  Serial.println("Lower CRC byte Match!");
   }
   
   if (return1forCRC1test32 == return2forCRC2)
   {
   //match found on upper CRC byte, tell the user something 
-    Serial.println("Upper CRC byte Mactch!");
+    Serial.println("Upper CRC byte Match!");
   }
    
 

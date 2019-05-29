@@ -51,34 +51,18 @@ double decimalizeSigned(int32_t input, double factor, double offset, bool absolu
 
 //************************
 
-// CRC CALCULATIO APPROACH, UNVERIFIED POSSIBLY GENERATES incorrect outputs- Comment by david, told by jacky
-uint16_t crc16(unsigned char* data_p, uint16_t length){ //example CCITT 16 CRC function that returns unsigned 16 bit return given an array of input values and a length of the array.  Used  for checksum verification, borrowed Bob Felice, 2007 from example: http://www.drdobbs.com/implementing-the-ccitt-cyclical-redundan/199904926  ALSO  https://forum.arduino.cc/index.php?topic=123467.0
-   unsigned char i;
-   unsigned int data;
-   unsigned int crc;
-   #define POLY 0x8408 //deff. of the polynomial used for the calculation (see sources)
-
-   crc = 0xffff; //initial reset calculation value
-	       if (length == 0)
-              return (~crc);
-
-       do {
-              for (i = 0, data = (unsigned int)0xff & *data_p++; i < 8; i++, data >>= 1) //*data_p++ is often without ++ in other versions (this is an adjustment incrementer for the pointer in this example, based on how this algorithm is set up), see links above for details on this and implementation/usage
-			  {
-                    if ((crc & 0x0001) ^ (data & 0x0001))
-                           crc = (crc >> 1) ^ POLY;
-                    else
-                           crc >>= 1;
-              }
-       } while (--length);
-
-       crc = ~crc;
-
-       data = crc;
-       crc = (crc << 8) | (data >> 8 & 0xFF);
-
-       return (crc);
+uint16_t crc16(char* pData, int length) //https://gist.github.com/tijnkooijmans/10981093, CCITT:  CCITT-FALSE (poly=0x1021 init=0xffff refin=false refout=false xorout=0x0000 check=0x29b1)
+{
+    uint8_t i;
+    uint16_t wCrc = 0xffff;
+    while (length--) {
+        wCrc ^= *(unsigned char *)pData++ << 8;
+        for (i=0; i < 8; i++)
+            wCrc = wCrc & 0x8000 ? (wCrc << 1) ^ 0x1021 : wCrc << 1;
+    }
+    return wCrc & 0xffff;
 }
+
 
 byte functionBitVal(uint16_t addr, uint8_t byteVal)
 {
