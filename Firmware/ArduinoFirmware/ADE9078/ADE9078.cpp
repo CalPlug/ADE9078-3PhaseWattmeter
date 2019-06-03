@@ -592,14 +592,14 @@ void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 
 	for(int i=0; i < WFB_RESAMPLE_SEGMENTS; i++)
 	{
-			lastReads.resampledData.Ia[i] = spiTransferWord(spy, WRITE);
-			lastReads.resampledData.Va[i] = spiTransferWord(spy, WRITE);
-			lastReads.resampledData.Ib[i] = spiTransferWord(spy, WRITE);
-			lastReads.resampledData.Vb[i] = spiTransferWord(spy, WRITE);
-			lastReads.resampledData.Ic[i] = spiTransferWord(spy, WRITE);
-			lastReads.resampledData.Vc[i] = spiTransferWord(spy, WRITE);
-			//blank cells are skipped internally
-			lastReads.resampledData.In[i] = spiTransferWord(spy, WRITE);
+		lastReads.resampledData.Va[i] = spiTransferWord(spy, WRITE);
+		lastReads.resampledData.Ia[i] = spiTransferWord(spy, WRITE);
+		lastReads.resampledData.Vb[i] = spiTransferWord(spy, WRITE);
+		lastReads.resampledData.Ib[i] = spiTransferWord(spy, WRITE);
+		lastReads.resampledData.Vc[i] = spiTransferWord(spy, WRITE);
+		lastReads.resampledData.Ic[i] = spiTransferWord(spy, WRITE);
+		//blank cells are skipped internally
+		lastReads.resampledData.In[i] = spiTransferWord(spy, WRITE);
 
 	}
 	//Serial.println("End for loop");
@@ -626,13 +626,13 @@ void ADE9078::spiBurstResampledWFB(uint16_t startingAddress)
 	//Serial.print("Begin forloop");
 	for(int i=0; i < WFB_RESAMPLE_SEGMENTS; i++)
 	{
-		  lastReads.resampledData.Ia[i] = SPI.transfer16(dummyWrite);
-		  lastReads.resampledData.Va[i] = SPI.transfer16(dummyWrite);
-		  lastReads.resampledData.Ib[i] = SPI.transfer16(dummyWrite);
-		  lastReads.resampledData.Vb[i] = SPI.transfer16(dummyWrite);
-		  lastReads.resampledData.Ic[i] = SPI.transfer16(dummyWrite);
-		  lastReads.resampledData.Vc[i] = SPI.transfer16(dummyWrite);
-		  lastReads.resampledData.In[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.Va[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.Ia[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.Vb[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.Ib[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.Vc[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.Ic[i] = SPI.transfer16(dummyWrite);
+		lastReads.resampledData.In[i] = SPI.transfer16(dummyWrite);
 			//blank cells are skipped internally
 	}
 	//Serial.println("End for loop");

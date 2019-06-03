@@ -6,7 +6,7 @@ import processing.serial.*;
 Serial myPort;
 
 float maxFreq = 64;
-float maxValue = 10000;
+float maxValue = 100000;
 int sampleSize = 64;
 
 float[]decimalAv = new float[2*sampleSize];
@@ -125,8 +125,8 @@ void s2f_array(String header, String inString_parts[], float output_array[]){
     if(header.equals(inString_parts[0]) == true ){
       for (i = 0; i<output_array.length; i++){
           output_array[i] = float(inString_parts[i+1]);
-          print(output_array[i]);
-          print(" ");
+          //print(output_array[i]);
+          //print(" ");
       }
       print("\n");
     }
@@ -208,8 +208,8 @@ void serialEvent(Serial myPort){
     String[] inStringParts = splitTokens(inString,":,;$\n\r");
     
     for(i=0; i<inStringParts.length; i++){
-      print(inStringParts[i]);
-      print(' ');
+      //print(inStringParts[i]);
+      //print(' ');
     }
     println();  
     s2f_array("Av", inStringParts, decimalAv);
@@ -225,9 +225,9 @@ void serialEvent(Serial myPort){
     
     array3Sum(decimalAv, decimalBv, decimalCv, decimalNv);
     
-    for (i=0; i<decimalAv.length; i++){
-      print(decimalAv[i]);
-      print(' ');
-    }
+    //for (i=0; i<decimalAv.length; i++){
+    //  print(decimalAv[i]);
+    //  print(' ');
+    //}
   }
 }
