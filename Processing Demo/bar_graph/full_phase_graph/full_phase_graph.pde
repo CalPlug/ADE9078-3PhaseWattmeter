@@ -17,6 +17,7 @@ float[]decimalCv = new float[2*sampleSize];
 float[]decimalCi = new float[2*sampleSize];
 float[]decimalNi = new float[2*sampleSize];
 float[]decimalNv = new float[2*sampleSize];
+float[]blondelItotal = new float [2*sampleSize];
 
 int horiz = 4;
 int vert = 2;
@@ -61,7 +62,7 @@ void text_label(int placeX, int placeY, float rectWidth){
     label = "Neutral Voltage";
   }
   if (placeX == 3 && placeY == 1){
-    label = "Neutral Current";
+    label = "Blondel Total Current"/*"Neutral Current"*/;
   }
   if (placeY == 1){
     placeY = 2;
@@ -145,6 +146,19 @@ void array3Sum(float A_in[], float B_in[], float C_in[], float total_out[]){
   }
 }
 
+//for processing blondelItotal (total current in blondel compliant setup)
+void array2Sum(float A_in[], float B_in[], float total_out[]){
+    int i;
+  //sum up total value
+  for(i=1;i<=total_out.length;i+=2){
+    total_out[i] = (A_in[i]+B_in[i]);
+  }
+  //set up frequencies
+  for (i=0;i<total_out.length;i+=2){
+    total_out[i] = A_in[i];
+  }
+}
+
 void zeroArray(float array[]){
   int i;
   for (i = 0; i < array.length; i++){
@@ -189,7 +203,7 @@ void draw(){
   mapping(decimalCi,rectWidth,rectHeight, 1,1);
   
   mapping(decimalNv,rectWidth,rectHeight, 2,1);
-  mapping(decimalNi,rectWidth,rectHeight, 3,1);
+  mapping(blondelItotal,rectWidth,rectHeight, 3,1);
   
   strokeWeight(2);
   line(width/4,0,width/4,height);
@@ -224,6 +238,7 @@ void serialEvent(Serial myPort){
     s2f_array("Ni", inStringParts, decimalNi);
     
     array3Sum(decimalAv, decimalBv, decimalCv, decimalNv);
+    array2Sum(decimalAi, decimalBi, blondelItotal);
     
     //for (i=0; i<decimalAv.length; i++){
     //  print(decimalAv[i]);
