@@ -1,5 +1,6 @@
 // Helper function for calibration of ADE9078 by Avinash Pai with contributions cited.
-#include <math.h>                      
+#include <math.h>
+//#include <EEPROM.h>                      
 #define ARDBUFFER 16
 #include <stdarg.h>
 #include <Arduino.h>
@@ -185,10 +186,6 @@ void setup() {
   Serial.begin(9600);
   delay(100);
   Serial.println("Starting...");
-}
-
-
-void loop() {
 
   Serial.print("Input Zero Point: ");
   delay(2000);
@@ -223,7 +220,11 @@ void loop() {
   delay(2000);
 
   fabls(totalPoints, px, py);
+}
 
+
+void loop() {
+  // None
 }
 
 
