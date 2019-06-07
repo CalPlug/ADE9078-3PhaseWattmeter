@@ -201,25 +201,31 @@ void setup() {
   readSeveralChars();
   unsigned int totalPoints = atoi(inputSeveral);
   Serial.println(totalPoints);
-
-  delay(3000);
-  double px[totalPoints];
-  double py[totalPoints];
-  for (unsigned int i = 0; i < totalPoints; ++i)
+  if (totalPoints < 2)
   {
-    px[i] = i;
-    ardprintf("Input point %d", i+1);
-    delay(3000);
-    readSeveralChars();
-    py[i] = atof(inputSeveral);
-    Serial.print(px[i]);
-    Serial.print(" " );
-    Serial.println(py[i]);
-    delay(500);
+      Serial.print("At least 2 points needed.");
   }
-  delay(2000);
-
-  fabls(totalPoints, px, py);
+  else
+  {
+    delay(3000);
+    double px[totalPoints];
+    double py[totalPoints];
+    for (unsigned int i = 0; i < totalPoints; ++i)
+    {
+      px[i] = i + 1;
+      ardprintf("Input point %d", i+1);
+      delay(3000);
+      readSeveralChars();
+      py[i] = atof(inputSeveral);
+      Serial.print(px[i]);
+      Serial.print(" " );
+      Serial.println(py[i]);
+      delay(500);
+    }
+    delay(2000);
+  
+    fabls(totalPoints, px, py);
+  }
 }
 
 
