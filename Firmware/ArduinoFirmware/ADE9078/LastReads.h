@@ -105,7 +105,6 @@ struct ResampledWFB
     int16_t Vc[WFB_RESAMPLE_SEGMENTS];
 
     int16_t In[WFB_RESAMPLE_SEGMENTS];
-
 };
 
 struct LastReads
