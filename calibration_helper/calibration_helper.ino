@@ -1,13 +1,20 @@
+// Helper function for calibration of ADE9078 by Avinash Pai with contributions cited.
 #include <math.h>                      
+#define ARDBUFFER 16
+#include <stdarg.h>
+#include <Arduino.h>
 
 const byte buffSize = 32;
 char inputSeveral[buffSize]; // space for 31 chars and a terminator
 
 byte maxChars = 12; // a shorter limit to make it easier to see what happens
-//   if too many chars are entered
+                   //  if too many chars are entered
+
+
 
 
 // https://forum.arduino.cc/index.php?topic=96292.0
+// Fit Analysis By Least Squares 
 double alog(double x)
 {  return (x < 0) ? -log(-x) : ((x > 0) ? log(x) : 0);
 }
@@ -40,7 +47,7 @@ void fabls(unsigned n,double *px,double *py)
       }
       s = sqrt(s / r);
       sign = (a1 < 0) ? '-' : '+';
-      printf("Linear:      y = (%f) x %c %f; s = %f\n",a2,sign,fabs(a1),s);
+      ardprintf("Linear:      y = (%f) x %c %f; s = %f\n",a2,sign,fabs(a1),s);
       mask |= '\x01';
       z[0] = s;
    }
@@ -195,21 +202,27 @@ void loop() {
   delay(2000);
 
   readSeveralChars();
-  int totalPoints = atoi(inputSeveral);
+  unsigned int totalPoints = atoi(inputSeveral);
   Serial.println(totalPoints);
 
   delay(3000);
-  double weights[totalPoints];
+  double px[totalPoints];
+  double py[totalPoints];
   for (unsigned int i = 0; i < totalPoints; ++i)
   {
-    Serial.print("Input weight:  ");
-    delay(2000);
+    px[i] = i;
+    Serial.print("Input point:  ");
+    delay(3000);
     readSeveralChars();
-    weights[i] = atof(inputSeveral);
-    Serial.println(weights[i]);
+    py[i] = atof(inputSeveral);
+    Serial.print(px[i]);
+    Serial.print(" " );
+    Serial.println(py[i]);
     delay(500);
   }
   delay(2000);
+
+  fabls(totalPoints, px, py);
 
 }
 
@@ -244,4 +257,56 @@ void readSeveralChars() {
 
 
 
+}
+
+
+
+// https://gist.github.com/asheeshr/9004783
+// A printf function for serial communication from Arduino boards
+int ardprintf(char *str, ...)
+{
+  int i, count=0, j=0, flag=0;
+  char temp[ARDBUFFER+1];
+  for(i=0; str[i]!='\0';i++)  if(str[i]=='%')  count++;
+
+  va_list argv;
+  va_start(argv, count);
+  for(i=0,j=0; str[i]!='\0';i++)
+  {
+    if(str[i]=='%')
+    {
+      temp[j] = '\0';
+      Serial.print(temp);
+      j=0;
+      temp[0] = '\0';
+
+      switch(str[++i])
+      {
+        case 'd': Serial.print(va_arg(argv, int));
+                  break;
+        case 'l': Serial.print(va_arg(argv, long));
+                  break;
+        case 'f': Serial.print(va_arg(argv, double));
+                  break;
+        case 'c': Serial.print((char)va_arg(argv, int));
+                  break;
+        case 's': Serial.print(va_arg(argv, char *));
+                  break;
+        default:  ;
+      };
+    }
+    else 
+    {
+      temp[j] = str[i];
+      j = (j+1)%ARDBUFFER;
+      if(j==0) 
+      {
+        temp[ARDBUFFER] = '\0';
+        Serial.print(temp);
+        temp[0]='\0';
+      }
+    }
+  };
+  Serial.println();
+  return count + 1;
 }
