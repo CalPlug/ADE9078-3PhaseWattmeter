@@ -84,7 +84,7 @@ void fabls(unsigned n,double *px,double *py)
       s = sqrt(s / r);
       sign  = (a1 < 0) ? '-' : '+';
       sign2 = (a2 < 0) ? '-' : '+';
-      printf("Quadratic:   y = (%f) x^2 %c (%f) x %c %f; s = %f\n",
+      ardprintf("Quadratic:   y = (%f) x^2 %c (%f) x %c %f; s = %f\n",
              a3,sign2,fabs(a2),sign,fabs(a1),s);
       mask |= '\x02';
       z[1] = s;
@@ -108,7 +108,7 @@ void fabls(unsigned n,double *px,double *py)
       }
       s = sqrt(s / r);
       sign = (a1 < 0) ? '-' : '+';
-      printf("Exponential: y = exp(%f x %c %f); s = %f\n",a2,sign,fabs(a1),s);
+      ardprintf("Exponential: y = exp(%f x %c %f); s = %f\n",a2,sign,fabs(a1),s);
       mask |= '\x04';
       z[2] = s;
    }
@@ -132,7 +132,7 @@ void fabls(unsigned n,double *px,double *py)
       }
       s = sqrt(s / r);
       sign = (a1 < 0) ? '-' : '+';
-      printf("Logarithmic: y = (%f) ln(x) %c %f; s = %f\n",a2,sign,fabs(a1),s);
+      ardprintf("Logarithmic: y = (%f) ln(x) %c %f; s = %f\n",a2,sign,fabs(a1),s);
       mask |= '\x08';
       z[3] = s;
    }
@@ -156,7 +156,7 @@ void fabls(unsigned n,double *px,double *py)
       }
       s = sqrt(s / r);
       sign = (a1 < 0) ? '-' : '+';
-      printf("Power:       y = (%f) x ^ (%f); s = %f\n",a1,a2,s);
+      ardprintf("Power:       y = (%f) x ^ (%f); s = %f\n",a1,a2,s);
       mask |= '\x10';
       z[4] = s;
    }
@@ -172,10 +172,10 @@ NotPower:
             if (mask && ('\x01' << i))
                if (z[i] < z[least])
                   least = i;
-         printf("The best fit is a%s function\n",best[least]);
+         ardprintf("The best fit is a%s function\n",best[least]);
       }
    }
-   else printf("Couldn't fit any of the five functions\n");
+   else ardprintf("Couldn't fit any of the five functions\n");
 }
 
 
@@ -211,7 +211,7 @@ void loop() {
   for (unsigned int i = 0; i < totalPoints; ++i)
   {
     px[i] = i;
-    Serial.print("Input point:  ");
+    ardprintf("Input point %d", i+1);
     delay(3000);
     readSeveralChars();
     py[i] = atof(inputSeveral);
