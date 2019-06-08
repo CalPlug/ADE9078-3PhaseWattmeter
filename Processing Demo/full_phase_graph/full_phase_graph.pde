@@ -73,6 +73,19 @@ void text_label(int placeX, int placeY, float rectWidth){
   text(label, (maxFreq/2)*rectWidth+(placeX*width/horiz)-rectWidth*maxFreq/4, height - height/placeY+50);
 }
 
+void printArray(float decimal[]){
+  int i;
+  print("Values:");
+  for(i=0; i<decimal.length ; i+=2){
+    print(decimal[i]);
+    print(",");
+    print(decimal[i+1]);
+    print(";");
+  }
+  print("$");
+  print("\n");
+}
+
 void errorMap(float value, int placeX, int placeY ){
   float errorvalue = 0;
   if (placeX == 0 && placeY == 2){
@@ -210,13 +223,14 @@ void draw(){
   line(width/2,0,width/2,height);
   line(width*3/4,0,width*3/4,height);
   line(0,height/2, width, height/2);
+  printArray(blondelItotal);
 }
 
 void serialEvent(Serial myPort){
   int i;
     
   String inString = myPort.readStringUntil('$');
-  println(inString);
+  //println(inString);
   
   if (inString != null){
     String[] inStringParts = splitTokens(inString,":,;$\n\r");
