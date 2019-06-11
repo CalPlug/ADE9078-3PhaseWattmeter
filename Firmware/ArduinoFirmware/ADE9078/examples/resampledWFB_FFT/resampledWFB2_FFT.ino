@@ -86,12 +86,6 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
-//tells you how much ram you have left
-int freeRam () {
-  extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-}
 
 //esp32 arch for spi
 SPIClass * vspi = NULL;

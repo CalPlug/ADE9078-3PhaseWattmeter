@@ -1,9 +1,4 @@
-FOR ESP32 (Arduino Uno does not have enough memory to perform this task)
-
-reads all 512 samples at once instead of reading in 8 loops of 64.
-
-in LastReads.h, change WFB_RESAMPLE_SEGMENTS to 512
-
+Run this programing using single_phase_graph.pde for a bar graph visualization of the FFT.
 
 ----------------------------pinout----------------------------------------
 Use VSPI pins for ESP32 SPI

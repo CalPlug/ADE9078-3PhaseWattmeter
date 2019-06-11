@@ -1,5 +1,6 @@
 //Resampled Wave form buffer for ADE9078 to read and report values (ADE9078_TEST)
 //California Plug Load Research Center - 2019
+//Enoch Chau 2019
 
 
 #include <ADE9078.h>
@@ -11,7 +12,7 @@
 //Architecture Control:
 //Make sure you select in the ADE9078.h file the proper board architecture, either Arduino/AVR/ESP8266 or ESP32
 //REMINDER: ONLY SELECT THE SINGLE OPTION FOR THE BOARD TYPE YOU ARE USING!
-
+#define ESP32ARCH
 
 //Define ADE9078 object with hardware parameters specified
 #define local_SPI_freq 115200  //Set SPI_Freq at 1MHz  - used for Arduino/AVR configuration
@@ -27,10 +28,6 @@ arduinoFFT FFT = arduinoFFT();
 unsigned int sampling_period_us;  //holder for microseconds for FFT
 #define SAMPLING_FREQUENCY 60 //Hz, match rate to match sampling frequency for input data from data source
 
-//Read, re-sample, process, report flow control
-bool SampleBufferFilled = 0; //Used to indicate when the buffer has been filled and is ready for readout, ready to be read out
-bool FFTCalculationComplete = 0; //Flow control for readout of values
-bool FFTInputBufferFilled = 0; //Flow control for readout of values
 
 
 //Declare object for buffer & FFT values to be received
@@ -51,8 +48,8 @@ struct InitializationSettings* is = new InitializationSettings; //define structu
 
 ADE9078 myADE9078(local_SS, local_SPI_freq, is); // Call the ADE9078 Object with hardware parameters specified, local variables are copied to private variables inside the class when object is created.
 
-
-
+//esp32 arch for spi
+SPIClass * vspi = NULL;
 
 void setup() {
 
@@ -105,23 +102,19 @@ void setup() {
 void loop() {
 
   FullResample fullResample;
-  //CONFIGURE WFB
-  myADE9078.configureWFB();
-
+  myADE9078.stopFillingBuffer();
+  myADE9078.resetFullBufferBit();
   myADE9078.startFillingBuffer();
 
   bool check = 0;
-  //Serial.println("check");
+
   while (check != 1){
   	delay(1);
-  	// Serial.println(wait);
-  	// wait++;
   	check = myADE9078.isDoneSampling();
-    Serial.print("wait status: ");
-    Serial.println(check);
+    // Serial.print("wait status: ");
+    // Serial.println(check);
   }
 
-  myADE9078.stopFillingBuffer();
 
   Serial.println("done sampling, start reading");
 
@@ -130,9 +123,6 @@ void loop() {
   //memcpy
   for (int seg=0; seg < WFB_RESAMPLE_SEGMENTS; ++seg)
   {
-    // int s = sizeof(FullResample);
-    // Serial.print("Size of FullResample: ");
-    // Serial.println(s); // should print 7168, and it is.
 
     Serial.print("Loop position: ");
     Serial.print(i);
@@ -142,32 +132,24 @@ void loop() {
     int segOffSet = seg + (i*64);
     Serial.println(segOffSet);
 
-    // myADE9078.readIrms();
-    // Serial.print("A, B, C rms (I): ");
-    // Serial.print(myADE9078.lastReads.irms.a);
-    // Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.irms.b);
-    // Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.irms.c);
-    // Serial.print(" ");
+    myADE9078.readIrms();
+    Serial.print("A, B, C rms (I): ");
+    Serial.print(myADE9078.lastReads.irms.a);
+    Serial.print(" ");
+    Serial.print(myADE9078.lastReads.irms.b);
+    Serial.print(" ");
+    Serial.print(myADE9078.lastReads.irms.c);
+    Serial.print(" ");
 
 
-    //Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
-    //Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
-    Serial.println(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-    // Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
-    // Serial.println(myADE9078.lastReads.resampledData.In[seg]);
-
-    // fullResample.Ia[segOffSet] = myADE9078.lastReads.resampledData.Ia[seg];
-    // fullResample->Va[segOffSet] = myADE9078.lastReads.resampledData.Va[seg];
-    // fullResample->Ib[segOffSet] = myADE9078.lastReads.resampledData.Ib[seg];
-    // fullResample->Vb[segOffSet] = myADE9078.lastReads.resampledData.Vb[seg];
-    // fullResample->Ic[segOffSet] = myADE9078.lastReads.resampledData.Ic[seg];
-    // fullResample->Vc[segOffSet] = myADE9078.lastReads.resampledData.Vc[seg];
-    // fullResample->In[segOffSet] = myADE9078.lastReads.resampledData.In[seg];
+    Serial.print("Ia,Va, Ib,Vb, Ic,Vc, In: ");
+    Serial.print(myADE9078.lastReads.resampledData.Ia[seg]); Serial.print(" ");
+    Serial.print(myADE9078.lastReads.resampledData.Va[seg]); Serial.print(" ");
+    Serial.print(myADE9078.lastReads.resampledData.Ib[seg]); Serial.print(" ");
+    Serial.print(myADE9078.lastReads.resampledData.Vb[seg]); Serial.print(" ");
+    Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
+    Serial.print(myADE9078.lastReads.resampledData.Ic[seg]); Serial.print(" ");
+    Serial.println(myADE9078.lastReads.resampledData.In[seg]);
   }
 
   Serial.println("Finished reading from ADE chip.");

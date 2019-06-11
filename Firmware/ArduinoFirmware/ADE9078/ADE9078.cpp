@@ -19,8 +19,11 @@ Note: Please refer to the Analog Devices ADE9078 datasheet - much of this librar
 Released into the public domain.
 */
 
-/*Later Contributions May 2019
-Continuing code developent by Enoch Chau
+/*Later Contributions Spring 2019 (May-June)
+
+Waveform Buffer code developent by Enoch Chau
+
+CRC code development by Avinash Pai
 */
 
 #include "Arduino.h"
